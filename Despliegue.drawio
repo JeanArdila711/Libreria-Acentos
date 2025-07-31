@@ -1,0 +1,52 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36" version="28.0.7">
+  <diagram name="Página-1" id="etvBA3zSJOwzn9R9Kbti">
+    <mxGraphModel dx="872" dy="513" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-1" value="&lt;div&gt;&amp;lt;&amp;lt;Device&amp;gt;&amp;gt;&lt;/div&gt;Web Server" style="verticalAlign=top;align=center;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="300" y="90" width="210" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-2" value="&lt;div style=&quot;&quot;&gt;&amp;lt;&amp;lt;Device&amp;gt;&amp;gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Client&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;br&gt;&lt;/div&gt;" style="verticalAlign=top;align=center;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="110" y="114" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-3" value="&lt;div&gt;&amp;lt;&amp;lt;Device&amp;gt;&amp;gt;&lt;/div&gt;AI&amp;nbsp;Microservice Server" style="verticalAlign=top;align=center;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="580" y="95" width="140" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-4" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;lt;&amp;lt;Device&amp;gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;Database&lt;/div&gt;" style="verticalAlign=top;align=center;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="330" y="310" width="170" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=40;exitDy=0;exitPerimeter=0;entryX=0.458;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;shape=link;" edge="1" parent="1" source="tnNl2SqUcfceAfjgYyvH-2" target="tnNl2SqUcfceAfjgYyvH-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=55;exitDy=0;exitPerimeter=0;entryX=0.455;entryY=1.007;entryDx=0;entryDy=0;entryPerimeter=0;shape=link;" edge="1" parent="1" source="tnNl2SqUcfceAfjgYyvH-1" target="tnNl2SqUcfceAfjgYyvH-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-8" value="HTTPS" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="234" y="115" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-9" value="API" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="515" y="110" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-10" value="Secure Internal Network" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="425" y="260" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-11" value="&lt;div&gt;Django Framework&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;- Book Catalog Module&lt;/div&gt;&lt;div&gt;- Offers Module&lt;/div&gt;&lt;div&gt;- Login &amp;amp; Session Handler&lt;/div&gt;&lt;div&gt;- AI Recommendation System&amp;nbsp;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="274" y="160" width="260" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=0;exitDy=75;exitPerimeter=0;entryX=1.021;entryY=0.452;entryDx=0;entryDy=0;entryPerimeter=0;shape=link;" edge="1" parent="1" source="tnNl2SqUcfceAfjgYyvH-4" target="tnNl2SqUcfceAfjgYyvH-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-14" value="- REST API for recommendations" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="160" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-15" value="Web browser" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="125" y="167.5" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tnNl2SqUcfceAfjgYyvH-16" value="&lt;div&gt;&amp;nbsp; &amp;nbsp; PostgreSQL&amp;nbsp;&lt;/div&gt;&lt;div&gt;- Books table&lt;/div&gt;&lt;div&gt;- Users table&lt;/div&gt;&lt;div&gt;- Offers table&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="364" y="370" width="100" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
