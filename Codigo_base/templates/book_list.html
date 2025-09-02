@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Todos los Libros - {{ app_name }}{% endblock %}
+
+{% block content %}
+    <h1>Todos los Libros</h1>
+
+    {# Eliminado el formulario de búsqueda principal, solo queda en la barra lateral #}
+
+    <!-- Catálogo de libros en grilla horizontal moderna -->
+    <div class="book-grid">
+        {% for book in books %}
+            <div class="book-item">
+                <img src="{{ book.cover_image }}" alt="Portada de {{ book.title }}">
+                                                <h3>{{ book.title }}</h3>
+                                                <p>{{ book.author }}</p>
+                                                <p>{{ book.synopsis }}</p>
+                                                {% if book.price %}
+                                                    <p><strong>Precio:</strong> ${{ book.price }}</strong></p>
+                                                {% endif %}
+                <button class="btn btn-outline-info w-100 mt-2">Agregar al carrito</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    {# Eliminada la paginación duplicada, solo queda una barra de paginación blanca al fondo #}
+        {% if is_paginated %}
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-lg" style="display: flex; flex-direction: row; justify-content: center; align-items: center; width: auto; margin: 0;">
+                    {% url 'book_list' as base_url %}
+                    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page_obj.has_previous %}{{ base_url }}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">&lt; Anterior</a>
+                    </li>
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if num == page_obj.number %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' or num == 1 or num == page_obj.paginator.num_pages %}
+                            <li class="page-item"><a class="page-link" href="{{ base_url }}?page={{ num }}">{{ num }}</a></li>
+                        {% elif num == page_obj.number|add:'-2' or num == page_obj.number|add:'2' %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page_obj.has_next %}{{ base_url }}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">Siguiente &gt;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+{% endblock %}

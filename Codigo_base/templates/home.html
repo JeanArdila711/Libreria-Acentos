@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Bienvenida - {{ app_name }}{% endblock %}
+
+{% block content %}
+    <h2>¡Hola!</h2>
+    <p>Bienvenido al proyecto de aplicación web de libros **{{ app_name }}**.</p>
+    <p>Este proyecto ha sido desarrollado para el curso de **Proyecto Integrador 1** como parte del cronograma evaluativo.</p>
+    <p>Realizado por: **{{ student_name }}**.</p>
+
+    <h3>¡Explora nuestra colección!</h3>
+    <p>Utiliza la barra lateral derecha para buscar libros por título, autor o género, o para filtrar por categorías específicas.</p>
+    <p>Descubre tu próxima lectura favorita en **BiblioSphere**.</p>
+{% endblock %}
