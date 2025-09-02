@@ -1,14 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}Bienvenida - {{ app_name }}{% endblock %}
+{% load static %}
+{% block title %}Inicio - {{ app_name }}{% endblock %}
 
 {% block content %}
-    <h2>¡Hola!</h2>
-    <p>Bienvenido al proyecto de aplicación web de libros **{{ app_name }}**.</p>
-    <p>Este proyecto ha sido desarrollado para el curso de **Proyecto Integrador 1** como parte del cronograma evaluativo.</p>
-    <p>Realizado por: **{{ student_name }}**.</p>
+    <!-- Hero simple con imagen institucional -->
+    <div class="card shadow-sm mb-4 text-center" data-aos="zoom-in" style="border-radius:12px; overflow:hidden; display:flex; flex-direction:column; align-items:center;">
+        <img src="{% static 'img/acentosimage.jpg' %}" alt="Biblioteca Acentos" class="img-fluid" style="max-height:240px; width:auto; object-fit:contain; margin:20px auto;">
+        <div class="card-body" style="width:100%;"></div>
+    </div>
 
-    <h3>¡Explora nuestra colección!</h3>
-    <p>Utiliza la barra lateral derecha para buscar libros por título, autor o género, o para filtrar por categorías específicas.</p>
-    <p>Descubre tu próxima lectura favorita en **BiblioSphere**.</p>
+    {# Se removieron accesos rápidos a petición del usuario #}
+
+    <!-- Libros destacados desde la BD -->
+    <h3 class="mb-3" data-aos="fade-right">Libros destacados</h3>
+    <div class="book-grid">
+        {% for book in featured_books %}
+            <div class="book-item" data-aos="fade-up">
+                <img src="{{ book.cover_image }}" alt="{{ book.title }}" onerror="this.onerror=null;this.src='https://placehold.co/300x450?text=Sin+Imagen';">
+                <h3>{{ book.title }}</h3>
+                {% if book.price %}<div class="price">${{ book.price }}</div>{% else %}<div class="price">Consultar</div>{% endif %}
+                <div class="text-muted" style="font-size:.9em;">Género: {{ book.genre|default:"N/D" }}</div>
+                {% if book.synopsis %}<p>{{ book.synopsis|truncatechars:130 }}</p>{% endif %}
+                <a class="btn btn-primary w-100" href="{% url 'book_list' %}">Ver más</a>
+            </div>
+        {% empty %}
+            <p>No hay libros cargados aún. Usa el comando de carga desde CSV.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Géneros populares -->
+    <h3 class="mt-4 mb-2" data-aos="fade-right">Géneros populares</h3>
+    <div class="d-flex flex-wrap gap-2" data-aos="fade-up">
+        {% for g in top_genres %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'book_list' %}?genre={{ g.genre|urlencode }}">{{ g.genre }} ({{ g.total }})</a>
+        {% empty %}
+            <span class="text-muted">Aún no hay géneros cargados.</span>
+        {% endfor %}
+    </div>
 {% endblock %}
