@@ -1,0 +1,17 @@
+ 
+# Entornos virtuales
+.venv/
+.venv-codex/
+
+# Cachés de Python
+__pycache__/
+*.pyc
+
+# Base de datos y logs locales
+db.sqlite3
+*.log
+runserver-*.log
+
+# Editor/IDE
+.vscode/
+.idea/

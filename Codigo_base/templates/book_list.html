@@ -3,22 +3,21 @@
 {% block title %}Todos los Libros - {{ app_name }}{% endblock %}
 
 {% block content %}
-    <h1>Todos los Libros</h1>
+    <h1 class="mb-3">Catálogo</h1>
 
     {# Eliminado el formulario de búsqueda principal, solo queda en la barra lateral #}
 
     <!-- Catálogo de libros en grilla horizontal moderna -->
     <div class="book-grid">
         {% for book in books %}
-            <div class="book-item">
-                <img src="{{ book.cover_image }}" alt="Portada de {{ book.title }}">
-                                                <h3>{{ book.title }}</h3>
-                                                <p>{{ book.author }}</p>
-                                                <p>{{ book.synopsis }}</p>
-                                                {% if book.price %}
-                                                    <p><strong>Precio:</strong> ${{ book.price }}</strong></p>
-                                                {% endif %}
-                <button class="btn btn-outline-info w-100 mt-2">Agregar al carrito</button>
+            <div class="book-item" data-aos="fade-up">
+                <img src="{{ book.cover_image }}" alt="Portada de {{ book.title }}" onerror="this.onerror=null;this.src='https://placehold.co/300x450?text=Sin+Imagen';">
+                <h3>{{ book.title }}</h3>
+                {# Autor oculto intencionalmente #}
+                {% if book.price %}<div class="price">${{ book.price }}</div>{% else %}<div class="price">Consultar</div>{% endif %}
+                <div class="text-muted" style="font-size:.9em;">Género: {{ book.genre|default:"N/D" }}</div>
+                {% if book.synopsis %}<p>{{ book.synopsis|truncatechars:160 }}</p>{% endif %}
+                <button class="btn btn-primary w-100 mt-1">Agregar al carrito</button>
             </div>
         {% endfor %}
     </div>

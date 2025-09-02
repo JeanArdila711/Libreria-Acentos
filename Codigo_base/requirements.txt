@@ -1,2 +1,3 @@
 Django
 django-bootstrap5
+matplotlib

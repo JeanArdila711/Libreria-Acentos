@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
 from .models import Book
 from django.db.models import Q
+from django.db.models import Count
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -12,6 +13,18 @@ import urllib, base64
 
 class HomePageView(TemplateView):
     template_name = "home.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        # Top 10 géneros por cantidad de libros
+        genres = (
+            Book.objects.values('genre')
+            .exclude(genre="")
+            .annotate(total=Count('id'))
+            .order_by('-total')[:10]
+        )
+        ctx['top_genres'] = genres
+        return ctx
 
 class AboutPageView(TemplateView):
     template_name = "about.html"
@@ -23,7 +36,23 @@ class BookListView(ListView):
     paginate_by = 6
 
     def get_queryset(self):
-        return super().get_queryset()
+        qs = super().get_queryset()
+        # Filtro por géneros (múltiples)
+        genres = self.request.GET.getlist('genre') or self.request.GET.get('genre')
+        if genres:
+            if isinstance(genres, str):
+                genres = [genres]
+            qs = qs.filter(genre__in=genres)
+
+        # Filtro por autores (múltiples)
+        authors = self.request.GET.getlist('author') or self.request.GET.get('author')
+        if authors:
+            if isinstance(authors, str):
+                authors = [authors]
+            qs = qs.filter(author__in=authors)
+
+        # Orden básico por título
+        return qs.order_by('title')
 
 class BookSearchView(ListView):
     model = Book
