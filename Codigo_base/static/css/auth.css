@@ -5,7 +5,7 @@
     align-items: center;
     min-height: 100vh; /* ocupa toda la altura */
     padding: 20px;
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* fondo más elegante */
+    background: #ffffff; /* fondo más elegante */
 }
 
 /* Estilo del recuadro */
@@ -40,7 +40,6 @@
 
 /* Inputs enfocados */
 .auth-card input:focus {
-    border-color: #007bff;
     box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
     outline: none;
 }
@@ -52,14 +51,16 @@
     padding: 12px;
     width: 100%;
     cursor: pointer;
-    transition: all 0.3s ease;
+    /* Removida la transición para eliminar cualquier efecto */
 }
 
-/* Efecto hover del botón */
+/* COMENTADO - Efecto hover del botón */
+/*
 .auth-card button:hover {
     transform: scale(1.03);
     box-shadow: 0 6px 15px rgba(0, 123, 255, 0.35);
 }
+*/
 
 /* Títulos centrados */
 .auth-card h2 {
@@ -82,6 +83,3 @@
     font-weight: 500;
 }
 
-.auth-card a:hover {
-    text-decoration: underline;
-}
