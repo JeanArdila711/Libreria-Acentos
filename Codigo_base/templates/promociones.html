@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Promociones{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+
+    <!-- Imagen centrada y más grande -->
+    <div class="d-flex justify-content-center mb-4">
+        <img src="https://universidadeafit.widen.net/content/92220c9a-bee2-4f14-84df-32502692dd4a/web/Comerciales-LibreriaAcentos-15.jpg?crop=yes&k=c&w=1920&h=788&itok=iLpqZ1JJ"
+             alt="Librería Acentos"
+             class="img-fluid shadow-lg"
+             style="border-radius:20px; max-height:650px; width:90%; object-fit:cover;">
+    </div>
+
+    <!-- Título centrado -->
+    <h2 class="fw-bold mb-5" 
+        style="color:#010101; text-shadow:2px 2px 4px rgba(0,0,0,0.15); font-size:2.5rem;">
+         Promociones Especiales 
+    </h2>
+
+    <!-- Promociones -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+
+                <div class="col">
+                    <div class="card h-100 shadow-lg border-0 text-center p-4" style="border-radius:18px;">
+                        <h5 class="card-title fw-bold">📚 2x1 en libros seleccionados</h5>
+                        <p class="card-text text-muted">Llévate 2 libros y paga solo 1 en nuestra colección destacada.</p>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-lg border-0 text-center p-4" style="border-radius:18px;">
+                        <h5 class="card-title fw-bold">🎓 15% para estudiantes</h5>
+                        <p class="card-text text-muted">Muestra tu carné estudiantil y recibe un descuento especial.</p>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-lg border-0 text-center p-4" style="border-radius:18px;">
+                        <h5 class="card-title fw-bold">📖 Colección Literaria</h5>
+                        <p class="card-text text-muted">3 clásicos de la literatura por solo <strong>$120.000</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-lg border-0 text-center p-4" style="border-radius:18px;">
+                        <h5 class="card-title fw-bold">🔥 Best Sellers</h5>
+                        <p class="card-text text-muted">20% de descuento en los libros más vendidos del mes.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Botón -->
+            <div class="text-center mt-5">
+                <a href="{% url 'book_list' %}" 
+                   class="btn btn-lg shadow px-5 py-3" 
+                   style="background:linear-gradient(90deg,#0B3D91,#2D9CDB); color:white; border-radius:50px; font-weight:600; transition: all 0.3s ease;"
+                   onmouseover="this.style.transform='scale(1.07)'; this.style.opacity='0.95';"
+                   onmouseout="this.style.transform='scale(1)'; this.style.opacity='1';">
+                    📖 Ver todos los libros
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -122,3 +122,5 @@ def statistics_view(request):
         'graphic_year': graphic_year,
         'graphic_genre': graphic_genre
     })
+def promociones_view(request):
+    return render(request, "promociones.html")
