@@ -1,0 +1,41 @@
+/* Centra el recuadro en toda la pantalla */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* ocupa toda la altura */
+    padding: 20px;
+    background-color: #f8f9fa; /* gris suave */
+}
+
+/* Estilo del recuadro */
+.auth-card {
+    width: 100%;
+    max-width: 420px;  /* ancho cómodo */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    background: #fff; /* fondo blanco */
+}
+
+/* Inputs más elegantes */
+.auth-card input {
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ced4da;
+}
+
+/* Botón principal */
+.auth-card button {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+/* Efecto hover */
+.auth-card button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}

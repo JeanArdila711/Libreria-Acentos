@@ -66,6 +66,14 @@
         <a href="{% url 'book_list' %}">Catálogo</a>
         <a href="#">Promociones</a>
         <a href="#">Pedidos</a>
+
+        {% if user.is_authenticated %}
+            <span style="margin-left:20px;">Hola, {{ user.username }}</span>
+            <a href="{% url 'logout' %}" style="margin-left:10px;">Cerrar sesión</a>
+        {% else %}
+            <a href="{% url 'login' %}" style="margin-left:20px;">Login</a> |
+            <a href="{% url 'signup' %}">Sign Up</a>
+        {% endif %}
     </nav>
 
     <div class="main-content-wrapper">
@@ -135,7 +143,6 @@
             });
 
             // Enviar el formulario vacío para borrar los filtros
-            // Esto redirigirá a la URL base de la lista de libros
             form.submit();
         });
 
@@ -148,7 +155,7 @@
             // Recorrer los selectores múltiples y seleccionar las opciones basadas en la URL
             document.querySelectorAll('select[multiple]').forEach(selectElement => {
                 const paramName = selectElement.name; // 'genre', 'author', 'year'
-                const selectedValues = params.getAll(paramName); // Obtener todos los valores para ese parámetro
+                const selectedValues = params.getAll(paramName);
 
                 Array.from(selectElement.options).forEach(option => {
                     if (selectedValues.includes(option.value)) {

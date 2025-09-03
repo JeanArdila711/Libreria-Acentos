@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+
+<div class="auth-container">
+  <div class="card auth-card">
+    <div class="card-body">
+      <h2 class="text-center mb-4">Registro</h2>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success w-100">Registrarse</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
