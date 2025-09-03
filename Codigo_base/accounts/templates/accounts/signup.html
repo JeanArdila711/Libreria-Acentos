@@ -10,7 +10,46 @@
       <h2 class="text-center mb-4">Registro</h2>
       <form method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <div class="mb-3">
+          <label for="id_username" class="form-label">Usuario</label>
+          {{ form.username }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_first_name" class="form-label">Nombre</label>
+          {{ form.first_name }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_last_name" class="form-label">Apellido</label>
+          {{ form.last_name }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_email" class="form-label">Correo electrónico</label>
+          {{ form.email }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_password1" class="form-label">Contraseña</label>
+          {{ form.password1 }}
+          <div class="form-text text-muted">
+            La contraseña debe cumplir con los siguientes requisitos:
+            <ul class="mb-0">
+              <li>Mínimo 8 caracteres.</li>
+              <li>No puede ser demasiado similar a tu información personal.</li>
+              <li>No puede ser una contraseña de uso común.</li>
+              <li>No puede ser completamente numérica.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="id_password2" class="form-label">Confirmar contraseña</label>
+          {{ form.password2 }}
+        </div>
+
         <button type="submit" class="btn btn-success w-100">Registrarse</button>
       </form>
     </div>

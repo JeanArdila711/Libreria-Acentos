@@ -100,12 +100,13 @@
     <!-- Barra Login/SignUp -->
     <div class="auth-top-bar">
         {% if user.is_authenticated %}
-            <span style="color:white;">Hola, {{ user.username }}</span>
-            <a href="{% url 'logout' %}" class="btn btn-auth btn-login">Cerrar sesión</a>
-        {% else %}
-            <a href="{% url 'login' %}" class="btn btn-auth btn-login">Login</a>
-            <a href="{% url 'signup' %}" class="btn btn-auth btn-signup">Sign Up</a>
-        {% endif %}
+    <span style="color:white;">Hola, {{ user.get_full_name }}</span>
+    <a href="{% url 'logout' %}" class="btn btn-auth btn-login">Cerrar sesión</a>
+{% else %}
+    <a href="{% url 'login' %}" class="btn btn-auth btn-login">Login</a>
+    <a href="{% url 'signup' %}" class="btn btn-auth btn-signup">Sign Up</a>
+{% endif %}
+
     </div>
 
     <!-- Navbar principal -->
