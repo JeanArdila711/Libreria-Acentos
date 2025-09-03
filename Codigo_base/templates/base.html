@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ app_name }}{% endblock %}</title>
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
     <style>
     :root{
@@ -20,12 +20,44 @@
         --border:#E5E7EB;
         --danger:#E76F51;
     }
+
     body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* --- Header y Navbar --- */
     header { background: linear-gradient(90deg,var(--primary),var(--primary-600)); color: white; padding: 1.25rem 0; text-align: center; box-shadow: 0 2px 8px rgba(11,61,145,0.25); }
     h1.app-title { margin: 0; font-size: 2rem; letter-spacing: .5px; font-weight: 700; }
     nav { background-color: var(--primary-600); padding: .7rem; text-align: center; position: sticky; top: 0; z-index: 10; }
     nav a { color: white; text-decoration: none; margin: 0 14px; font-weight: 600; }
     nav a:hover { text-decoration: underline; color: var(--accent); }
+
+    /* --- Barra superior Login/SignUp elegante --- */
+    .auth-top-bar {
+        display: flex;
+        justify-content: flex-end; /* botones a la derecha */
+        align-items: center;
+        gap: 12px;
+        padding: 10px 30px;
+        background-color: var(--primary); /* azul sólido */
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .btn-auth {
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        min-width: 100px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        border: none;
+    }
+    .btn-login { background-color: white; color: var(--primary); border: 2px solid white; }
+    .btn-login:hover { background-color: var(--primary-600); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.25); transform: translateY(-2px); }
+    .btn-signup { background-color: var(--accent); color: white; border: 2px solid white; }
+    .btn-signup:hover { background-color: var(--primary-600); box-shadow: 0 4px 12px rgba(0,0,0,0.25); transform: translateY(-2px); }
+
+    /* --- Contenido principal --- */
     .main-content-wrapper { display: flex; flex: 1; width: 96%; max-width: 1400px; margin: 20px auto; gap: 18px; }
     .content { flex: 4; background-color: var(--card); padding: 22px; border-radius: 10px; border:1px solid var(--border); box-shadow: 0 6px 16px rgba(17,24,39,0.06); }
     aside { flex: 1; background-color: var(--card); padding: 18px; border-radius: 10px; border:1px solid var(--border); box-shadow: 0 6px 16px rgba(17,24,39,0.04); position: sticky; top: 72px; height: fit-content; }
@@ -35,6 +67,7 @@
     aside button:hover { background-color: var(--primary-600); }
     aside .clear-filters-btn { background-color: var(--danger); }
     aside .clear-filters-btn:hover { filter: brightness(.9); }
+
     .book-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 8px; }
     .book-item { text-align: left; border: 1px solid var(--border); padding: 14px; border-radius: 10px; background-color: var(--card); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 6px 16px rgba(17,24,39,0.05); }
     .book-item img { width: 100%; height: 260px; object-fit: cover; border-radius: 8px; }
@@ -46,34 +79,41 @@
     .search-form input[type="text"] { padding: 10px; border: 1px solid var(--border); border-radius: 8px; width: calc(100% - 22px); margin-bottom: 10px; }
     .search-form button { padding: 10px 14px; background-color: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 600; }
     .search-form button:hover { background-color: var(--primary-600); }
+
     .pagination { text-align: center; margin-top: 28px; }
     .pagination a, .pagination span { margin: 0 5px; text-decoration: none; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; }
     .pagination a { color: var(--primary); }
     .pagination a:hover { background-color: #EEF2FF; }
     .pagination .current { background-color: var(--primary); color: white; border-color: var(--primary); }
+
     footer { text-align: center; padding: 18px; margin-top: auto; background-color: var(--primary-600); color: white; border-top: 1px solid var(--primary); }
     footer p { margin: 0; }
     </style>
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoA6VKHr8zWvZt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknL" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
         <h1 class="app-title">{{ app_name }}</h1>
     </header>
+
+    <!-- Barra Login/SignUp -->
+    <div class="auth-top-bar">
+        {% if user.is_authenticated %}
+            <span style="color:white;">Hola, {{ user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn btn-auth btn-login">Cerrar sesión</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-auth btn-login">Login</a>
+            <a href="{% url 'signup' %}" class="btn btn-auth btn-signup">Sign Up</a>
+        {% endif %}
+    </div>
+
+    <!-- Navbar principal -->
     <nav>
         <a href="{% url 'home' %}">Inicio</a>
         <a href="{% url 'book_list' %}">Catálogo</a>
         <a href="#">Promociones</a>
         <a href="#">Pedidos</a>
-
-        {% if user.is_authenticated %}
-            <span style="margin-left:20px;">Hola, {{ user.username }}</span>
-            <a href="{% url 'logout' %}" style="margin-left:10px;">Cerrar sesión</a>
-        {% else %}
-            <a href="{% url 'login' %}" style="margin-left:20px;">Login</a> |
-            <a href="{% url 'signup' %}">Sign Up</a>
-        {% endif %}
     </nav>
 
     <div class="main-content-wrapper">
@@ -106,8 +146,7 @@
                     {% endfor %}
                 </select>
 
-                {% comment %} Si agregas el campo 'publication_year' al modelo Book, descomenta esto {% endcomment %}
-                {% if all_years %} {# Asegúrate de que all_years esté disponible en el context processor #}
+                {% if all_years %}
                 <label for="year-select">Año de Publicación:</label>
                 <select id="year-select" name="year" multiple>
                     {% for year in all_years %}
@@ -127,45 +166,29 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',function(){ if(window.AOS){AOS.init({once:true,offset:80,duration:700,easing:'ease-out-cubic'});} });</script>
-
     <script>
-        document.getElementById('clear-filters').addEventListener('click', function() {
-            // Obtener el formulario de filtros
-            const form = document.getElementById('filter-form');
+    document.addEventListener('DOMContentLoaded', function() {
+        if(window.AOS){AOS.init({once:true,offset:80,duration:700,easing:'ease-out-cubic'});}
 
-            // Resetear todos los select múltiples
-            const selects = form.querySelectorAll('select[multiple]');
-            selects.forEach(select => {
-                Array.from(select.options).forEach(option => {
-                    option.selected = false;
-                });
+        // Persistir selección de filtros
+        const currentUrl = new URL(window.location.href);
+        const params = currentUrl.searchParams;
+        document.querySelectorAll('select[multiple]').forEach(selectElement => {
+            const paramName = selectElement.name;
+            const selectedValues = params.getAll(paramName);
+            Array.from(selectElement.options).forEach(option => {
+                option.selected = selectedValues.includes(option.value);
             });
+        });
 
-            // Enviar el formulario vacío para borrar los filtros
+        // Limpiar filtros
+        document.getElementById('clear-filters').addEventListener('click', function() {
+            const form = document.getElementById('filter-form');
+            const selects = form.querySelectorAll('select[multiple]');
+            selects.forEach(select => { Array.from(select.options).forEach(option => option.selected = false); });
             form.submit();
         });
-
-        // Este script es para que las selecciones persistan cuando navegas a otra página paginada
-        // o para que aparezcan seleccionadas si vienes de una URL con filtros.
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentUrl = new URL(window.location.href);
-            const params = currentUrl.searchParams;
-
-            // Recorrer los selectores múltiples y seleccionar las opciones basadas en la URL
-            document.querySelectorAll('select[multiple]').forEach(selectElement => {
-                const paramName = selectElement.name; // 'genre', 'author', 'year'
-                const selectedValues = params.getAll(paramName);
-
-                Array.from(selectElement.options).forEach(option => {
-                    if (selectedValues.includes(option.value)) {
-                        option.selected = true;
-                    } else {
-                        option.selected = false;
-                    }
-                });
-            });
-        });
+    });
     </script>
 </body>
 </html>

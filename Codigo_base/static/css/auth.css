@@ -5,37 +5,83 @@
     align-items: center;
     min-height: 100vh; /* ocupa toda la altura */
     padding: 20px;
-    background-color: #f8f9fa; /* gris suave */
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* fondo más elegante */
 }
 
 /* Estilo del recuadro */
 .auth-card {
     width: 100%;
     max-width: 420px;  /* ancho cómodo */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-    background: #fff; /* fondo blanco */
+    padding: 35px 30px;
+    border-radius: 20px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    background: #ffffff; /* fondo blanco */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* separación uniforme entre inputs y botones */
+    animation: fadeIn 0.7s ease-in-out;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Inputs más elegantes */
 .auth-card input {
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 12px;
+    border-radius: 10px;
+    padding: 12px 15px;
     border: 1px solid #ced4da;
+    width: 100%;
+    font-size: 0.95rem;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Inputs enfocados */
+.auth-card input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+    outline: none;
 }
 
 /* Botón principal */
 .auth-card button {
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
-    padding: 10px;
+    padding: 12px;
+    width: 100%;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
 
-/* Efecto hover */
+/* Efecto hover del botón */
 .auth-card button:hover {
     transform: scale(1.03);
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.35);
+}
+
+/* Títulos centrados */
+.auth-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333333;
+    font-weight: 700;
+}
+
+/* Links dentro del formulario */
+.auth-card p {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+.auth-card a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-card a:hover {
+    text-decoration: underline;
 }
