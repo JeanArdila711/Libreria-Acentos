@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-container text-center">
+    <h3 class="mb-4">Has cerrado sesión</h3>
+    <a href="{% url 'login' %}" class="btn btn-primary w-100">Volver a Iniciar Sesión</a>
+</div>
+{% endblock %}
