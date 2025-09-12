@@ -10,30 +10,52 @@
       <h2 class="text-center mb-4">Registro</h2>
       <form method="POST">
         {% csrf_token %}
+
+        {# Errores generales del formulario #}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
         
         <div class="mb-3">
           <label for="id_username" class="form-label">Usuario</label>
           {{ form.username }}
+          {% if form.username.errors %}
+            <div class="text-danger small">{{ form.username.errors }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3">
           <label for="id_first_name" class="form-label">Nombre</label>
           {{ form.first_name }}
+          {% if form.first_name.errors %}
+            <div class="text-danger small">{{ form.first_name.errors }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3">
           <label for="id_last_name" class="form-label">Apellido</label>
           {{ form.last_name }}
+          {% if form.last_name.errors %}
+            <div class="text-danger small">{{ form.last_name.errors }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3">
           <label for="id_email" class="form-label">Correo electrónico</label>
           {{ form.email }}
+          {% if form.email.errors %}
+            <div class="text-danger small">{{ form.email.errors }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3">
           <label for="id_password1" class="form-label">Contraseña</label>
           {{ form.password1 }}
+          {% if form.password1.errors %}
+            <div class="text-danger small">{{ form.password1.errors }}</div>
+          {% endif %}
           <div class="form-text text-muted">
             La contraseña debe cumplir con los siguientes requisitos:
             <ul class="mb-0">
@@ -48,6 +70,9 @@
         <div class="mb-3">
           <label for="id_password2" class="form-label">Confirmar contraseña</label>
           {{ form.password2 }}
+          {% if form.password2.errors %}
+            <div class="text-danger small">{{ form.password2.errors }}</div>
+          {% endif %}
         </div>
 
         <button type="submit" class="auth-btn">Registrarse</button>

@@ -4,34 +4,9 @@
 {% block title %}Inicio - {{ app_name }}{% endblock %}
 
 {% block content %}
-    <!-- Hero simple con imagen institucional -->
-
-    {# Se removieron accesos rápidos a petición del usuario #}
-
-    <!-- Libros destacados desde la BD -->
-    <h3 class="mb-3" data-aos="fade-right">Libros destacados</h3>
-    <div class="book-grid">
-        {% for book in featured_books %}
-            <div class="book-item" data-aos="fade-up">
-                <img src="{{ book.cover_image }}" alt="{{ book.title }}" onerror="this.onerror=null;this.src='https://placehold.co/300x450?text=Sin+Imagen';">
-                <h3>{{ book.title }}</h3>
-                {% if book.price %}<div class="price">${{ book.price }}</div>{% else %}<div class="price">Consultar</div>{% endif %}
-                <div class="text-muted" style="font-size:.9em;">Género: {{ book.genre|default:"N/D" }}</div>
-                {% if book.synopsis %}<p>{{ book.synopsis|truncatechars:130 }}</p>{% endif %}
-                <a class="btn btn-primary w-100" href="{% url 'book_list' %}">Ver más</a>
-            </div>
-        {% empty %}
-            <p>No hay libros cargados aún. Usa el comando de carga desde CSV.</p>
-        {% endfor %}
-    </div>
-
-    <!-- Géneros populares -->
-    <h3 class="mt-4 mb-2" data-aos="fade-right">Géneros populares</h3>
-    <div class="d-flex flex-wrap gap-2" data-aos="fade-up">
-        {% for g in top_genres %}
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'book_list' %}?genre={{ g.genre|urlencode }}">{{ g.genre }} ({{ g.total }})</a>
-        {% empty %}
-            <span class="text-muted">Aún no hay géneros cargados.</span>
-        {% endfor %}
+    <div class="welcome-panel" style="text-align:center; margin-top:60px;">
+        <h1>¡Bienvenido a la Librería Acentos!</h1>
+        <p>Explora nuestro catálogo, promociones y realiza tus pedidos desde el menú superior.</p>
+        <img src="{% static 'img/acentosimage.jpg' %}" alt="Librería Acentos" style="max-width:300px; margin-top:30px;"/>
     </div>
 {% endblock %}

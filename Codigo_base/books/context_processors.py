@@ -3,7 +3,7 @@ from .models import Book
 
 def common_context(request):
     genres = Book.objects.values_list('genre', flat=True).distinct().order_by('genre')
-    authors = Book.objects.values_list('author', flat=True).distinct().order_by('author')
+    authors = Book.objects.values_list('authors', flat=True).distinct().order_by('authors')
     featured_books = Book.objects.all()[:12]
 
     return {

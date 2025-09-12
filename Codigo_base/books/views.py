@@ -1,3 +1,29 @@
+from django.http import JsonResponse
+# Endpoint AJAX para filtros cruzados
+from django.views.decorators.http import require_GET
+from django.utils.decorators import method_decorator
+@require_GET
+def filter_options_ajax(request):
+    genres = request.GET.getlist('genre')
+    authors = request.GET.getlist('author')
+    qs = Book.objects.all()
+    if genres:
+        qs = qs.filter(genre__in=genres)
+    if authors:
+        qs = qs.filter(
+            # autores separados por /
+            authors__regex=r'(' + '|'.join([a.replace('.', '\.') for a in authors]) + ')'
+        )
+    # Géneros válidos según autores seleccionados
+    valid_genres = list(qs.values_list('genre', flat=True).exclude(genre='').distinct().order_by('genre'))
+    # Autores válidos según géneros seleccionados
+    autores_raw = qs.values_list('authors', flat=True).exclude(authors='').distinct()
+    autores_set = set()
+    for autores in autores_raw:
+        for autor in autores.split('/'):
+            autores_set.add(autor.strip())
+    valid_authors = sorted(autores_set)
+    return JsonResponse({'genres': valid_genres, 'authors': valid_authors})
 
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
@@ -30,13 +56,38 @@ class AboutPageView(TemplateView):
     template_name = "about.html"
 
 class BookListView(ListView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Lista de géneros únicos ordenados
+        context['genres'] = Book.objects.values_list('genre', flat=True).exclude(genre='').distinct().order_by('genre')
+        # Lista de autores únicos ordenados (puede haber autores múltiples por libro, separados por /)
+        autores_raw = Book.objects.values_list('authors', flat=True).exclude(authors='').distinct()
+        autores_set = set()
+        for autores in autores_raw:
+            for autor in autores.split('/'):
+                autores_set.add(autor.strip())
+        context['authors'] = sorted(autores_set)
+        # Pasar géneros y autores seleccionados para la plantilla
+        request = self.request
+        context['selected_genres'] = request.GET.getlist('genre')
+        context['selected_authors'] = request.GET.getlist('author')
+        return context
     model = Book
     template_name = "book_list.html"
     context_object_name = "books"
-    paginate_by = 6
+    paginate_by = 20
 
     def get_queryset(self):
         qs = super().get_queryset()
+        # Búsqueda general por título, autor o género
+        search = self.request.GET.get('q', '').strip()
+        if search:
+            qs = qs.filter(
+                Q(title__icontains=search) |
+                Q(authors__icontains=search) |
+                Q(genre__icontains=search)
+            )
+
         # Filtro por géneros (múltiples)
         genres = self.request.GET.getlist('genre') or self.request.GET.get('genre')
         if genres:
@@ -49,7 +100,12 @@ class BookListView(ListView):
         if authors:
             if isinstance(authors, str):
                 authors = [authors]
-            qs = qs.filter(author__in=authors)
+            qs = qs.filter(authors__in=authors)
+
+        # Filtro por idioma (opcional)
+        language = self.request.GET.get('language_code')
+        if language:
+            qs = qs.filter(language_code=language)
 
         # Orden básico por título
         return qs.order_by('title')
@@ -65,7 +121,7 @@ class BookSearchView(ListView):
         if query:
             return Book.objects.filter(
                 Q(title__icontains=query) |
-                Q(author__icontains=query) |
+                Q(authors__icontains=query) |
                 Q(genre__icontains=query)
             ).distinct()
         return Book.objects.none()

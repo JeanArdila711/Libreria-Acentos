@@ -102,6 +102,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    {% if messages %}
+      <div class="container mt-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
     <header>
     <div class="logo-container" style="display:flex; align-items:center; gap:15px; margin-top: 5px;">
         <!-- Logo -->
@@ -139,49 +149,222 @@
             {% block content %}
             {% endblock %}
         </div>
-        <aside data-aos="fade-left" data-aos-duration="700">
-            <h3>Buscar Libros</h3>
-            <div class="search-form">
-                <form action="{% url 'book_search' %}" method="get">
-                    <input type="text" name="q" placeholder="Buscar por título, autor o género..." value="{{ request.GET.q }}">
-                    <button type="submit">Buscar</button>
-                </form>
-            </div>
-
-            <h3>Filtrar por Categorías</h3>
-            <form id="filter-form" action="{% url 'book_list' %}" method="get">
-                <label for="genre-select">Género:</label>
-                <select id="genre-select" name="genre" multiple>
-                    {% for genre in all_genres %}
-                        <option value="{{ genre }}" {% if genre in request.GET.genre %}selected{% endif %}>{{ genre }}</option>
-                    {% endfor %}
-                </select>
-
-                <label for="author-select">Autor:</label>
-                <select id="author-select" name="author" multiple>
-                    {% for author in all_authors %}
-                        <option value="{{ author }}" {% if author in request.GET.author %}selected{% endif %}>{{ author }}</option>
-                    {% endfor %}
-                </select>
-
-                {% if all_years %}
-                <label for="year-select">Año de Publicación:</label>
-                <select id="year-select" name="year" multiple>
-                    {% for year in all_years %}
-                        <option value="{{ year }}" {% if year|stringformat:"s" in request.GET.year %}selected{% endif %}>{{ year }}</option>
-                    {% endfor %}
-                </select>
-                {% endif %}
-
-                <button type="submit">Aplicar Filtros</button>
-                <button type="button" id="clear-filters" class="clear-filters-btn">Borrar Filtros</button>
-            </form>
-        </aside>
     </div>
 
     <footer>
         <p>Plataforma de digitalización de la Librería Acentos (Universidad EAFIT).</p>
     </footer>
+
+    {% if user.is_authenticated %}
+        <!-- Chatbot Widget Flotante -->
+        <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+        <div id="chatbot-fab" title="¿Necesitas ayuda?">
+            <!-- SVG de robot mejorado -->
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="24" fill="#2D9CDB"/>
+                <ellipse cx="24" cy="30" rx="12" ry="8" fill="#fff"/>
+                <circle cx="18" cy="28" r="2" fill="#2D9CDB"/>
+                <circle cx="30" cy="28" r="2" fill="#2D9CDB"/>
+                <rect x="18" y="34" width="12" height="2" rx="1" fill="#2D9CDB"/>
+                <rect x="14" y="16" width="20" height="10" rx="5" fill="#fff"/>
+                <circle cx="19" cy="21" r="1.5" fill="#2D9CDB"/>
+                <circle cx="29" cy="21" r="1.5" fill="#2D9CDB"/>
+                <rect x="20" y="10" width="8" height="6" rx="3" fill="#2D9CDB"/>
+            </svg>
+        </div>
+        <div id="chatbot-panel">
+            <div id="chatbot-header">
+                <span style="display:flex;align-items:center;gap:8px;">
+                    <svg width="28" height="28" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#2D9CDB"/><ellipse cx="24" cy="30" rx="12" ry="8" fill="#fff"/><circle cx="18" cy="28" r="2" fill="#2D9CDB"/><circle cx="30" cy="28" r="2" fill="#2D9CDB"/><rect x="18" y="34" width="12" height="2" rx="1" fill="#2D9CDB"/><rect x="14" y="16" width="20" height="10" rx="5" fill="#fff"/><circle cx="19" cy="21" r="1.5" fill="#2D9CDB"/><circle cx="29" cy="21" r="1.5" fill="#2D9CDB"/><rect x="20" y="10" width="8" height="6" rx="3" fill="#2D9CDB"/></svg>
+                    Asistente Virtual
+                </span>
+                <button id="chatbot-close-btn" title="Cerrar">&times;</button>
+            </div>
+            <div id="chatbot-messages"></div>
+            <div id="chatbot-input-area">
+                <input id="chatbot-input" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
+                <button id="chatbot-send-btn">Enviar</button>
+            </div>
+        </div>
+        <script>
+        // Chatbot Widget JS Mejorado
+        (function() {
+            const fab = document.getElementById('chatbot-fab');
+            const panel = document.getElementById('chatbot-panel');
+            const closeBtn = document.getElementById('chatbot-close-btn');
+            fab.addEventListener('click', () => panel.classList.add('open'));
+            closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+            document.addEventListener('keydown', e => { if(panel.classList.contains('open') && e.key === 'Escape') panel.classList.remove('open'); });
+
+            // Chatbot lógica básica (flujo inicial)
+            const messages = document.getElementById('chatbot-messages');
+            const input = document.getElementById('chatbot-input');
+            const sendBtn = document.getElementById('chatbot-send-btn');
+            let started = false;
+            // Obtener nombre del usuario desde Django template
+            const userName = "{{ user.first_name|default:user.username }}";
+            // Variable global para recordar el libro actual
+            window.chatbotCurrentBook = null;
+
+            function addMessage(text, sender) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chatbot-message ' + sender;
+                const bubble = document.createElement('div');
+                bubble.className = 'chatbot-bubble';
+                bubble.innerHTML = text;
+                msgDiv.appendChild(bubble);
+                messages.appendChild(msgDiv);
+                messages.scrollTop = messages.scrollHeight;
+            }
+
+            function showOptions() {
+                addMessage('¿Qué quieres que haga hoy por ti?<br>' +
+                    '<button class="chatbot-btn" onclick="window.chatbotChoose(1)">📖 Hablar de un libro</button><br>' +
+                    '<button class="chatbot-btn" onclick="window.chatbotChoose(2)">✨ Recomiéndame qué leer</button>', 'bot');
+            }
+
+            window.chatbotChoose = function(opt) {
+                messages.lastChild.querySelectorAll('button').forEach(btn => btn.disabled = true);
+                if(opt === 1) {
+                    addMessage('¡Excelente! Dime el nombre del libro que te interesa.', 'bot');
+                    window.chatbotState = 'sinopsis';
+                } else {
+                    addMessage('¡Perfecto! ¿El libro es para ti o para otra persona?', 'bot');
+                    window.chatbotState = 'recomendar';
+                }
+            }
+
+            function botReply(userText) {
+                if(!started) {
+                    addMessage('¡Hola, ' + userName + '! Soy tu asistente virtual, estaré encantado de ayudarte hoy.<br><span style="font-size:0.95em;color:#888;">Para volver a ver el menú de opciones, escribe <b>/menu</b> en cualquier momento.</span>', 'bot');
+                    showOptions();
+                    started = true;
+                    return;
+                }
+                // Mostrar menú solo si el usuario escribe /menu
+                if(userText.trim().toLowerCase() === '/menu') {
+                    showOptions();
+                    return;
+                }
+                if(window.chatbotState === 'sinopsis') {
+                    // Guardar el libro actual
+                    window.chatbotCurrentBook = userText;
+                    addMessage('Buscando información sobre <b>' + userText + '</b>...', 'bot');
+                    window.chatbotState = null;
+                    // Llamada AJAX al endpoint de IA
+                    fetch('/books/ia-synopsis/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || ''
+                        },
+                        body: JSON.stringify({ book_title: userText })
+                    })
+                    .then(resp => resp.json())
+                    .then(data => {
+                        if(data.result) {
+                            addMessage(data.result, 'bot');
+                        } else {
+                            addMessage('No se pudo obtener la sinopsis. Intenta de nuevo más tarde.', 'bot');
+                        }
+                        showContinueOptions();
+                    })
+                    .catch(() => {
+                        addMessage('Ocurrió un error al consultar la IA.', 'bot');
+                        showContinueOptions();
+                    });
+                } else if(window.chatbotState === 'recomendar') {
+                    addMessage('¡Gracias! <span style="color:#2D9CDB">(Aquí el bot haría más preguntas para afinar la recomendación)</span>', 'bot');
+                    window.chatbotState = null;
+                    setTimeout(showContinueOptions, 1200);
+                } else {
+                    addMessage('No entendí, puedes escribir <b>/menu</b> para ver las opciones.', 'bot');
+                }
+
+            }
+
+            function showContinueOptions() {
+                addMessage('¿Quieres seguir hablando sobre este libro o puedo ayudarte con otra consulta?<br>' +
+                    '<button class="chatbot-btn" onclick="window.chatbotContinue(1)">Seguir con este libro</button><br>' +
+                    '<button class="chatbot-btn" onclick="window.chatbotContinue(2)">Otra consulta</button>', 'bot');
+            }
+
+            window.chatbotContinue = function(opt) {
+                messages.lastChild.querySelectorAll('button').forEach(btn => btn.disabled = true);
+                if(opt === 1) {
+                    if(window.chatbotCurrentBook) {
+                        addMessage('¡Perfecto! ¿Qué más quieres saber sobre <b>' + window.chatbotCurrentBook + '</b>?', 'bot');
+                    } else {
+                        addMessage('¡Perfecto! ¿Qué más quieres saber sobre este libro?', 'bot');
+                    }
+                    window.chatbotState = 'sinopsis';
+                } else {
+                    window.chatbotCurrentBook = null;
+                    addMessage('Si necesitas ver el menú de opciones, escribe <b>/menu</b>.', 'bot');
+                }
+            }
+
+            function sendUserMessage() {
+                const text = input.value.trim();
+                if(!text) return;
+                addMessage(text, 'user');
+                input.value = '';
+                setTimeout(() => botReply(text), 600);
+            }
+            sendBtn.addEventListener('click', sendUserMessage);
+            input.addEventListener('keydown', e => { if(e.key === 'Enter') sendUserMessage(); });
+
+            fab.addEventListener('click', function() {
+                if(!started) setTimeout(() => botReply(''), 400);
+            });
+        })();
+        </script>
+    {% else %}
+        <!-- Chatbot Widget Flotante para no autenticados -->
+        <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+        <div id="chatbot-fab" title="¿Necesitas ayuda?">
+            <!-- SVG de robot mejorado -->
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="24" fill="#2D9CDB"/>
+                <ellipse cx="24" cy="30" rx="12" ry="8" fill="#fff"/>
+                <circle cx="18" cy="28" r="2" fill="#2D9CDB"/>
+                <circle cx="30" cy="28" r="2" fill="#2D9CDB"/>
+                <rect x="18" y="34" width="12" height="2" rx="1" fill="#2D9CDB"/>
+                <rect x="14" y="16" width="20" height="10" rx="5" fill="#fff"/>
+                <circle cx="19" cy="21" r="1.5" fill="#2D9CDB"/>
+                <circle cx="29" cy="21" r="1.5" fill="#2D9CDB"/>
+                <rect x="20" y="10" width="8" height="6" rx="3" fill="#2D9CDB"/>
+            </svg>
+        </div>
+        <div id="chatbot-panel">
+            <div id="chatbot-header">
+                <span style="display:flex;align-items:center;gap:8px;">
+                    <svg width="28" height="28" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#2D9CDB"/><ellipse cx="24" cy="30" rx="12" ry="8" fill="#fff"/><circle cx="18" cy="28" r="2" fill="#2D9CDB"/><circle cx="30" cy="28" r="2" fill="#2D9CDB"/><rect x="18" y="34" width="12" height="2" rx="1" fill="#2D9CDB"/><rect x="14" y="16" width="20" height="10" rx="5" fill="#fff"/><circle cx="19" cy="21" r="1.5" fill="#2D9CDB"/><circle cx="29" cy="21" r="1.5" fill="#2D9CDB"/><rect x="20" y="10" width="8" height="6" rx="3" fill="#2D9CDB"/></svg>
+                    Asistente Virtual
+                </span>
+                <button id="chatbot-close-btn" title="Cerrar">&times;</button>
+            </div>
+            <div id="chatbot-messages">
+                <div class="chatbot-message bot">
+                  <div class="chatbot-bubble">
+                    Inicia sesión para sacar el máximo provecho de nuestra ayuda personalizada.<br>
+                    <a href="{% url 'login' %}" class="btn btn-primary mt-2">Iniciar sesión</a>
+                  </div>
+                </div>
+            </div>
+            <div id="chatbot-input-area" style="display:none;"></div>
+        </div>
+        <script>
+        (function() {
+            const fab = document.getElementById('chatbot-fab');
+            const panel = document.getElementById('chatbot-panel');
+            const closeBtn = document.getElementById('chatbot-close-btn');
+            fab.addEventListener('click', () => panel.classList.add('open'));
+            closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+            document.addEventListener('keydown', e => { if(panel.classList.contains('open') && e.key === 'Escape') panel.classList.remove('open'); });
+        })();
+        </script>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>

@@ -12,8 +12,10 @@ def signup_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # inicia sesión automáticamente
-            return redirect("home")  # cámbialo por la ruta de inicio que tengas
+            messages.success(request, "Usuario registrado correctamente. Ahora puedes iniciar sesión.")
+            return redirect("login")  # Redirigir a la página de login
+        else:
+            messages.error(request, "Hubo un error en el registro. Por favor revisa los datos.")
     else:
         form = SignUpForm()
     return render(request, "accounts/signup.html", {"form": form})
@@ -35,6 +37,6 @@ def login_view(request):
 # Logout
 def logout_view(request):
     logout(request)
-    return redirect("/")    
+    return redirect("/")
 
 
