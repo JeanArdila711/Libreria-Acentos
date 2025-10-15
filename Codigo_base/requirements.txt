@@ -1,3 +1,5 @@
 Django
 django-bootstrap5
 matplotlib
+psycopg[binary]
+psycopg2-binary

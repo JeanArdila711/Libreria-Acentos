@@ -179,4 +179,4 @@ def statistics_view(request):
         'graphic_genre': graphic_genre
     })
 def promociones_view(request):
-    return render(request, "promociones.html")
+    return render(request, "books/promociones.html")
