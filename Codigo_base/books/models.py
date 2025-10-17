@@ -1,4 +1,9 @@
 from django.db import models
+import numpy as np
+
+def get_default_array():
+    default_arr = np.random.rand(1536)
+    return default_arr.astype(np.float32).tobytes()
 
 class Book(models.Model):
     publication_date = models.CharField(max_length=20, blank=True, null=True)
@@ -16,6 +21,7 @@ class Book(models.Model):
     publisher = models.CharField(max_length=255, blank=True, null=True)
     genre = models.CharField(max_length=100, blank=True, default="Sin género")
     price = models.FloatField(null=True, blank=True)
+    emb = models.BinaryField(default=get_default_array)
 
     def __str__(self):
         return self.title
