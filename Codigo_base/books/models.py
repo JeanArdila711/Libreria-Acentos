@@ -21,7 +21,8 @@ class Book(models.Model):
     publisher = models.CharField(max_length=255, blank=True, null=True)
     genre = models.CharField(max_length=100, blank=True, default="Sin género")
     price = models.FloatField(null=True, blank=True)
-    emb = models.BinaryField(default=get_default_array)
+    embeddings = models.JSONField(null=True, blank=True)
+
 
     def __str__(self):
         return self.title

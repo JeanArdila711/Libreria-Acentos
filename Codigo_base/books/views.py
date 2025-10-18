@@ -206,6 +206,10 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
+def cosine_similarity(a, b):
+    """Calcula similitud de coseno entre dos vectores."""
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 @csrf_exempt
 def recommend_book(request):
     if request.method == "POST":
@@ -216,6 +220,7 @@ def recommend_book(request):
             })
 
         try:
+            # 🧠 Generamos embedding del prompt del usuario
             response = client.embeddings.create(
                 model="text-embedding-3-small",
                 input=[prompt]
@@ -223,16 +228,28 @@ def recommend_book(request):
             prompt_emb = np.array(response.data[0].embedding, dtype=np.float32)
 
             books_with_similarity = []
-            for book in Book.objects.all():
+
+            # 📚 Recorremos solo los libros con embeddings válidos
+            for book in Book.objects.exclude(embeddings__isnull=True):
                 try:
-                    book_emb = np.frombuffer(book.emb, dtype=np.float32)
+                    if not book.embeddings:
+                        continue
+
+                    book_emb = np.array(book.embeddings, dtype=np.float32)
                     similarity = cosine_similarity(prompt_emb, book_emb)
                     books_with_similarity.append((book, similarity))
                 except Exception:
                     continue
 
+            # 🔝 Ordenar por similitud
             books_with_similarity.sort(key=lambda x: x[1], reverse=True)
-            top_books = books_with_similarity[:3]
+            top_books = books_with_similarity[:5]  # puedes ajustar el número de resultados
+
+            if not top_books:
+                return render(request, "books/recommend.html", {
+                    "prompt": prompt,
+                    "message": "No se encontraron coincidencias."
+                })
 
             context = {
                 "prompt": prompt,
@@ -248,6 +265,7 @@ def recommend_book(request):
             })
 
     return render(request, "books/recommend.html")
+
 
 
 # -------------------------------------------------------
@@ -371,3 +389,4 @@ def buy_now(request, book_id):
     request.session['cart'] = cart
     request.session.modified = True
     return redirect('cart_view')
+

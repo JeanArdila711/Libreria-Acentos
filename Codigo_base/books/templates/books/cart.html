@@ -25,22 +25,11 @@
                 {% for item in cart_items %}
                 <tr>
                     <td>
-                        <div class="d-flex align-items-center gap-3">
-                            {% if item.book.cover %}
-                                <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}" 
-                                     style="width:70px; height:100px; object-fit:cover; border-radius:8px;">
-                            {% else %}
-                                <img src="{% static 'img/placeholder.jpg' %}" 
-                                     alt="Sin portada" 
-                                     style="width:70px; height:100px; object-fit:cover; border-radius:8px;">
-                            {% endif %}
-                            <div>
-                                <h6 class="mb-1 fw-bold" style="color:#2d3e50;">{{ item.book.title }}</h6>
-                                <small class="text-muted">{{ item.book.authors }}</small>
-                            </div>
+                        <div>
+                            <h6 class="mb-1 fw-bold" style="color:#2d3e50;">{{ item.book.title }}</h6>
+                            <small class="text-muted">{{ item.book.authors }}</small>
                         </div>
                     </td>
-
                     <td class="text-center">
                         <div class="d-flex justify-content-center align-items-center gap-2">
                             <form method="post" action="{% url 'update_cart' item.book.id 'decrease' %}" style="display:inline;">
