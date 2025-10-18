@@ -1,44 +1,88 @@
 /* ==============================
-   🌈 Animaciones y Estilos Globales
+   🎨 VARIABLES GLOBALES CSS
    ============================== */
-
-/* Suaviza todas las transiciones y hace scroll suave */
-* {
-    transition: all 0.25s ease-in-out;
-    scroll-behavior: smooth;
+:root {
+    --primary: #343537;
+    --accent: #26a69a;
+    --accent-dark: #178f7a;
+    --bg-light: #f9fafb;
+    --bg-dark: #121212;
+    --card-light: #ffffff;
+    --card-dark: #1c1c1c;
+    --text-light: #1f2937;
+    --text-dark: #f1f1f1;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    --border-radius: 14px;
 }
 
 /* ==============================
-   ✨ Animación Global al Cargar
+   🌐 RESET Y BASE GLOBAL
    ============================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 120px; /* Para compensar headers fijos */
+}
+
 body {
     opacity: 0;
     animation: fadeInPage 0.8s ease forwards;
-    background-color: #f9fafb;
-    color: #1f2937;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
+
 @keyframes fadeInPage {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
 }
 
 /* ==============================
-   🔹 Offcanvas (menú lateral)
+   🔹 OFFCANVAS MEJORADO
    ============================== */
 .offcanvas {
     transform: translateX(-100%);
     opacity: 0;
-    transition: transform 0.4s ease, opacity 0.4s ease;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.4s ease;
+    backdrop-filter: blur(10px);
 }
+
 .offcanvas.show {
     transform: translateX(0);
     opacity: 1;
 }
+
+.offcanvas-backdrop {
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
 .offcanvas-body a {
     position: relative;
     display: inline-block;
-    padding-left: 5px;
 }
+
+/* Efecto de subrayado animado */
 .offcanvas-body a::after {
     content: "";
     position: absolute;
@@ -46,148 +90,575 @@ body {
     left: 0;
     width: 0%;
     height: 2px;
-    background: #26a69a;
-    transition: width 0.3s ease;
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 2px;
 }
+
 .offcanvas-body a:hover::after {
     width: 100%;
 }
 
 /* ==============================
-   🧠 Navbar y Botones
+   💫 BOTONES GLOBALES
    ============================== */
 button, .btn, a.btn {
-    transition: all 0.3s ease-in-out !important;
-    border-radius: 10px;
+    transition: all var(--transition-normal) !important;
+    border-radius: 12px;
     font-weight: 600;
     position: relative;
     overflow: hidden;
+    border: none;
+    cursor: pointer;
+    user-select: none;
 }
 
-nav, .btn {
-    transition: all 0.4s ease-in-out;
-}
-nav:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+/* Efecto ripple al hacer clic */
+.btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
 }
 
-/* Hover con brillo tipo reflejo */
-.btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+.btn:active::before {
+    width: 300px;
+    height: 300px;
 }
+
+/* Brillo tipo reflejo mejorado */
 .btn::after {
     content: "";
     position: absolute;
     top: 0;
-    left: -75%;
+    left: -100%;
     width: 50%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.25);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
     transform: skewX(-25deg);
-    transition: left 0.6s ease;
-    border-radius: 10px;
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .btn:hover::after {
-    left: 130%;
+    left: 150%;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+    transform: translateY(0);
 }
 
 /* ==============================
-   💫 Hero con gradiente animado
+   🎇 NAVBAR MEJORADO
+   ============================== */
+nav {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+nav:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Sticky navbar con efecto de reducción */
+nav.scrolled {
+    padding: 0.3rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ==============================
+   💎 HERO SECTION CON GRADIENTE ANIMADO
    ============================== */
 .hero-section {
-    background: linear-gradient(135deg, #2d3e50, #26a69a);
+    background: linear-gradient(135deg, #667eea, #764ba2, #26a69a);
     background-size: 200% 200%;
     color: white;
-    animation: gradientShift 8s ease infinite;
+    animation: gradientShift 10s ease infinite;
     border-radius: 16px;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
 }
+
+/* Partículas flotantes en el hero */
+.hero-section::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: float 20s linear infinite;
+    pointer-events: none;
+}
+
 @keyframes gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
+@keyframes float {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-50px, -50px); }
+}
+
 /* ==============================
-   🎇 Tarjetas de libros
+   🎴 TARJETAS DE LIBROS MEJORADAS
    ============================== */
 .card {
-    background-color: #ffffff;
-    border-radius: 14px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    background-color: var(--card-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
-    transition: all 0.3s ease;
-}
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
 }
 
-/* Zoom suave en las imágenes */
-.card img {
-    transition: transform 0.4s ease;
-}
-.card:hover img {
-    transform: scale(1.05);
-}
-
-/* ==============================
-   🧠 Animaciones AOS personalizadas
-   ============================== */
-[data-aos="fade-up"] {
-    animation: fadeUp 0.6s ease-in-out;
-}
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ==============================
-   🤖 Chatbot Animación de Entrada
-   ============================== */
-#chatbot-panel {
-    transition: all 0.35s ease-in-out;
-    transform: scale(0.9);
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), transparent);
     opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
-#chatbot-panel.open {
-    transform: scale(1);
+
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+}
+
+.card:hover::before {
     opacity: 1;
 }
 
+/* Zoom suave en las imágenes con efecto ken burns */
+.card img {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.card:hover img {
+    transform: scale(1.1) rotate(1deg);
+}
+
+/* Card body con fondo suave y gradiente sutil */
+.card-body {
+    background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+    padding: 20px;
+    position: relative;
+}
+
+/* Card footer mejorado - FONDO SUAVE */
+.card-footer {
+    background: linear-gradient(to bottom, #f8f9fa 0%, #f0f2f5 100%) !important;
+    border-top: 1px solid #e5e7eb !important;
+    padding: 16px 20px !important;
+}
+
+/* Títulos de las cards */
+.card-title {
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+/* Texto secundario en cards */
+.card-text {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Precios en las cards */
+.card-price {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* Badge en las cards */
+.card .badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
 /* ==============================
-   🌙 Modo Oscuro (corregido)
+   ✨ ANIMACIONES AOS PERSONALIZADAS
+   ============================== */
+[data-aos="fade-up"] {
+    animation-duration: 0.6s;
+    animation-timing-function: ease-out;
+}
+
+[data-aos="zoom-in"] {
+    animation-duration: 0.5s;
+}
+
+/* Animación de entrada escalonada para listas */
+.stagger-animation > * {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-animation > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-animation > *:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==============================
+   🎯 FORMULARIOS MEJORADOS
+   ============================== */
+input, textarea, select {
+    transition: all var(--transition-normal);
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    padding: 12px 16px;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(38, 166, 154, 0.1);
+    transform: translateY(-2px);
+}
+
+input::placeholder {
+    color: #9ca3af;
+    transition: all var(--transition-fast);
+}
+
+input:focus::placeholder {
+    opacity: 0.6;
+    transform: translateX(5px);
+}
+
+/* ==============================
+   ⬅️ BOTÓN VOLVER MEJORADO
+   ============================== */
+.btn-back {
+    background: linear-gradient(135deg, white, #f8f9fa);
+    color: var(--primary);
+    font-weight: 600;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-back:hover {
+    background: linear-gradient(135deg, var(--primary), #2d3e50);
+    color: white;
+    transform: translateX(-5px) scale(1.05);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+}
+
+.btn-back:active {
+    transform: translateX(-3px) scale(1.02);
+}
+
+/* ==============================
+   📊 ELEMENTOS AUXILIARES
+   ============================== */
+
+/* Skeleton loader para contenido que carga */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e0e0e0 50%,
+        #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Separadores elegantes */
+hr.divider {
+    border: none;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--accent),
+        transparent
+    );
+    margin: 30px 0;
+}
+
+/* Badges modernos */
+.badge-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: white;
+    box-shadow: 0 2px 8px rgba(38, 166, 154, 0.3);
+}
+
+/* ==============================
+   🌙 MODO OSCURO MEJORADO
    ============================== */
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: #121212;
-        color: #f1f1f1;
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
     }
 
     nav {
-        background-color: #1c1c1c;
-        box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
-    /* Mantiene las tarjetas claras para buena legibilidad */
     .card {
-        background-color: #ffffff;
-        color: #1f2937;
-        box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+        background-color: var(--card-dark);
+        color: var(--text-dark);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Card body en modo oscuro */
+    .card-body {
+        background: linear-gradient(to bottom, #1c1c1c 0%, #2a2a2a 100%);
+    }
+
+    /* Card footer en modo oscuro - FONDO SUAVE */
+    .card-footer {
+        background: linear-gradient(to bottom, #2a2a2a 0%, #333333 100%) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .card-title {
+        color: #f1f1f1;
+    }
+
+    .card-text {
+        color: #b0b0b0;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        border-color: var(--accent);
     }
 
     .btn {
-        background-color: #26a69a;
-        color: #fff;
-        border: none;
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: white;
     }
 
     .btn:hover {
-        background-color: #2d3e50;
+        filter: brightness(1.2);
     }
 
     .hero-section {
-        color: #fff;
-        background: linear-gradient(135deg, #1e2b3a, #178f7a);
+        background: linear-gradient(135deg, #1e2b3a, #178f7a, #0f4c42);
+    }
+
+    input, textarea, select {
+        background-color: #2d2d2d;
+        color: var(--text-dark);
+        border-color: #3d3d3d;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        border-color: var(--accent);
+        background-color: #333;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
+        color: var(--text-dark);
+        border-color: #3d3d3d;
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    }
+
+    .skeleton {
+        background: linear-gradient(
+            90deg,
+            #2d2d2d 25%,
+            #3d3d3d 50%,
+            #2d2d2d 75%
+        );
+        background-size: 200% 100%;
+    }
+}
+
+/* ==============================
+   📱 RESPONSIVE MEJORADO
+   ============================== */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 40px 20px;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+
+    .btn-back {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ==============================
+   🎪 EFECTOS ESPECIALES
+   ============================== */
+
+/* Efecto parallax suave */
+.parallax {
+    transition: transform 0.3s ease-out;
+}
+
+/* Glow effect para elementos importantes */
+.glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(38, 166, 154, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(38, 166, 154, 0.6);
+    }
+}
+
+/* Shake animation para errores */
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* Bounce suave para botones importantes */
+.bounce-subtle {
+    animation: bounceSubtle 2s ease-in-out infinite;
+}
+
+@keyframes bounceSubtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* ==============================
+   🎯 UTILIDADES GENERALES
+   ============================== */
+
+/* Texto con gradiente */
+.gradient-text {
+    background: linear-gradient(135deg, var(--accent), #667eea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+/* Contenedor con glassmorphism */
+.glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    border-radius: 6px;
+    border: 2px solid var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+}
+
+@media (prefers-color-scheme: dark) {
+    ::-webkit-scrollbar-track {
+        background: var(--bg-dark);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        border-color: var(--bg-dark);
     }
 }

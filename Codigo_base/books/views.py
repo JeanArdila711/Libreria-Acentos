@@ -74,17 +74,10 @@ class HomePageView(TemplateView):
     template_name = "home.html"
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
         from random import sample
+        ctx = super().get_context_data(**kwargs)
         books = list(Book.objects.all())
-        ctx['featured_books'] = sample(books, min(len(books), 6))
-        genres = (
-            Book.objects.values('genre')
-            .exclude(genre="")
-            .annotate(total=Count('id'))
-            .order_by('-total')[:10]
-        )
-        ctx['top_genres'] = genres
+        ctx['featured_books'] = sample(books, min(len(books), 10))  # 🔹 ahora muestra 10 libros
         return ctx
 
 

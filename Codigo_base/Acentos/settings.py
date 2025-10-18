@@ -52,6 +52,7 @@ TEMPLATES = [
             'context_processors': [
                 'books.context_processors.cart_counter',
                 'books.context_processors.common_context',
+                'books.context_processors.back_button_context',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',

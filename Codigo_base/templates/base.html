@@ -12,22 +12,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
-
     <style>
     :root {
-        --primary:#343537;
-        --primary-600:#343537;
-        --accent:#2D9CDB;
-        --bg:#F5F7FB;
-        --card:#FFFFFF;
-        --text:#1F2937;
-        --muted:#6B7280;
-        --border:#E5E7EB;
-        --danger:#E76F51;
+        --primary: #343537;
+        --accent: #2D9CDB;
+        --bg: #F5F7FB;
+        --card: #FFFFFF;
+        --text: #1F2937;
+        --muted: #6B7280;
+        --border: #E5E7EB;
+        --danger: #E76F51;
+        --success: #10b981;
     }
 
     body {
-        font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
         margin: 0;
         padding: 0;
         background-color: var(--bg);
@@ -35,238 +34,935 @@
         min-height: 100vh;
     }
 
-    /* Header */
+    /* 🔝 Header fijo y sólido */
     header {
-        background: linear-gradient(90deg,var(--primary),var(--primary-600));
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
         color: white;
-        padding: 0.5rem 0;
+        padding: 0.8rem 0;
         text-align: center;
-        box-shadow: 0 2px 8px rgba(11,61,145,0.25);
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
-    h1.app-title { margin: 0; font-size: 1.8rem; letter-spacing: .5px; font-weight: 700; }
 
-    /* Barra superior */
-    .auth-top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 30px;
-        background-color: var(--primary);
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    h1.app-title {
+        margin: 0;
+        font-size: 1.8rem;
+        letter-spacing: .5px;
+        font-weight: 700;
     }
+
+    /* 👤 Avatar mejorado con tooltip */
+    .user-avatar-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .user-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        position: relative;
+    }
+
+    .user-avatar:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Tooltip del usuario - aparece ARRIBA */
+    .user-tooltip {
+        position: absolute;
+        bottom: calc(100% + 12px);
+        left: 50%;
+        transform: translateX(-50%) translateY(-5px);
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        z-index: 1050;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    /* Flecha del tooltip apuntando HACIA ABAJO */
+    .user-tooltip::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid rgba(0, 0, 0, 0.9);
+    }
+
+    .user-avatar-container:hover .user-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* Botones de auth compactos */
+    .auth-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
     .btn-auth {
         font-weight: 600;
         padding: 8px 18px;
-        border-radius: 12px;
+        border-radius: 10px;
         text-decoration: none;
-        min-width: 100px;
         text-align: center;
         cursor: pointer;
         display: inline-block;
-        border: 2px solid white;
-        background-color: white !important;
-        color: var(--primary) !important;
-    }
-    .btn-auth:hover {
-        background-color: white !important;
-        color: var(--primary) !important;
-        border: 2px solid white !important;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+        font-size: 0.9rem;
     }
 
-    /* Botón Carrito */
-    .btn-light {
+    .btn-login {
+        background-color: transparent;
+        color: white;
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-login:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-signup {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+    }
+
+    .btn-signup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        filter: brightness(1.1);
+    }
+
+    /* 🛒 Carrito mejorado */
+    .btn-cart {
         font-weight: 600;
         background-color: white;
         color: var(--primary);
         border: 2px solid var(--primary);
         border-radius: 12px;
+        padding: 8px 20px;
         transition: all 0.3s ease;
-    }
-    .btn-light:hover {
-        background-color: var(--primary);
-        color: white;
-        transform: scale(1.05);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
     }
 
-    /* Contenido principal */
-    .main-content-wrapper {
+    .btn-cart:hover {
+        background-color: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
         display: flex;
-        flex: 1;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    /* 💎 Navbar mejorado - TODO EN UNA LÍNEA */
+    nav {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 60px;
+        z-index: 1020;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        gap: 20px;
+    }
+
+    /* Lado izquierdo del navbar */
+    .navbar-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* Lado derecho del navbar */
+    .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* 🍔 Botón hamburguesa mejorado */
+    .btn-hamburguesa {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        font-size: 1.8rem;
+        cursor: pointer;
+        padding: 6px 12px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    .btn-hamburguesa:hover {
+        transform: scale(1.1);
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* 🧱 Menú lateral mejorado */
+    .offcanvas {
+        width: 320px !important;
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+        border-right: none;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .offcanvas-header {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: 1.5rem;
+    }
+    
+    .offcanvas-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .menu-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #e8e8e8;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 14px 18px;
+        margin: 4px 12px;
+        border-radius: 12px;
+        transition: all 0.25s ease;
+        position: relative;
+    }
+    
+    .menu-link:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+        color: white;
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .menu-link i {
+        font-size: 1.2rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    /* 📄 Contenido principal */
+    .main-content-wrapper {
         width: 96%;
         max-width: 1400px;
-        margin: 20px auto;
-        gap: 18px;
+        margin: 25px auto;
     }
+
     .content {
-        flex: 4;
         background-color: var(--card);
-        padding: 22px;
-        border-radius: 10px;
-        border:1px solid var(--border);
-        box-shadow: 0 6px 16px rgba(17,24,39,0.06);
+        padding: 28px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
     footer {
         text-align: center;
-        padding: 18px;
-        margin-top: auto;
-        background-color: var(--primary-600);
+        padding: 20px;
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
         color: white;
-        border-top: 1px solid var(--primary);
+        border-top: 1px solid var(--border);
+        margin-top: 40px;
+    }
+
+    /* 💫 Botón flotante de volver atrás mejorado */
+    .btn-back {
+        position: fixed;
+        left: 25px;
+        bottom: 25px;
+        z-index: 1050;
+        background: linear-gradient(135deg, white 0%, #f8f9fa 100%);
+        color: #2d3e50;
+        border: 2px solid #ddd;
+        font-weight: 600;
+        border-radius: 12px;
+        padding: 12px 22px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-20px);
+    }
+
+    .btn-back.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(135deg, #2d3e50 0%, #34495e 100%);
+        color: white;
+        transform: translateX(-5px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        text-decoration: none;
+    }
+
+    .btn-back i {
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-back:hover i {
+        transform: translateX(-3px);
+    }
+
+    /* Versión responsive del botón */
+    @media (max-width: 768px) {
+        .btn-back {
+            left: 15px;
+            bottom: 15px;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-back span {
+            display: none; /* Solo ícono en móvil */
+        }
+        
+        .btn-back {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            padding: 0;
+            justify-content: center;
+        }
+    }
+
+    /* Animaciones de entrada */
+    @keyframes slideInFromTop {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    header, .auth-top-bar, nav {
+        animation: slideInFromTop 0.6s ease-out;
+    }
+
+    /* 🔄 LOADER DE CARGA ELEGANTE */
+    .page-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .page-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .loader-content {
+        text-align: center;
+        color: white;
+    }
+
+    .spinner {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 20px;
+        position: relative;
+    }
+
+    .spinner-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 4px solid transparent;
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .spinner-ring:nth-child(2) {
+        border-top-color: rgba(255, 255, 255, 0.6);
+        animation-duration: 1.5s;
+    }
+
+    .spinner-ring:nth-child(3) {
+        border-top-color: rgba(255, 255, 255, 0.3);
+        animation-duration: 2s;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        animation: fadeInOut 1.5s ease-in-out infinite;
+    }
+
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+
+    /* 📬 NOTIFICACIONES TOAST MODERNAS */
+    .toast-container-custom {
+        position: fixed;
+        top: 90px;
+        right: 20px;
+        z-index: 9998;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 400px;
+    }
+
+    .toast-custom {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 320px;
+        animation: slideInRight 0.4s ease-out;
+        position: relative;
+        overflow: hidden;
+        border-left: 4px solid;
+    }
+
+    .toast-custom.removing {
+        animation: slideOutRight 0.4s ease-out forwards;
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+
+    .toast-custom.success {
+        border-left-color: #10b981;
+    }
+
+    .toast-custom.error {
+        border-left-color: #ef4444;
+    }
+
+    .toast-custom.warning {
+        border-left-color: #f59e0b;
+    }
+
+    .toast-custom.info {
+        border-left-color: #3b82f6;
+    }
+
+    .toast-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .toast-custom.success .toast-icon {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .toast-custom.error .toast-icon {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    .toast-custom.warning .toast-icon {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .toast-custom.info .toast-icon {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        color: #1f2937;
+    }
+
+    .toast-message {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: #9ca3af;
+        font-size: 1.3rem;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+
+    .toast-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, rgba(0,0,0,0.1), rgba(0,0,0,0.2));
+        animation: progressBar 4s linear forwards;
+    }
+
+    @keyframes progressBar {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        h1.app-title {
+            font-size: 1.4rem;
+        }
+
+        nav {
+            padding: 0.6rem 1rem;
+            gap: 10px;
+        }
+
+        .navbar-left a span {
+            display: none; /* Oculta "Biblioteca Acentos" en móvil */
+        }
+        
+        .btn-auth {
+            padding: 7px 14px;
+            font-size: 0.85rem;
+        }
+
+        .btn-auth span {
+            display: none; /* Solo íconos en móvil */
+        }
+
+        .btn-cart span {
+            display: none; /* Solo ícono del carrito en móvil */
+        }
+
+        .toast-container-custom {
+            right: 10px;
+            left: 10px;
+            max-width: none;
+        }
+
+        .toast-custom {
+            min-width: auto;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .navbar-left a {
+            font-size: 1rem;
+        }
+
+        .btn-hamburguesa {
+            padding: 4px 10px;
+            font-size: 1.5rem;
+        }
     }
     </style>
 </head>
 
 <body>
-    {% if messages %}
-    <div class="container mt-3">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- 🔄 LOADER DE CARGA -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loader-text">Cargando Biblioteca Acentos...</div>
         </div>
-        {% endfor %}
     </div>
+
+    <!-- 📬 CONTENEDOR DE TOASTS -->
+    <div class="toast-container-custom" id="toastContainer"></div>
+
+    <!-- Los mensajes de Django se convierten en toasts -->
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for message in messages %}
+                showToast(
+                    '{{ message.tags }}',
+                    '{{ message|escapejs }}'
+                );
+            {% endfor %}
+        });
+    </script>
     {% endif %}
 
     <!-- Header -->
     <header>
-        <div class="logo-container" style="display:flex; align-items:center; gap:15px; margin-top: 5px;">
-            <img src="{% static 'img/Logo.png' %}" 
-                alt="Biblioteca Acentos"
-                style="max-height:40px; width:auto; object-fit:contain; border-radius:8px; padding-left:5px;">
+        <div class="logo-container" style="display:flex; align-items:center; gap:15px; justify-content:center;">
+            <img src="{% static 'img/Logo.png' %}" alt="Biblioteca Acentos"
+                style="max-height:45px; width:auto; border-radius:8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
             <h1 class="app-title">{{ app_name }}</h1>
         </div>
     </header>
 
-    <!-- Barra superior -->
-    <div class="auth-top-bar">
-        {% if user.is_authenticated %}
-            <div class="text-white fw-semibold">
-                👋 Hola, {{ user.first_name|default:user.username }}
-            </div>
-        {% else %}
-            <div>
-                <a href="{% url 'login' %}" class="btn btn-auth btn-login me-2">Login</a>
-                <a href="{% url 'signup' %}" class="btn btn-auth btn-signup">Sign Up</a>
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Navbar con menú hamburguesa -->
-    <nav class="d-flex justify-content-between align-items-center px-3" style="background-color: var(--primary-600);">
-        <!-- Botón hamburguesa -->
-        <button class="btn text-white fs-4" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral" aria-controls="menuLateral">
-            <i class="bi bi-list"></i>
-        </button>
-
-        <!-- Nombre del sitio -->
-        <div>
-            <a href="{% url 'home' %}" class="text-white text-decoration-none fw-bold fs-5">Biblioteca Acentos</a>
+    <!-- Navbar - TODO EN UNA LÍNEA -->
+    <nav>
+        <!-- Lado izquierdo: Hamburguesa + Logo -->
+        <div class="navbar-left">
+            <button class="btn-hamburguesa" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral">
+                <i class="bi bi-list"></i>
+            </button>
+            <a href="{% url 'home' %}" class="text-white text-decoration-none fw-bold fs-5" style="display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-book"></i> Biblioteca Acentos
+            </a>
         </div>
 
-        <!-- Carrito -->
-        <div class="position-relative">
-            <a href="{% url 'cart_view' %}" class="btn btn-light position-relative">
-                🛒 Carrito
+        <!-- Lado derecho: Carrito + Auth -->
+        <div class="navbar-right">
+            <!-- Carrito -->
+            <a href="{% url 'cart_view' %}" class="btn-cart">
+                <i class="bi bi-cart3 fs-5"></i>
+                <span>Carrito</span>
                 {% if cart_count and cart_count > 0 %}
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{ cart_count }}
-                    </span>
+                    <span class="cart-badge">{{ cart_count }}</span>
                 {% endif %}
             </a>
+
+            <!-- Auth: Avatar o botones Login/Signup -->
+            {% if user.is_authenticated %}
+                <div class="user-avatar-container">
+                    <div class="user-avatar">
+                        <i class="bi bi-person-circle"></i>
+                        <div class="user-tooltip">
+                            👋 {{ user.first_name|default:user.username }}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="auth-buttons">
+                    <a href="{% url 'login' %}" class="btn-auth btn-login">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                    <a href="{% url 'signup' %}" class="btn-auth btn-signup">
+                        <i class="bi bi-person-plus"></i> Sign Up
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </nav>
 
-    <!-- Menú lateral (offcanvas) -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="menuLateral" aria-labelledby="menuLateralLabel">
-        <div class="offcanvas-header" style="background-color: var(--primary-600); color: white;">
-            <h5 class="offcanvas-title" id="menuLateralLabel">Menú</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    <!-- Menú lateral -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="menuLateral">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title"><i class="bi bi-journal-bookmark me-2"></i>Menú Principal</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body d-flex flex-column">
-            <a href="{% url 'home' %}" class="text-decoration-none mb-2">🏠 Inicio</a>
-            <a href="{% url 'book_list' %}" class="text-decoration-none mb-2">📚 Catálogo</a>
-            <a href="{% url 'promociones' %}" class="text-decoration-none mb-2">💥 Promociones</a>
-            <a href="#" class="text-decoration-none mb-2">📦 Pedidos</a>
-            <hr>
-            {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}" class="text-decoration-none">🚪 Cerrar sesión</a>
-            {% else %}
-                <a href="{% url 'login' %}" class="text-decoration-none mb-2">🔐 Iniciar sesión</a>
-                <a href="{% url 'signup' %}" class="text-decoration-none">📝 Registrarse</a>
-            {% endif %}
+        <div class="offcanvas-body">
+            <nav class="nav flex-column">
+                <a href="{% url 'home' %}" class="menu-link">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="{% url 'book_list' %}" class="menu-link">
+                    <i class="bi bi-book-half"></i>
+                    <span>Catálogo</span>
+                </a>
+                <a href="{% url 'promociones' %}" class="menu-link">
+                    <i class="bi bi-stars"></i>
+                    <span>Promociones</span>
+                </a>
+                <a href="#" class="menu-link">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Pedidos</span>
+                </a>
+                <hr class="my-3" style="border-color: rgba(255,255,255,0.2);">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="menu-link" style="color: #ff6b6b;">
+                        <i class="bi bi-door-open"></i>
+                        <span>Cerrar sesión</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="menu-link">
+                        <i class="bi bi-person-lock"></i>
+                        <span>Iniciar sesión</span>
+                    </a>
+                    <a href="{% url 'signup' %}" class="menu-link">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>Registrarse</span>
+                    </a>
+                {% endif %}
+            </nav>
         </div>
     </div>
 
-    <!-- Contenido principal -->
+    <!-- Contenido -->
     <div class="main-content-wrapper">
-        <div class="content" data-aos="fade-up" data-aos-duration="700">
-            {% block content %}
-            {% endblock %}
+        <div class="content" data-aos="fade-up">
+            {% block content %}{% endblock %}
         </div>
     </div>
+
+    <!-- Botón volver - MEJORADO (al final del body) -->
+    <button id="btnBack" class="btn-back">
+        <i class="bi bi-arrow-left"></i>
+        <span>Volver</span>
+    </button>
 
     <!-- Footer -->
     <footer>
-        <p>Plataforma de digitalización de la Librería Acentos (Universidad EAFIT).</p>
+        <p style="margin: 0; font-size: 0.95rem;">
+            <i class="bi bi-book-fill me-2"></i>
+            Plataforma de digitalización de la Librería Acentos (Universidad EAFIT)
+        </p>
+        <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.8;">
+            © 2024 - Desarrollado con <i class="bi bi-heart-fill text-danger"></i>
+        </p>
     </footer>
-
-    <!-- Chatbot -->
-    {% if user.is_authenticated %}
-        <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
-        <div id="chatbot-fab" title="¿Necesitas ayuda?">
-            🤖
-        </div>
-        <div id="chatbot-panel">
-            <div id="chatbot-header">
-                <span>Asistente Virtual</span>
-                <button id="chatbot-close-btn" title="Cerrar">&times;</button>
-            </div>
-            <div id="chatbot-messages"></div>
-            <div id="chatbot-input-area">
-                <input id="chatbot-input" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
-                <button id="chatbot-send-btn">Enviar</button>
-            </div>
-        </div>
-        <script>
-        (function() {
-            const fab = document.getElementById('chatbot-fab');
-            const panel = document.getElementById('chatbot-panel');
-            const closeBtn = document.getElementById('chatbot-close-btn');
-            fab.addEventListener('click', () => panel.classList.add('open'));
-            closeBtn.addEventListener('click', () => panel.classList.remove('open'));
-        })();
-        </script>
-    {% else %}
-        <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
-        <div id="chatbot-fab" title="¿Necesitas ayuda?">🤖</div>
-        <div id="chatbot-panel">
-            <div id="chatbot-header">
-                <span>Asistente Virtual</span>
-                <button id="chatbot-close-btn">&times;</button>
-            </div>
-            <div id="chatbot-messages">
-                <div class="chatbot-message bot">
-                    <div class="chatbot-bubble">
-                        Inicia sesión para sacar el máximo provecho de nuestra ayuda personalizada.<br>
-                        <a href="{% url 'login' %}" class="btn btn-primary mt-2">Iniciar sesión</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if(window.AOS){
-                AOS.init({once:true,offset:80,duration:700,easing:'ease-out-cubic'});
-            }
+        // 🔄 LOADER: Ocultar cuando la página termine de cargar
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('pageLoader');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 500);
         });
+
+        // ⬅️ BOTÓN VOLVER ATRÁS - Versión simplificada y robusta
+        (function() {
+            const btnBack = document.getElementById('btnBack');
+            if (!btnBack) return; // Si no existe, salir
+            
+            const homeUrl = "{% url 'home' %}";
+            const currentPath = window.location.pathname;
+            
+            // Páginas donde NO mostrar el botón
+            const hiddenPages = ['/', homeUrl, '/login/', '/signup/', '/logout/'];
+            
+            // Función para mostrar/ocultar el botón
+            function toggleButton() {
+                const shouldShow = !hiddenPages.some(page => currentPath === page || currentPath.startsWith(page));
+                
+                if (shouldShow) {
+                    btnBack.classList.add('show');
+                } else {
+                    btnBack.classList.remove('show');
+                }
+            }
+            
+            // Mostrar el botón si corresponde
+            toggleButton();
+            
+            // Manejar el click
+            btnBack.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Si hay historial previo, volver
+                if (document.referrer && document.referrer.includes(window.location.host)) {
+                    window.history.back();
+                } else {
+                    // Si no, ir al home
+                    window.location.href = homeUrl;
+                }
+            });
+        })();
+
+        // 📬 SISTEMA DE NOTIFICACIONES TOAST
+        function showToast(type, message, duration = 4000) {
+            const container = document.getElementById('toastContainer');
+            
+            const typeMap = {
+                'success': 'success',
+                'error': 'error',
+                'danger': 'error',
+                'warning': 'warning',
+                'info': 'info',
+                'debug': 'info'
+            };
+            
+            const toastType = typeMap[type] || 'info';
+            
+            const icons = {
+                'success': '✓',
+                'error': '✕',
+                'warning': '⚠',
+                'info': 'ℹ'
+            };
+            
+            const titles = {
+                'success': '¡Éxito!',
+                'error': 'Error',
+                'warning': 'Advertencia',
+                'info': 'Información'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${toastType}`;
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[toastType]}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[toastType]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="closeToast(this)">×</button>
+                <div class="toast-progress"></div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                closeToast(toast.querySelector('.toast-close'));
+            }, duration);
+        }
+        
+        function closeToast(button) {
+            const toast = button.closest('.toast-custom');
+            toast.classList.add('removing');
+            setTimeout(() => {
+                toast.remove();
+            }, 400);
+        }
+
+        // Inicializar AOS (animaciones)
+        if (window.AOS) {
+            AOS.init({ 
+                once: true, 
+                offset: 80, 
+                duration: 700,
+                easing: 'ease-out-cubic'
+            });
+        }
     </script>
 </body>
 </html>
