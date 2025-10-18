@@ -3,138 +3,217 @@
 {% block title %}Todos los Libros - {{ app_name }}{% endblock %}
 
 {% block content %}
-    <div style="display: flex; flex-direction: row; gap: 2rem;">
-        <aside style="min-width: 300px; max-width: 350px;">
-            <form method="get" action="">
-                <div class="mb-3">
-                    <label for="search"><strong>Buscar Libros</strong></label>
-                    <input type="text" name="q" id="search" class="form-control" placeholder="Buscar por título, autor o género" value="{{ request.GET.q|default:'' }}">
-                </div>
-                <div class="mb-3">
-                    <label><strong>Género:</strong></label>
-                    <div style="max-height: 180px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 8px;">
-                        {% for g in genres %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="genre" id="genre_{{ forloop.counter }}" value="{{ g }}" {% if g in selected_genres %}checked{% endif %}>
-                            <label class="form-check-label" for="genre_{{ forloop.counter }}">{{ g }}</label>
-                        </div>
-                        {% endfor %}
+<div style="display: flex; flex-direction: row; gap: 2rem;">
+    <!-- 📚 Panel lateral de filtros -->
+    <aside style="min-width: 300px; max-width: 350px;">
+        <form method="get" action="">
+            <div class="mb-3">
+                <label for="search"><strong>Buscar Libros</strong></label>
+                <input type="text" name="q" id="search" class="form-control"
+                    placeholder="Buscar por título, autor o género"
+                    value="{{ request.GET.q|default:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label><strong>Género:</strong></label>
+                <div
+                    style="max-height: 180px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 8px;">
+                    {% for g in genres %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" id="genre_{{ forloop.counter }}"
+                            value="{{ g }}" {% if g in selected_genres %}checked{% endif %}>
+                        <label class="form-check-label" for="genre_{{ forloop.counter }}">{{ g }}</label>
                     </div>
+                    {% endfor %}
                 </div>
-                <div class="mb-3">
-                    <label><strong>Autor:</strong></label>
-                    <div style="max-height: 180px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 8px;">
-                        {% for a in authors %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="author" id="author_{{ forloop.counter }}" value="{{ a }}" {% if a in selected_authors %}checked{% endif %}>
-                            <label class="form-check-label" for="author_{{ forloop.counter }}">{{ a }}</label>
-                        </div>
-                        {% endfor %}
+            </div>
+
+            <div class="mb-3">
+                <label><strong>Autor:</strong></label>
+                <div
+                    style="max-height: 180px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 8px;">
+                    {% for a in authors %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="author" id="author_{{ forloop.counter }}"
+                            value="{{ a }}" {% if a in selected_authors %}checked{% endif %}>
+                        <label class="form-check-label" for="author_{{ forloop.counter }}">{{ a }}</label>
                     </div>
+                    {% endfor %}
                 </div>
-                <button type="submit" class="btn btn-dark w-100 mb-2">Aplicar Filtros</button>
-                <a href="?" class="btn btn-danger w-100">Borrar Filtros</a>
-            </form>
-        </aside>
-        <div style="flex: 1;">
-            <!-- Catálogo de libros en grilla 4x5 -->
-    <style>
-        .book-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem 1.5rem;
-        }
-        .book-item {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            padding: 1rem;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 420px;
-        }
-        .book-item img {
-            width: 140px;
-            height: 210px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-bottom: 0.7rem;
-        }
-        .book-item h3 {
-            font-size: 1.1rem;
-            margin: 0.5rem 0 0.2rem 0;
-            font-weight: 600;
-        }
-        .book-item .authors {
-            color: #555;
-            font-size: 0.97em;
-            margin-bottom: 0.3rem;
-        }
-        .book-item .price {
-            font-weight: 500;
-            color: #1a7f37;
-            margin-bottom: 0.2rem;
-        }
-    </style>
-    <div class="book-grid">
-        {% for book in books %}
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100 mb-2">Aplicar Filtros</button>
+            <a href="?" class="btn btn-danger w-100">Borrar Filtros</a>
+        </form>
+    </aside>
+
+    <!-- 🧠 Catálogo de libros -->
+    <div style="flex: 1;">
+        <div class="book-grid">
+            {% for book in books %}
             <div class="book-item">
-                <!-- Portada -->
-                <img src="{{ book.image_url|default:'https://placehold.co/140x210?text=Sin+Imagen' }}" alt="Portada de {{ book.title }}" onerror="this.onerror=null;this.src='https://placehold.co/140x210?text=Sin+Imagen';">
-                <!-- Nombre de la obra -->
-                <h3>{{ book.title }}</h3>
+                <!-- Imagen clickeable -->
+                <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;">
+                    <img src="{{ book.image_url|default:'https://placehold.co/140x210?text=Sin+Imagen' }}"
+                        alt="Portada de {{ book.title }}"
+                        onerror="this.onerror=null;this.src='https://placehold.co/140x210?text=Sin+Imagen';">
+                </a>
+
+                <!-- Título clickeable -->
+                <h3>
+                    <a href="{% url 'book_detail' book.id %}" class="book-link">
+                        {{ book.title }}
+                    </a>
+                </h3>
+
                 <!-- Autor -->
                 <div class="authors">{{ book.authors }}</div>
+
                 <!-- Precio -->
                 <div class="price">
                     {% if book.price %}
-                        ${{ book.price|floatformat:0 }}
+                    ${{ book.price|floatformat:0 }}
                     {% else %}
-                        Consultar
+                    Consultar
                     {% endif %}
                 </div>
             </div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
 
-    {% if is_paginated %}
-    <div class="d-flex justify-content-center mt-4">
-        <nav aria-label="Page navigation">
-            <ul class="pagination pagination-lg" style="display: flex; flex-direction: row; justify-content: center; align-items: center; width: auto; margin: 0;">
-                {% url 'book_list' as base_url %}
-                <!-- Ir al inicio -->
-                <li class="page-item {% if page_obj.number == 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_obj.number > 1 %}{{ base_url }}?page=1{% else %}#{% endif %}">|&lt;</a>
-                </li>
-                <!-- Anterior -->
-                <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_obj.has_previous %}{{ base_url }}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">&lt;</a>
-                </li>
-                <!-- Números de página -->
-                {% for num in page_obj.paginator.page_range %}
+        <!-- 🔢 Paginación -->
+        {% if is_paginated %}
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-lg"
+                    style="display: flex; flex-direction: row; justify-content: center; align-items: center; width: auto; margin: 0;">
+                    {% url 'book_list' as base_url %}
+                    <!-- Ir al inicio -->
+                    <li class="page-item {% if page_obj.number == 1 %}disabled{% endif %}">
+                        <a class="page-link"
+                            href="{% if page_obj.number > 1 %}{{ base_url }}?page=1{% else %}#{% endif %}">|&lt;</a>
+                    </li>
+
+                    <!-- Anterior -->
+                    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                        <a class="page-link"
+                            href="{% if page_obj.has_previous %}{{ base_url }}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">&lt;</a>
+                    </li>
+
+                    <!-- Números -->
+                    {% for num in page_obj.paginator.page_range %}
                     {% if num == page_obj.number %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                     {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' or num == 1 or num == page_obj.paginator.num_pages %}
-                        <li class="page-item"><a class="page-link" href="{{ base_url }}?page={{ num }}">{{ num }}</a></li>
+                    <li class="page-item"><a class="page-link" href="{{ base_url }}?page={{ num }}">{{ num }}</a></li>
                     {% elif num == page_obj.number|add:'-2' or num == page_obj.number|add:'2' %}
-                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
                     {% endif %}
-                {% endfor %}
-                <!-- Siguiente -->
-                <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_obj.has_next %}{{ base_url }}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">&gt;</a>
-                </li>
-                <!-- Ir al final -->
-                <li class="page-item {% if page_obj.number == page_obj.paginator.num_pages %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_obj.number < page_obj.paginator.num_pages %}{{ base_url }}?page={{ page_obj.paginator.num_pages }}{% else %}#{% endif %}">&gt;|</a>
-                </li>
-            </ul>
-            <div class="ms-3 align-self-center">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</div>
-        </nav>
+                    {% endfor %}
+
+                    <!-- Siguiente -->
+                    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                        <a class="page-link"
+                            href="{% if page_obj.has_next %}{{ base_url }}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">&gt;</a>
+                    </li>
+
+                    <!-- Ir al final -->
+                    <li class="page-item {% if page_obj.number == page_obj.paginator.num_pages %}disabled{% endif %}">
+                        <a class="page-link"
+                            href="{% if page_obj.number < page_obj.paginator.num_pages %}{{ base_url }}?page={{ page_obj.paginator.num_pages }}{% else %}#{% endif %}">&gt;|</a>
+                    </li>
+                </ul>
+                <div class="ms-3 align-self-center">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </div>
+            </nav>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
+</div>
+
+<!-- 🎨 Estilos -->
+<style>
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem 1.5rem;
+}
+
+.book-item {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 420px;
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.book-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Imagen */
+.book-item img {
+    width: 140px;
+    height: 210px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+.book-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Título clickeable */
+.book-link {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    text-decoration: none;
+    position: relative;
+}
+
+.book-link::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background-color: #26a69a;
+    transition: width 0.3s ease;
+}
+
+.book-link:hover {
+    color: #26a69a;
+}
+
+.book-link:hover::after {
+    width: 100%;
+}
+
+/* Autor y precio */
+.authors {
+    color: #555;
+    font-size: 0.97em;
+    margin-bottom: 0.3rem;
+}
+
+.price {
+    font-weight: 500;
+    color: #1a7f37;
+    margin-bottom: 0.2rem;
+}
+</style>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -149,6 +228,7 @@ function updateFilters() {
     const params = new URLSearchParams();
     genres.forEach(g => params.append('genre', g));
     authors.forEach(a => params.append('author', a));
+
     fetch("{% url 'books_filter_options' %}?" + params.toString())
         .then(resp => resp.json())
         .then(data => {
@@ -175,7 +255,7 @@ function updateFilters() {
         });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('input[name="genre"], input[name="author"]').forEach(cb => {
         cb.addEventListener('change', updateFilters);
     });

@@ -19,6 +19,24 @@ from dotenv import load_dotenv
 from .models import Book
 
 # -------------------------------------------------------
+# 🔧 CONFIGURACIÓN OPENAI
+# -------------------------------------------------------
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'openAI.env'))
+
+def get_openai_client():
+    """Inicializa el cliente de OpenAI usando la API Key del entorno."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("❌ No se encontró la API key de OpenAI en las variables de entorno.")
+    return OpenAI(api_key=api_key)
+
+
+def cosine_similarity(a, b):
+    """Calcula la similitud de coseno entre dos vectores."""
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
+# -------------------------------------------------------
 # 1️⃣ FILTROS AJAX
 # -------------------------------------------------------
 @require_GET
@@ -30,7 +48,6 @@ def filter_options_ajax(request):
     if genres:
         qs = qs.filter(genre__in=genres)
     if authors:
-        # ✅ corregimos el warning del escape con r'\.'
         qs = qs.filter(
             authors__regex=r'(' + '|'.join([a.replace('.', r'\.') for a in authors]) + ')'
         )
@@ -145,19 +162,16 @@ class BookSearchView(ListView):
 
 def statistics_view(request):
     all_books = Book.objects.all()
-    # Libros por año
     book_counts_by_year = {}
     for book in all_books:
         year = str(book.publication_year) if book.publication_year else "Sin año"
         book_counts_by_year[year] = book_counts_by_year.get(year, 0) + 1
 
-    # Libros por género
     book_counts_by_genre = {}
     for book in all_books:
         genre = book.genre if book.genre else "Sin género"
         book_counts_by_genre[genre] = book_counts_by_genre.get(genre, 0) + 1
 
-    # Gráfica por año
     plt.figure(figsize=(8, 4))
     years = sorted(book_counts_by_year.keys())
     values = [book_counts_by_year[y] for y in years]
@@ -171,7 +185,6 @@ def statistics_view(request):
     buffer1.close()
     plt.close()
 
-    # Gráfica por género
     plt.figure(figsize=(8, 4))
     genres = sorted(book_counts_by_genre.keys())
     values = [book_counts_by_genre[g] for g in genres]
@@ -203,31 +216,19 @@ def book_detail(request, book_id):
 # -------------------------------------------------------
 # 3️⃣ RECOMENDADOR CON OPENAI
 # -------------------------------------------------------
-# ✅ No inicializamos el cliente globalmente.
-# ✅ Usamos una función que lo carga bajo demanda.
-def get_openai_client():
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("❌ No se encontró la API key de OpenAI en las variables de entorno.")
-    return OpenAI(api_key=api_key)
-
-
-def cosine_similarity(a, b):
-    """Calcula similitud de coseno entre dos vectores."""
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-
-
 @csrf_exempt
 def recommend_book(request):
     if request.method == "POST":
         prompt = request.POST.get("prompt", "").strip()
         if not prompt:
             return render(request, "books/recommend.html", {
-                "error": "Por favor escribe una descripción o preferencia."
+                "error": "Por favor escribe una descripción o preferencia.",
+                "show_prompt_section": True
             })
 
         try:
-            client = get_openai_client()  # ✅ aquí se carga cuando se necesita
+            client = get_openai_client()  # ✅ Se inicializa aquí
+
             response = client.embeddings.create(
                 model="text-embedding-3-small",
                 input=[prompt]
@@ -235,7 +236,6 @@ def recommend_book(request):
             prompt_emb = np.array(response.data[0].embedding, dtype=np.float32)
 
             books_with_similarity = []
-
             for book in Book.objects.exclude(embeddings__isnull=True):
                 try:
                     if not book.embeddings:
@@ -252,7 +252,8 @@ def recommend_book(request):
             if not top_books:
                 return render(request, "books/recommend.html", {
                     "prompt": prompt,
-                    "message": "No se encontraron coincidencias."
+                    "message": "No se encontraron coincidencias.",
+                    "show_prompt_section": True
                 })
 
             context = {
@@ -265,16 +266,19 @@ def recommend_book(request):
 
         except Exception as e:
             return render(request, "books/recommend.html", {
-                "error": f"Ocurrió un error: {e}"
+                "error": f"Ocurrió un error: {e}",
+                "show_prompt_section": True
             })
 
-    return render(request, "books/recommend.html")
+    # 👇 Cuando entra por primera vez (GET)
+    return render(request, "books/recommend.html", {
+        "show_prompt_section": True
+    })
 
 
 # -------------------------------------------------------
 # 4️⃣ CARRITO DE COMPRAS
 # -------------------------------------------------------
-
 def _get_qty(value):
     """Devuelve cantidad válida sin importar el formato viejo o nuevo."""
     if isinstance(value, dict):
@@ -283,7 +287,6 @@ def _get_qty(value):
 
 
 def add_to_cart(request, book_id):
-    """Agrega un libro al carrito o incrementa si ya existe."""
     cart = request.session.get('cart', {})
     if any(isinstance(v, dict) for v in cart.values()):
         cart = {}
@@ -306,7 +309,6 @@ def add_to_cart(request, book_id):
 
 
 def update_cart(request, book_id, action):
-    """Actualiza cantidad (+/-) desde el carrito."""
     if request.method != 'POST':
         return redirect('cart_view')
 
@@ -332,7 +334,6 @@ def update_cart(request, book_id, action):
 
 
 def remove_from_cart(request, book_id):
-    """Elimina un libro del carrito."""
     cart = request.session.get('cart', {})
     key = str(book_id)
     if key in cart:
@@ -344,7 +345,6 @@ def remove_from_cart(request, book_id):
 
 
 def cart_view(request):
-    """Muestra el carrito con todos los libros agregados."""
     cart = request.session.get('cart', {})
     cart_items = []
     total_price = 0.0
@@ -381,7 +381,6 @@ def cart_view(request):
 
 
 def clear_cart(request):
-    """Vacía completamente el carrito."""
     request.session['cart'] = {}
     request.session.modified = True
     messages.info(request, "Carrito vaciado 🧹")
@@ -389,7 +388,6 @@ def clear_cart(request):
 
 
 def buy_now(request, book_id):
-    """Agrega el libro al carrito y redirige a la vista del carrito."""
     book = get_object_or_404(Book, pk=book_id)
     cart = request.session.get('cart', {})
     key = str(book_id)

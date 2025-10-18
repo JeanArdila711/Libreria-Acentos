@@ -1,0 +1,193 @@
+/* ==============================
+   🌈 Animaciones y Estilos Globales
+   ============================== */
+
+/* Suaviza todas las transiciones y hace scroll suave */
+* {
+    transition: all 0.25s ease-in-out;
+    scroll-behavior: smooth;
+}
+
+/* ==============================
+   ✨ Animación Global al Cargar
+   ============================== */
+body {
+    opacity: 0;
+    animation: fadeInPage 0.8s ease forwards;
+    background-color: #f9fafb;
+    color: #1f2937;
+}
+@keyframes fadeInPage {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==============================
+   🔹 Offcanvas (menú lateral)
+   ============================== */
+.offcanvas {
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}
+.offcanvas.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+.offcanvas-body a {
+    position: relative;
+    display: inline-block;
+    padding-left: 5px;
+}
+.offcanvas-body a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: #26a69a;
+    transition: width 0.3s ease;
+}
+.offcanvas-body a:hover::after {
+    width: 100%;
+}
+
+/* ==============================
+   🧠 Navbar y Botones
+   ============================== */
+button, .btn, a.btn {
+    transition: all 0.3s ease-in-out !important;
+    border-radius: 10px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+nav, .btn {
+    transition: all 0.4s ease-in-out;
+}
+nav:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover con brillo tipo reflejo */
+.btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+.btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.25);
+    transform: skewX(-25deg);
+    transition: left 0.6s ease;
+    border-radius: 10px;
+}
+.btn:hover::after {
+    left: 130%;
+}
+
+/* ==============================
+   💫 Hero con gradiente animado
+   ============================== */
+.hero-section {
+    background: linear-gradient(135deg, #2d3e50, #26a69a);
+    background-size: 200% 200%;
+    color: white;
+    animation: gradientShift 8s ease infinite;
+    border-radius: 16px;
+}
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ==============================
+   🎇 Tarjetas de libros
+   ============================== */
+.card {
+    background-color: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Zoom suave en las imágenes */
+.card img {
+    transition: transform 0.4s ease;
+}
+.card:hover img {
+    transform: scale(1.05);
+}
+
+/* ==============================
+   🧠 Animaciones AOS personalizadas
+   ============================== */
+[data-aos="fade-up"] {
+    animation: fadeUp 0.6s ease-in-out;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==============================
+   🤖 Chatbot Animación de Entrada
+   ============================== */
+#chatbot-panel {
+    transition: all 0.35s ease-in-out;
+    transform: scale(0.9);
+    opacity: 0;
+}
+#chatbot-panel.open {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* ==============================
+   🌙 Modo Oscuro (corregido)
+   ============================== */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #f1f1f1;
+    }
+
+    nav {
+        background-color: #1c1c1c;
+        box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+    }
+
+    /* Mantiene las tarjetas claras para buena legibilidad */
+    .card {
+        background-color: #ffffff;
+        color: #1f2937;
+        box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+    }
+
+    .btn {
+        background-color: #26a69a;
+        color: #fff;
+        border: none;
+    }
+
+    .btn:hover {
+        background-color: #2d3e50;
+    }
+
+    .hero-section {
+        color: #fff;
+        background: linear-gradient(135deg, #1e2b3a, #178f7a);
+    }
+}
