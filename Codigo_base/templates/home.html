@@ -1,12 +1,122 @@
 {% extends "base.html" %}
-
 {% load static %}
+
 {% block title %}Inicio - {{ app_name }}{% endblock %}
 
 {% block content %}
-    <div class="welcome-panel" style="text-align:center; margin-top:60px;">
-        <h1>¡Bienvenido a la Librería Acentos!</h1>
-        <p>Explora nuestro catálogo, promociones y realiza tus pedidos desde el menú superior.</p>
-        <img src="{% static 'img/acentosimage.jpg' %}" alt="Librería Acentos" style="max-width:300px; margin-top:30px;"/>
+<!-- 🟩 HERO PRINCIPAL -->
+<section class="hero-section text-center text-white" 
+    style="background: linear-gradient(120deg, #2d3e50, #26a69a);
+           padding: 80px 20px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.25);">
+    <div class="container">
+        <img src="{% static 'img/nuevo_logo.png' %}" alt="Logo Librería Acentos" 
+             style="width: 110px; height: auto; border-radius: 12px; margin-bottom: 18px;">
+        <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 12px;">
+            Bienvenido a la Librería Acentos 📚
+        </h1>
+        <p style="font-size: 1.15rem; max-width: 720px; margin: 0 auto 30px;">
+            Explora, descubre y enamórate de tu próxima lectura. Inspirado por la Universidad EAFIT.
+        </p>
+        <a href="{% url 'recommend_book' %}" 
+           class="btn btn-lg shadow"
+           style="background-color: #26a69a; color: white; border: none;
+                  border-radius: 14px; padding: 14px 28px; font-weight: 600;
+                  transition: all 0.3s ease;">
+            🔍 Descubre tu próxima lectura
+        </a>
     </div>
+</section>
+
+<!-- 🧠 RECOMENDACIÓN EXPRESS -->
+<section class="prompt-section text-center" style="margin-top: 70px;">
+    <div class="container">
+        <h2 style="font-weight: 700; color: #2d3e50; margin-bottom: 20px;">
+            ¿No sabes qué leer? Cuéntanos qué te gusta 👇
+        </h2>
+        <form method="post" action="{% url 'recommend_book' %}" 
+              style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            {% csrf_token %}
+            <input type="text" name="prompt" placeholder="Ejemplo: novelas de aventuras con historia romántica" 
+                   required style="width: 60%; min-width: 280px; padding: 12px 16px; 
+                   border-radius: 12px; border: 1px solid #ccc; outline: none;">
+            <button type="submit" 
+                    style="background-color: #2d3e50; color: white; border: none;
+                           border-radius: 12px; padding: 12px 20px; font-weight: 600; 
+                           transition: all 0.3s ease;">
+                Recomendar
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- 📚 LIBROS DESTACADOS -->
+<section class="featured-books" style="margin-top: 80px;">
+    <div class="container text-center">
+        <h2 style="font-weight: 700; color: #2d3e50; margin-bottom: 40px;">Libros destacados</h2>
+        <div class="row justify-content-center">
+            {% for book in featured_books %}
+            <div class="col-md-4 col-lg-3 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'100' }}">
+                <div class="card shadow-sm h-100 hover-card" 
+                     style="border-radius: 14px; overflow: hidden; transition: all 0.3s ease;">
+                    <img src="{{ book.cover.url }}" alt="{{ book.title }}" 
+                         class="card-img-top" style="height: 300px; object-fit: cover;">
+                    <div class="card-body text-start">
+                        <h5 class="card-title" style="font-weight: 700; color: #2d3e50;">{{ book.title }}</h5>
+                        <p class="card-text" style="color: #555;">{{ book.author }}</p>
+                        <p class="fw-bold" style="color: #26a69a;">${{ book.price }}</p>
+                        <a href="{% url 'book_detail' book.id %}" class="btn btn-outline-dark w-100 mt-2">
+                            Ver más
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p style="color: #888;">No hay libros destacados aún.</p>
+            {% endfor %}
+        </div>
+        <a href="{% url 'book_list' %}" class="btn btn-outline-secondary mt-3">
+            Ver todo el catálogo →
+        </a>
+    </div>
+</section>
+
+<!-- 🏫 FOOTER INSTITUCIONAL -->
+<section class="footer-info text-center mt-5" 
+    style="background-color: #f8f9fa; padding: 40px 20px; border-radius: 16px;">
+    <p style="margin-bottom: 8px; color: #2d3e50; font-weight: 600;">
+        📍 Librería Acentos — Universidad EAFIT
+    </p>
+    <p style="color: #555;">
+        Desarrollado por estudiantes de Ingeniería de Sistemas. Proyecto académico de digitalización 📘
+    </p>
+</section>
+
+<!-- ✨ Script de animación de botón -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.querySelector(".btn.shadow");
+    if (btn) {
+        btn.addEventListener("mouseover", () => {
+            btn.style.transform = "scale(1.07)";
+            btn.style.boxShadow = "0 6px 18px rgba(38, 166, 154, 0.4)";
+        });
+        btn.addEventListener("mouseout", () => {
+            btn.style.transform = "scale(1)";
+            btn.style.boxShadow = "0 4px 12px rgba(38, 166, 154, 0.3)";
+        });
+    }
+
+    // Efecto hover extra para las tarjetas de libros
+    document.querySelectorAll(".hover-card").forEach(card => {
+        card.addEventListener("mouseover", () => {
+            card.style.transform = "translateY(-5px)";
+            card.style.boxShadow = "0 8px 20px rgba(0,0,0,0.15)";
+        });
+        card.addEventListener("mouseout", () => {
+            card.style.transform = "translateY(0)";
+            card.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+        });
+    });
+});
+</script>
 {% endblock %}

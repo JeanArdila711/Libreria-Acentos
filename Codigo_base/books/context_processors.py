@@ -1,6 +1,5 @@
 from .models import Book
 
-
 def common_context(request):
     genres = Book.objects.values_list('genre', flat=True).distinct().order_by('genre')
     authors = Book.objects.values_list('authors', flat=True).distinct().order_by('authors')
@@ -12,3 +11,10 @@ def common_context(request):
         'all_authors': authors,
         'featured_books': featured_books,
     }
+
+def cart_counter(request):
+    cart = request.session.get('cart', {})
+    try:
+        return {"cart_count": sum(int(q) for q in cart.values())}
+    except Exception:
+        return {"cart_count": 0}

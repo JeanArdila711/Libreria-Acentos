@@ -47,6 +47,8 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'books.context_processors.cart_counter',
+                'books.context_processors.common_context',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -104,3 +106,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # API Key de OpenAI (se lee desde el entorno)
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'

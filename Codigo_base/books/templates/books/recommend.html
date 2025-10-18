@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Recomendaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Resultados de recomendación</h2>
+
+    {% if error %}
+        <div class="alert alert-danger text-center">{{ error }}</div>
+    {% elif recommendations %}
+        <div class="row justify-content-center">
+            {% for rec in recommendations %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'100' }}">
+                <div class="card shadow-sm h-100" style="border-radius: 14px; overflow: hidden;">
+                    <img src="{{ rec.book.cover.url }}" class="card-img-top" alt="{{ rec.book.title }}" style="height: 300px; object-fit: cover;">
+                    <div class="card-body text-center">
+                        <h5 class="fw-bold">{{ rec.book.title }}</h5>
+                        <p class="text-muted">{{ rec.book.authors }}</p>
+                        <p><strong>Similitud:</strong> {{ rec.similarity }}</p>
+                        <a href="{% url 'book_detail' rec.book.id %}" class="btn btn-outline-primary w-100 mt-2">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center text-muted">No se encontraron coincidencias.</p>
+    {% endif %}
+</div>
+{% endblock %}

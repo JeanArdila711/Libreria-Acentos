@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Carrito - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5" data-aos="fade-up">
+    <h2 class="text-center mb-4" style="color:#2d3e50; font-weight:700;">
+        🛒 Tu carrito de compras
+    </h2>
+
+    {% if items %}
+    <div class="table-responsive shadow-sm rounded-4" style="overflow:hidden;">
+        <table class="table align-middle mb-0 text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Libro</th>
+                    <th scope="col" style="width:160px;">Cantidad</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Subtotal</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td class="text-start">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}" 
+                                 style="width:70px; height:100px; object-fit:cover; border-radius:8px;">
+                            <div>
+                                <h6 class="mb-1 fw-bold" style="color:#2d3e50;">{{ item.book.title }}</h6>
+                                <small class="text-muted">{{ item.book.author }}</small>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            <!-- Botón restar -->
+                            <form method="post" action="{% url 'update_cart' item.book.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="dec">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm rounded-circle fw-bold" style="width:32px; height:32px;">-</button>
+                            </form>
+
+                            <span class="fw-semibold">{{ item.qty }}</span>
+
+                            <!-- Botón sumar -->
+                            <form method="post" action="{% url 'update_cart' item.book.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="inc">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm rounded-circle fw-bold" style="width:32px; height:32px;">+</button>
+                            </form>
+                        </div>
+                    </td>
+
+                    <td>${{ item.price|floatformat:0 }}</td>
+                    <td class="fw-bold text-success">${{ item.subtotal|floatformat:0 }}</td>
+
+                    <td>
+                        <form method="post" action="{% url 'remove_from_cart' item.book.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                🗑️ Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-end mt-4">
+        <h4>Total: <span class="fw-bold text-success">${{ total|floatformat:0 }}</span></h4>
+        <div class="mt-3 d-flex justify-content-end gap-3 flex-wrap">
+            <a href="{% url 'book_list' %}" class="btn btn-outline-secondary">⬅️ Seguir comprando</a>
+            <a href="#" class="btn btn-success">💳 Finalizar compra</a>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="text-center p-5 border rounded-4 shadow-sm bg-white">
+        <h5 class="mb-3 text-muted">Tu carrito está vacío 😕</h5>
+        <a href="{% url 'book_list' %}" class="btn btn-primary">Explorar libros</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.table thead th {
+    background-color: #343537 !important;
+    color: white;
+    font-weight: 600;
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f8f9fa;
+}
+.btn-outline-secondary:hover {
+    background-color: #343537;
+    color: white;
+}
+</style>
+{% endblock %}

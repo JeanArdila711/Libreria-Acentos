@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ book.title }} - Detalle{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-start">
+        <!-- Imagen del libro -->
+        <div class="col-md-4 text-center" data-aos="fade-right">
+            <img src="{{ book.cover.url }}" alt="{{ book.title }}" class="img-fluid rounded shadow" style="max-height: 450px; object-fit: cover;">
+        </div>
+
+        <!-- Info del libro -->
+        <div class="col-md-8" data-aos="fade-left">
+            <h2 class="fw-bold">{{ book.title }}</h2>
+            <p class="text-muted mb-1"><strong>Autor(es):</strong> {{ book.authors }}</p>
+            <p class="text-muted mb-1"><strong>Género:</strong> {{ book.genre }}</p>
+            <p class="text-muted mb-1"><strong>Año:</strong> {{ book.publication_year }}</p>
+            <p class="text-muted mb-4"><strong>Idioma:</strong> {{ book.language_code|default:"No especificado" }}</p>
+
+            <h4 class="text-success fw-bold mb-4">${{ book.price }}</h4>
+
+            <p class="lead">{{ book.description|default:"No hay descripción disponible." }}</p>
+
+            <!-- Botones de acción -->
+            <div class="d-flex gap-3 mt-4">
+                <form action="{% url 'add_to_cart' book.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-primary btn-lg px-4">
+                        🛒 Agregar al carrito
+                    </button>
+                </form>
+
+                <form action="{% url 'buy_now' book.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-success btn-lg px-4">
+                        💳 Comprar ahora
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <!-- Recomendaciones relacionadas (más adelante las metemos con embeddings) -->
+    <h3 class="fw-bold text-center mb-4">Libros relacionados</h3>
+    <p class="text-center text-muted">(Próximamente recomendaciones personalizadas)</p>
+</div>
+{% endblock %}
