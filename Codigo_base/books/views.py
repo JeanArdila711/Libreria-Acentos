@@ -30,8 +30,9 @@ def filter_options_ajax(request):
     if genres:
         qs = qs.filter(genre__in=genres)
     if authors:
+        # ✅ corregimos el warning del escape con r'\.'
         qs = qs.filter(
-            authors__regex=r'(' + '|'.join([a.replace('.', '\.') for a in authors]) + ')'
+            authors__regex=r'(' + '|'.join([a.replace('.', r'\.') for a in authors]) + ')'
         )
 
     valid_genres = list(qs.values_list('genre', flat=True)
@@ -47,6 +48,7 @@ def filter_options_ajax(request):
     valid_authors = sorted(autores_set)
 
     return JsonResponse({'genres': valid_genres, 'authors': valid_authors})
+
 
 # -------------------------------------------------------
 # 2️⃣ HOME, LISTA, DETALLE Y ESTADÍSTICAS
@@ -197,18 +199,23 @@ def book_detail(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
     return render(request, "books/book_detail.html", {"book": book})
 
+
 # -------------------------------------------------------
 # 3️⃣ RECOMENDADOR CON OPENAI
 # -------------------------------------------------------
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'openAI.env'))
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# ✅ No inicializamos el cliente globalmente.
+# ✅ Usamos una función que lo carga bajo demanda.
+def get_openai_client():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("❌ No se encontró la API key de OpenAI en las variables de entorno.")
+    return OpenAI(api_key=api_key)
 
-def cosine_similarity(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 def cosine_similarity(a, b):
     """Calcula similitud de coseno entre dos vectores."""
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 
 @csrf_exempt
 def recommend_book(request):
@@ -220,7 +227,7 @@ def recommend_book(request):
             })
 
         try:
-            # 🧠 Generamos embedding del prompt del usuario
+            client = get_openai_client()  # ✅ aquí se carga cuando se necesita
             response = client.embeddings.create(
                 model="text-embedding-3-small",
                 input=[prompt]
@@ -229,21 +236,18 @@ def recommend_book(request):
 
             books_with_similarity = []
 
-            # 📚 Recorremos solo los libros con embeddings válidos
             for book in Book.objects.exclude(embeddings__isnull=True):
                 try:
                     if not book.embeddings:
                         continue
-
                     book_emb = np.array(book.embeddings, dtype=np.float32)
                     similarity = cosine_similarity(prompt_emb, book_emb)
                     books_with_similarity.append((book, similarity))
                 except Exception:
                     continue
 
-            # 🔝 Ordenar por similitud
             books_with_similarity.sort(key=lambda x: x[1], reverse=True)
-            top_books = books_with_similarity[:5]  # puedes ajustar el número de resultados
+            top_books = books_with_similarity[:5]
 
             if not top_books:
                 return render(request, "books/recommend.html", {
@@ -267,7 +271,6 @@ def recommend_book(request):
     return render(request, "books/recommend.html")
 
 
-
 # -------------------------------------------------------
 # 4️⃣ CARRITO DE COMPRAS
 # -------------------------------------------------------
@@ -278,10 +281,10 @@ def _get_qty(value):
         return int(value.get("quantity", 1))
     return int(value)
 
+
 def add_to_cart(request, book_id):
     """Agrega un libro al carrito o incrementa si ya existe."""
     cart = request.session.get('cart', {})
-    # Si detecta formato viejo, limpia
     if any(isinstance(v, dict) for v in cart.values()):
         cart = {}
 
@@ -300,6 +303,7 @@ def add_to_cart(request, book_id):
 
     messages.success(request, f"Agregado al carrito: {book.title}")
     return redirect('cart_view')
+
 
 def update_cart(request, book_id, action):
     """Actualiza cantidad (+/-) desde el carrito."""
@@ -326,6 +330,7 @@ def update_cart(request, book_id, action):
 
     return redirect('cart_view')
 
+
 def remove_from_cart(request, book_id):
     """Elimina un libro del carrito."""
     cart = request.session.get('cart', {})
@@ -336,6 +341,7 @@ def remove_from_cart(request, book_id):
         request.session.modified = True
         messages.success(request, "Libro eliminado del carrito 🗑️")
     return redirect('cart_view')
+
 
 def cart_view(request):
     """Muestra el carrito con todos los libros agregados."""
@@ -373,12 +379,14 @@ def cart_view(request):
         "total_price": round(total_price, 2),
     })
 
+
 def clear_cart(request):
     """Vacía completamente el carrito."""
     request.session['cart'] = {}
     request.session.modified = True
     messages.info(request, "Carrito vaciado 🧹")
     return redirect('cart_view')
+
 
 def buy_now(request, book_id):
     """Agrega el libro al carrito y redirige a la vista del carrito."""
@@ -389,4 +397,3 @@ def buy_now(request, book_id):
     request.session['cart'] = cart
     request.session.modified = True
     return redirect('cart_view')
-

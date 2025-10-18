@@ -7,6 +7,9 @@ load_dotenv()  # Carga variables desde openAI.env o .env
 # Ruta base
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Cargar el archivo de openAI.env que esta dentro de Codigo_base
+load_dotenv(os.path.join(BASE_DIR, "openAI.env"))
+
 # Seguridad
 SECRET_KEY = 'django-insecure-reemplaza-esto-por-una-clave-real'
 DEBUG = True
