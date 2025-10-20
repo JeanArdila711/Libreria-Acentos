@@ -78,10 +78,10 @@
                             <h5 class="card-title">{{ book.title }}</h5>
                             <p class="text-muted mb-1">{{ book.authors }}</p>
                             <p class="fw-bold price-tag mb-0">
-                                {% if book.price %}
-                                    ${{ book.price|floatformat:0 }}
+                                {% if book.average_rating %}
+                                    ⭐ {{ book.average_rating|floatformat:2 }}
                                 {% else %}
-                                    Consultar
+                                    Sin calificación
                                 {% endif %}
                             </p>
                         </div>

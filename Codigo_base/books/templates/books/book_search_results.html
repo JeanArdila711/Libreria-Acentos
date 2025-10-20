@@ -10,17 +10,19 @@
         <div class="book-grid">
             {% for book in books %}
                 <div class="book-item">
-                    <img src="{{ book.cover_image }}" alt="Portada de {{ book.title }}">
+                    <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
+                         alt="Portada de {{ book.title }}"
+                         onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
                     <h3>{{ book.title }}</h3>
-                    <p><strong>Autor:</strong> {{ book.author }}</p>
+                    <p><strong>Autor:</strong> {{ book.authors }}</p>
                     <p><strong>Género:</strong> {{ book.genre }}</p>
-                    {% if book.publication_year %}
-                        <p><strong>Año:</strong> {{ book.publication_year }}</p>
+                    {% if book.publication_date %}
+                        <p><strong>Año:</strong> {{ book.publication_date }}</p>
                     {% endif %}
                     <div class="book-detail">
                         <details>
-                            <summary>Ver Sinopsis</summary>
-                            <p>{{ book.synopsis }}</p>
+                            <summary>Ver Descripción</summary>
+                            <p>{{ book.description|default:"No hay descripción disponible" }}</p>
                         </details>
                     </div>
                 </div>

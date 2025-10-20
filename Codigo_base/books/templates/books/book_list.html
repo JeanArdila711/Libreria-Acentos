@@ -121,7 +121,7 @@
           <p class="book-author"><i class="bi bi-person me-1"></i>{{ book.authors|truncatewords:3 }}</p>
           <div class="book-footer">
             <span class="book-price">
-              {% if book.price %} ${{ book.price|floatformat:0 }} {% else %} Consultar {% endif %}
+              {% if book.average_rating %} ⭐ {{ book.average_rating|floatformat:2 }} {% else %} Sin calificación {% endif %}
             </span>
             <a href="{% url 'book_detail' book.id %}" class="view-details-btn">
               Ver más <i class="bi bi-arrow-right ms-1"></i>

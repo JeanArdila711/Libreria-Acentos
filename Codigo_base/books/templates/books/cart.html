@@ -16,8 +16,7 @@
                 <tr>
                     <th>Libro</th>
                     <th style="width:160px;">Cantidad</th>
-                    <th>Precio</th>
-                    <th>Subtotal</th>
+                    <th>Calificación</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -46,8 +45,13 @@
                         </div>
                     </td>
 
-                    <td class="text-center">${{ item.book.price }}</td>
-                    <td class="text-center fw-bold">${{ item.subtotal }}</td>
+                    <td class="text-center">
+                        {% if item.book.average_rating %}
+                            ⭐ {{ item.book.average_rating|floatformat:2 }}
+                        {% else %}
+                            Sin calificación
+                        {% endif %}
+                    </td>
 
                     <td class="text-center">
                         <form method="post" action="{% url 'remove_from_cart' item.book.id %}">
@@ -64,14 +68,14 @@
     </div>
 
     <div class="text-end mt-4">
-        <h4>Total: <span class="fw-bold" style="color: var(--black);">${{ total_price }}</span></h4>
+        <h4>Libros en carrito: <span class="fw-bold" style="color: var(--black);">{{ cart_items|length }}</span></h4>
         <div class="mt-3 d-flex justify-content-end gap-3 flex-wrap">
-            <a href="{% url 'book_list' %}" class="btn btn-outline">⬅️ Seguir comprando</a>
+            <a href="{% url 'book_list' %}" class="btn btn-outline">⬅️ Seguir explorando</a>
             <form method="post" action="{% url 'clear_cart' %}">
                 {% csrf_token %}
                 <button class="btn btn-outline">🧹 Vaciar carrito</button>
             </form>
-            <a href="#" class="btn btn-main">💳 Finalizar compra</a>
+            <a href="#" class="btn btn-main">📚 Guardar lista</a>
         </div>
     </div>
 

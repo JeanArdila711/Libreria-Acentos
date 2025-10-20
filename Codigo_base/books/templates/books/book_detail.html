@@ -54,21 +54,21 @@
             <div class="book-meta mb-4">
                 <div class="meta-item"><i class="bi bi-person"></i><span>Autor(es):</span> {{ book.authors }}</div>
                 <div class="meta-item"><i class="bi bi-bookmark"></i><span>Género:</span> {{ book.genre }}</div>
-                <div class="meta-item"><i class="bi bi-calendar"></i><span>Año:</span> {{ book.publication_year }}</div>
-                <div class="meta-item"><i class="bi bi-translate"></i><span>Idioma:</span> {{ book.language_code|default:"No especificado" }}</div>
+                <div class="meta-item"><i class="bi bi-calendar"></i><span>Año:</span> {{ book.publication_date }}</div>
+                <div class="meta-item"><i class="bi bi-people"></i><span>Grupo edad:</span> {{ book.dominant_age_group|default:"No especificado" }}</div>
             </div>
 
-            <!-- 💰 Precio -->
+            <!-- ⭐ Calificación -->
             <div class="price-section mb-4">
                 <h3 class="price-amount mb-2">
-                    {% if book.price %}
-                        ${{ book.price|floatformat:0 }}
+                    {% if book.average_rating %}
+                        ⭐ {{ book.average_rating|floatformat:2 }} / 5.0
                     {% else %}
-                        Precio a consultar
+                        Sin calificación
                     {% endif %}
                 </h3>
                 <p class="text-muted small">
-                    <i class="bi bi-truck"></i> Envío gratis en compras mayores a $100.000
+                    <i class="bi bi-people"></i> {{ book.ratings_count|default:"0" }} calificaciones
                 </p>
             </div>
 

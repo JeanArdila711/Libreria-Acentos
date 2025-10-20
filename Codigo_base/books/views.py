@@ -129,9 +129,7 @@ class BookListView(ListView):
                 authors = [authors]
             qs = qs.filter(authors__in=authors)
 
-        language = self.request.GET.get('language_code')
-        if language:
-            qs = qs.filter(language_code=language)
+        # El campo language_code ya no existe en el nuevo modelo
 
         return qs.order_by('title')
 
@@ -157,7 +155,7 @@ def statistics_view(request):
     all_books = Book.objects.all()
     book_counts_by_year = {}
     for book in all_books:
-        year = str(book.publication_year) if book.publication_year else "Sin año"
+        year = str(book.publication_date) if book.publication_date else "Sin año"
         book_counts_by_year[year] = book_counts_by_year.get(year, 0) + 1
 
     book_counts_by_genre = {}
@@ -354,10 +352,8 @@ def cart_view(request):
         except (ValueError, Book.DoesNotExist):
             continue
 
-        try:
-            price = float(book.price or 0)
-        except Exception:
-            price = 0.0
+        # El modelo actual no tiene campo price, se puede agregar después si es necesario
+        price = 0.0
 
         subtotal = round(price * qty, 2)
         total_price += subtotal
