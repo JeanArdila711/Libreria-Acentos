@@ -4,61 +4,72 @@
 {% block title %}Inicio - {{ app_name }}{% endblock %}
 
 {% block content %}
-<!-- 🟩 HERO PRINCIPAL -->
+<!-- 🌊 HERO PRINCIPAL - ÚNICO ELEMENTO CON COLOR -->
 <section class="hero-section text-center text-white" 
-    style="background: linear-gradient(120deg, #2d3e50, #26a69a);
-           padding: 80px 20px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.25);">
+    style="background: linear-gradient(120deg, #2c5f5f, #3d8080, #4da5a5);
+           padding: 80px 20px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
     <div class="container">
-        <img src="{% static 'img/Logo.png' %}" alt="Logo Librería Acentos" 
-             style="width: 110px; height: auto; border-radius: 12px; margin-bottom: 18px;">
-        <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 12px;">
+        <img src="{% static 'img/Logo.png' %}" alt="Logo INKALAB LIBROS" 
+             style="width: 110px; height: auto; border-radius: 12px; margin-bottom: 18px; 
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.02em;">
             Bienvenido a INKALAB LIBROS 📚
         </h1>
-        <p style="font-size: 1.15rem; max-width: 720px; margin: 0 auto 30px;">
+        <p style="font-size: 1.15rem; max-width: 720px; margin: 0 auto 30px; opacity: 0.95;">
             Explora, descubre y enamórate de tu próxima lectura. Inspirado por la Universidad EAFIT.
         </p>
         <a href="{% url 'recommend_book' %}" 
-           class="btn btn-lg shadow"
-           style="background-color: #26a69a; color: white; border: none;
-                  border-radius: 14px; padding: 14px 28px; font-weight: 600;
-                  transition: all 0.3s ease;">
+           class="btn btn-lg shadow hero-btn"
+           style="background-color: rgba(255, 255, 255, 0.95); color: #2c5f5f; border: none;
+                  border-radius: 12px; padding: 14px 32px; font-weight: 600;
+                  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
             🔍 Descubre tu próxima lectura
         </a>
     </div>
 </section>
 
-<!-- 🧠 RECOMENDACIÓN EXPRESS -->
+<!-- 🧠 RECOMENDACIÓN EXPRESS - MONOCROMÁTICO -->
 <section class="prompt-section text-center" style="margin-top: 70px;">
     <div class="container">
-        <h2 style="font-weight: 700; color: #2d3e50; margin-bottom: 20px;">
+        <h2 style="font-weight: 700; color: #1a1a1a; margin-bottom: 20px; letter-spacing: -0.02em;">
             ¿No sabes qué leer? Cuéntanos qué te gusta 👇
         </h2>
         <form method="post" action="{% url 'recommend_book' %}" 
               style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
             {% csrf_token %}
-            <input type="text" name="prompt" placeholder="Ejemplo: novelas de aventuras con historia romántica" 
-                   required style="width: 60%; min-width: 280px; padding: 12px 16px; 
-                   border-radius: 12px; border: 1px solid #ccc; outline: none;">
+            <input type="text" name="prompt" 
+                   placeholder="Ejemplo: novelas de aventuras con historia romántica" 
+                   required 
+                   class="search-input"
+                   style="width: 60%; min-width: 280px; padding: 14px 20px; 
+                          border-radius: 12px; border: 2px solid #e5e5e5; 
+                          outline: none; font-size: 1rem;
+                          transition: all 0.3s ease;
+                          background: white;">
             <button type="submit" 
-                    style="background-color: #2d3e50; color: white; border: none;
-                           border-radius: 12px; padding: 12px 20px; font-weight: 600; 
-                           transition: all 0.3s ease;">
+                    class="search-btn"
+                    style="background-color: #1a1a1a; color: white; border: none;
+                           border-radius: 12px; padding: 14px 28px; font-weight: 600; 
+                           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                           cursor: pointer;">
                 Recomendar
             </button>
         </form>
     </div>
 </section>
 
-<!-- 📚 LIBROS DESTACADOS -->
+<!-- 📚 LIBROS DESTACADOS - MONOCROMÁTICO -->
 <section class="featured-books" style="margin-top: 80px;">
     <div class="container text-center">
-        <h2 style="font-weight: 700; color: #2d3e50; margin-bottom: 40px;">Libros recomendados</h2>
+        <h2 style="font-weight: 700; color: #1a1a1a; margin-bottom: 40px; letter-spacing: -0.02em;">
+            Libros recomendados
+        </h2>
 
         <div class="row justify-content-center g-4">
             {% for book in featured_books %}
             <div class="col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'100' }}">
                 <a href="{% url 'book_detail' book.id %}" class="book-card-link">
-                    <div class="card h-100 shadow-sm book-card">
+                    <div class="card h-100 book-card">
                         <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
                              alt="Portada de {{ book.title }}"
                              class="card-img-top"
@@ -66,7 +77,7 @@
                         <div class="card-body text-start">
                             <h5 class="card-title">{{ book.title }}</h5>
                             <p class="text-muted mb-1">{{ book.authors }}</p>
-                            <p class="fw-bold text-success mb-0">
+                            <p class="fw-bold price-tag mb-0">
                                 {% if book.price %}
                                     ${{ book.price|floatformat:0 }}
                                 {% else %}
@@ -78,156 +89,137 @@
                 </a>
             </div>
             {% empty %}
-            <p style="color: #888;">No hay libros destacados aún.</p>
+            <p style="color: #6b7280;">No hay libros destacados aún.</p>
             {% endfor %}
         </div>
 
-        <a href="{% url 'book_list' %}" class="btn btn-outline-secondary mt-4">
+        <a href="{% url 'book_list' %}" class="btn btn-catalog mt-5">
             Ver todo el catálogo →
         </a>
     </div>
 </section>
 
-<!-- 🏫 FOOTER INSTITUCIONAL -->
+<!-- 🏫 FOOTER INSTITUCIONAL - MONOCROMÁTICO -->
 <section class="footer-info text-center mt-5" 
-    style="background-color: #f8f9fa; padding: 40px 20px; border-radius: 16px;">
-    <p style="margin-bottom: 8px; color: #2d3e50; font-weight: 600;">
+    style="background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%); 
+           padding: 40px 20px; border-radius: 16px;
+           border: 1px solid #e5e5e5;">
+    <p style="margin-bottom: 8px; color: #1a1a1a; font-weight: 600; font-size: 1.05rem;">
         📍 INKALAB LIBROS — Universidad EAFIT
     </p>
-    <p style="color: #555;">
+    <p style="color: #4a4a4a;">
         Desarrollado por estudiantes de Ingeniería de Sistemas. Proyecto académico de digitalización 📘
     </p>
 </section>
 
-<!-- 🎨 Estilos -->
+<!-- 🎨 ESTILOS MONOCROMÁTICOS ELEGANTES -->
 <style>
-/* Links de las cards sin decoración */
+/* ==================== HERO SECTION ==================== */
+.hero-btn:hover {
+    background-color: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== BÚSQUEDA ==================== */
+.search-input:focus {
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-btn:hover {
+    background-color: #2d2d2d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* ==================== BOOK CARDS ==================== */
 .book-card-link {
     text-decoration: none;
     color: inherit;
     display: block;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Cards base */
 .book-card {
-    border-radius: 14px;
+    border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e5e5e5;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Imágenes de las cards */
 .book-card img {
     height: 280px;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: grayscale(0%);
 }
 
-/* Hover en toda la card */
 .book-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    border-color: #1a1a1a;
 }
 
-/* Zoom en la imagen al hacer hover */
 .book-card:hover img {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
-/* Títulos de las cards */
+/* Card body con degradado sutil */
+.book-card .card-body {
+    background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
+    padding: 20px;
+}
+
 .book-card .card-title {
     font-weight: 700;
-    color: #2d3e50;
+    color: #1a1a1a;
     transition: color 0.3s ease;
     font-size: 1.05rem;
     line-height: 1.3;
+    letter-spacing: -0.01em;
 }
 
-/* Cambio de color del título en hover */
 .book-card:hover .card-title {
-    color: #26a69a;
+    color: #2d2d2d;
 }
 
-/* 🎨 ARREGLO DE CARDS - FONDOS SUAVES */
-.book-card .card-body {
-    background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%) !important;
-    color: #1f2937 !important;
-    padding: 20px !important;
-}
-
-/* Asegurar que todos los elementos dentro tengan fondo transparente */
-.book-card .card-body * {
-    background: transparent !important;
-}
-
-/* Títulos con color oscuro */
-.book-card .card-body h5,
-.book-card .card-body .card-title {
-    color: #2d3e50 !important;
-}
-
-/* Texto secundario (autor) en gris suave */
-.book-card .card-body .text-muted {
+.book-card .text-muted {
     color: #6b7280 !important;
     font-size: 0.9rem;
 }
 
-/* Precio en verde/azul mantenerlo */
-.book-card .card-body .text-success {
-    color: #26a69a !important;
-    font-size: 1.1rem;
+/* Precio elegante en negro */
+.price-tag {
+    color: #1a1a1a !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em;
 }
 
-/* Hover mejorado en el body */
-.book-card:hover .card-body {
-    background: linear-gradient(to bottom, #fafbfc 0%, #f0f2f5 100%) !important;
-}
-
-/* Si hay un footer en las cards (opcional) */
-.book-card .card-footer {
-    background: linear-gradient(to bottom, #f8f9fa 0%, #f0f2f5 100%) !important;
-    border-top: 1px solid #e5e7eb !important;
-    padding: 14px 20px !important;
-}
-
-/* Animación suave del botón del hero */
-.hero-section .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(38, 166, 154, 0.4);
-}
-
-/* Input de búsqueda mejorado */
-.prompt-section input:focus {
-    border-color: #26a69a;
-    box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1);
-    outline: none;
-}
-
-.prompt-section button:hover {
-    background-color: #1e2f3e;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(45, 62, 80, 0.3);
-}
-
-/* Botón de ver catálogo */
-.btn-outline-secondary {
-    border-color: #2d3e50;
-    color: #2d3e50;
+/* ==================== BOTÓN CATÁLOGO ==================== */
+.btn-catalog {
+    display: inline-block;
+    background: white;
+    color: #1a1a1a;
+    border: 2px solid #1a1a1a;
     font-weight: 600;
-    padding: 12px 30px;
+    padding: 14px 36px;
     border-radius: 12px;
-    transition: all 0.3s ease;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
 }
 
-.btn-outline-secondary:hover {
-    background-color: #2d3e50;
+.btn-catalog:hover {
+    background-color: #1a1a1a;
     color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(45, 62, 80, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
-/* Responsive */
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
     .hero-section h1 {
         font-size: 1.8rem !important;
@@ -241,9 +233,34 @@
         width: 100% !important;
     }
 
+    .search-btn {
+        width: 100%;
+    }
+
     .book-card img {
         height: 240px;
     }
+
+    .btn-catalog {
+        width: 100%;
+        padding: 12px 24px;
+    }
+}
+
+/* ==================== ANIMACIONES SUAVES ==================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.featured-books {
+    animation: fadeInUp 0.6s ease-out;
 }
 </style>
 {% endblock %}

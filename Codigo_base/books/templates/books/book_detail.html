@@ -3,48 +3,208 @@
 
 {% block title %}{{ book.title }} - Detalle{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumb-container fade-in-up mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'home' %}" class="text-decoration-none">
+                    <i class="bi bi-house-door-fill"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-separator mx-2">›</li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'book_list' %}" class="text-decoration-none">
+                    <i class="bi bi-book-half"></i> Catálogo
+                </a>
+            </li>
+            <li class="breadcrumb-separator mx-2">›</li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ book.title|truncatewords:5 }}
+            </li>
+        </ol>
+    </nav>
+</div>
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <div class="row align-items-start">
-        <!-- Imagen genérica -->
+<div class="container py-5 fade-in-up">
+    <div class="row align-items-start g-4">
+        <!-- 📘 Imagen del libro -->
         <div class="col-md-4 text-center" data-aos="fade-right">
-            <img src="{% static 'img/default_cover.jpg' %}" alt="Portada genérica" 
-                 class="img-fluid rounded shadow" 
-                 style="max-height: 450px; object-fit: cover;">
+            <div class="book-image-container position-relative">
+                <img src="{{ book.image_url|default:'https://placehold.co/300x450?text=Sin+Imagen' }}" 
+                     alt="Portada de {{ book.title }}" 
+                     class="img-fluid rounded-3 shadow-sm book-cover"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x450?text=Sin+Imagen';">
+
+                <!-- Badge -->
+                <div class="book-badge">
+                    <span class="badge bg-dark text-white">
+                        <i class="bi bi-check-circle"></i> Disponible
+                    </span>
+                </div>
+            </div>
         </div>
 
-        <!-- Info del libro -->
+        <!-- 📄 Detalles del libro -->
         <div class="col-md-8" data-aos="fade-left">
-            <h2 class="fw-bold">{{ book.title }}</h2>
-            <p class="text-muted mb-1"><strong>Autor(es):</strong> {{ book.authors }}</p>
-            <p class="text-muted mb-1"><strong>Género:</strong> {{ book.genre }}</p>
-            <p class="text-muted mb-1"><strong>Año:</strong> {{ book.publication_year }}</p>
-            <p class="text-muted mb-4"><strong>Idioma:</strong> {{ book.language_code|default:"No especificado" }}</p>
+            <h1 class="fw-bold mb-3 book-title">{{ book.title }}</h1>
 
-            <h4 class="text-success fw-bold mb-4">${{ book.price }}</h4>
+            <div class="book-meta mb-4">
+                <div class="meta-item"><i class="bi bi-person"></i><span>Autor(es):</span> {{ book.authors }}</div>
+                <div class="meta-item"><i class="bi bi-bookmark"></i><span>Género:</span> {{ book.genre }}</div>
+                <div class="meta-item"><i class="bi bi-calendar"></i><span>Año:</span> {{ book.publication_year }}</div>
+                <div class="meta-item"><i class="bi bi-translate"></i><span>Idioma:</span> {{ book.language_code|default:"No especificado" }}</div>
+            </div>
 
-            <p class="lead">{{ book.description|default:"No hay descripción disponible." }}</p>
+            <!-- 💰 Precio -->
+            <div class="price-section mb-4">
+                <h3 class="price-amount mb-2">
+                    {% if book.price %}
+                        ${{ book.price|floatformat:0 }}
+                    {% else %}
+                        Precio a consultar
+                    {% endif %}
+                </h3>
+                <p class="text-muted small">
+                    <i class="bi bi-truck"></i> Envío gratis en compras mayores a $100.000
+                </p>
+            </div>
 
-            <div class="d-flex gap-3 mt-4">
-                <form action="{% url 'add_to_cart' book.id %}" method="post">
+            <!-- 📜 Descripción -->
+            <div class="book-description mb-4">
+                <h5><i class="bi bi-card-text"></i> Descripción</h5>
+                <p>{{ book.description|default:"No hay descripción disponible para este libro." }}</p>
+            </div>
+
+            <!-- 🛒 Botones principales -->
+            <div class="action-buttons d-flex flex-wrap gap-3 mt-4">
+                <form action="{% url 'add_to_cart' book.id %}" method="post" class="flex-fill">
                     {% csrf_token %}
-                    <button class="btn btn-outline-primary btn-lg px-4">
-                        🛒 Agregar al carrito
+                    <button class="btn btn-outline btn-lg w-100">
+                        <i class="bi bi-cart-plus"></i> Agregar al carrito
                     </button>
                 </form>
 
-                <form action="{% url 'buy_now' book.id %}" method="post">
+                <form action="{% url 'buy_now' book.id %}" method="post" class="flex-fill">
                     {% csrf_token %}
-                    <button class="btn btn-success btn-lg px-4">
-                        💳 Comprar ahora
+                    <button class="btn btn-main btn-lg w-100">
+                        <i class="bi bi-lightning-fill"></i> Comprar ahora
                     </button>
                 </form>
+            </div>
+
+            <!-- ❤️ Botones secundarios -->
+            <div class="secondary-actions d-flex gap-2 mt-3">
+                <button class="btn btn-outline btn-small">
+                    <i class="bi bi-heart"></i> Favoritos
+                </button>
+                <button class="btn btn-outline btn-small">
+                    <i class="bi bi-share"></i> Compartir
+                </button>
             </div>
         </div>
     </div>
 
-    <hr class="my-5">
-    <h3 class="fw-bold text-center mb-4">Libros relacionados</h3>
-    <p class="text-center text-muted">(Próximamente recomendaciones personalizadas)</p>
+    <!-- 🔸 Separador -->
+    <hr class="divider-custom my-5">
+
+    <!-- 📚 Libros relacionados -->
+    <div class="related-books-section" data-aos="fade-up">
+        <h3 class="fw-bold text-center mb-2">
+            <i class="bi bi-stars"></i> Libros relacionados
+        </h3>
+        <p class="text-center text-muted mb-4">
+            Descubre más libros que te podrían interesar
+        </p>
+        <div class="alert alert-info text-center">
+            <i class="bi bi-clock-history me-2"></i>
+            Próximamente recomendaciones personalizadas basadas en tus intereses
+        </div>
+    </div>
 </div>
+
+<style>
+/* 🧱 ESTRUCTURA DEL DETALLE (Monocromático) */
+.book-cover {
+    border: 1px solid var(--light-gray);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.book-cover:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+.book-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+.book-title {
+    color: var(--black);
+    font-size: 2rem;
+    letter-spacing: -0.01em;
+}
+.book-meta {
+    background: var(--extra-light-gray);
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid var(--light-gray);
+}
+.book-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: var(--medium-gray);
+    padding: 5px 0;
+}
+.price-section {
+    background: var(--white);
+    border: 2px solid var(--black);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: left;
+}
+.price-amount {
+    color: var(--black);
+    font-size: 2rem;
+    font-weight: 700;
+}
+.book-description {
+    background: var(--extra-light-gray);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--medium-gray);
+}
+.book-description h5 {
+    font-weight: 600;
+    color: var(--black);
+}
+.book-description p {
+    color: var(--medium-gray);
+}
+.divider-custom {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--medium-gray), transparent);
+}
+.related-books-section h3 {
+    color: var(--black);
+}
+.related-books-section .alert {
+    border: 2px dashed var(--medium-gray);
+    background: var(--extra-light-gray);
+    color: var(--black);
+    border-radius: 12px;
+}
+.secondary-actions .btn:hover {
+    transform: translateY(-2px);
+}
+@media (max-width: 768px) {
+    .book-title { font-size: 1.6rem; }
+    .price-amount { font-size: 1.8rem; }
+    .action-buttons { flex-direction: column; }
+}
+</style>
 {% endblock %}

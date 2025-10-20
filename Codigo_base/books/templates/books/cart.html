@@ -4,15 +4,15 @@
 {% block title %}Carrito - {{ app_name }}{% endblock %}
 
 {% block content %}
-<div class="container my-5" data-aos="fade-up">
-    <h2 class="text-center mb-4 fw-bold" style="color:#2d3e50;">
+<div class="container my-5 fade-in-up">
+    <h2 class="text-center mb-4 fw-bold" style="color: var(--black);">
         🛒 Tu carrito de compras
     </h2>
 
     {% if cart_items and cart_items|length > 0 %}
-    <div class="table-responsive shadow-sm rounded-4" style="overflow:hidden;">
+    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
         <table class="table align-middle mb-0">
-            <thead class="table-dark text-center">
+            <thead class="text-center" style="background: var(--black); color: var(--white);">
                 <tr>
                     <th>Libro</th>
                     <th style="width:160px;">Cantidad</th>
@@ -26,7 +26,9 @@
                 <tr>
                     <td>
                         <div>
-                            <h6 class="mb-1 fw-bold" style="color:#2d3e50;">{{ item.book.title }}</h6>
+                            <h6 class="mb-1 fw-bold" style="color: var(--black);">
+                                {{ item.book.title }}
+                            </h6>
                             <small class="text-muted">{{ item.book.authors }}</small>
                         </div>
                     </td>
@@ -34,12 +36,12 @@
                         <div class="d-flex justify-content-center align-items-center gap-2">
                             <form method="post" action="{% url 'update_cart' item.book.id 'decrease' %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-secondary btn-sm rounded-circle fw-bold" style="width:32px; height:32px;">-</button>
+                                <button type="submit" class="btn btn-outline btn-sm rounded-circle fw-bold" style="width:32px; height:32px;">-</button>
                             </form>
                             <span class="fw-semibold">{{ item.quantity }}</span>
                             <form method="post" action="{% url 'update_cart' item.book.id 'increase' %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-secondary btn-sm rounded-circle fw-bold" style="width:32px; height:32px;">+</button>
+                                <button type="submit" class="btn btn-outline btn-sm rounded-circle fw-bold" style="width:32px; height:32px;">+</button>
                             </form>
                         </div>
                     </td>
@@ -50,7 +52,7 @@
                     <td class="text-center">
                         <form method="post" action="{% url 'remove_from_cart' item.book.id %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                            <button type="submit" class="btn btn-outline btn-small">
                                 🗑️ Eliminar
                             </button>
                         </form>
@@ -62,34 +64,84 @@
     </div>
 
     <div class="text-end mt-4">
-        <h4>Total: <span class="fw-bold text-success">${{ total_price }}</span></h4>
+        <h4>Total: <span class="fw-bold" style="color: var(--black);">${{ total_price }}</span></h4>
         <div class="mt-3 d-flex justify-content-end gap-3 flex-wrap">
-            <a href="{% url 'book_list' %}" class="btn btn-outline-secondary">⬅️ Seguir comprando</a>
+            <a href="{% url 'book_list' %}" class="btn btn-outline">⬅️ Seguir comprando</a>
             <form method="post" action="{% url 'clear_cart' %}">
                 {% csrf_token %}
-                <button class="btn btn-outline-danger">🧹 Vaciar carrito</button>
+                <button class="btn btn-outline">🧹 Vaciar carrito</button>
             </form>
-            <a href="#" class="btn btn-success">💳 Finalizar compra</a>
+            <a href="#" class="btn btn-main">💳 Finalizar compra</a>
         </div>
     </div>
 
     {% else %}
-    <div class="text-center p-5 border rounded-4 shadow-sm bg-white">
+    <div class="text-center p-5 border rounded-4 shadow-sm" style="background: var(--white); border-color: var(--light-gray);">
         <h5 class="mb-3 text-muted">Tu carrito está vacío 😕</h5>
-        <a href="{% url 'book_list' %}" class="btn btn-primary">Explorar libros</a>
+        <a href="{% url 'book_list' %}" class="btn btn-main">Explorar libros</a>
     </div>
     {% endif %}
 </div>
 
 <style>
-.table thead th {
-    background-color: #343537 !important;
-    color: white;
-    font-weight: 600;
+/* 🧱 TABLA */
+.table {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
 }
-.btn-outline-secondary:hover {
-    background-color: #343537;
-    color: white;
+.table th, .table td {
+    vertical-align: middle;
+    padding: 14px;
+    border-color: var(--light-gray);
+}
+.table tbody tr:hover {
+    background: var(--extra-light-gray);
+}
+
+/* BOTONES */
+.btn-outline {
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--black);
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+.btn-outline:hover {
+    background: var(--black);
+    color: var(--white);
+}
+.btn-main {
+    background: var(--black);
+    color: var(--white);
+    border: 2px solid var(--black);
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+.btn-main:hover {
+    background: var(--white);
+    color: var(--black);
+}
+.btn-small {
+    padding: 6px 14px;
+    font-size: 0.9rem;
+}
+
+/* TOTAL */
+.text-end h4 {
+    font-size: 1.4rem;
+    color: var(--black);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    table {
+        font-size: 0.9rem;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
 }
 </style>
 {% endblock %}

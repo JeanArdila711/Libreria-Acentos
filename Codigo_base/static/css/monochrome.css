@@ -1,0 +1,261 @@
+/* ======================================================
+   🎨 MONOCHROME.CSS
+   Tema monocromático elegante para Librería Acentos
+   ====================================================== */
+
+:root {
+    --black: #1a1a1a;
+    --dark-gray: #2d2d2d;
+    --medium-gray: #4a4a4a;
+    --light-gray: #e5e5e5;
+    --extra-light-gray: #f5f5f5;
+    --white: #ffffff;
+
+    /* Solo para el HERO */
+    --hero-start: #2c5f5f;
+    --hero-mid: #3d8080;
+    --hero-end: #4da5a5;
+}
+
+/* 🧱 ESTRUCTURA GENERAL */
+body {
+    background-color: var(--extra-light-gray);
+    color: var(--black);
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* ==================== BOTONES ==================== */
+.btn-main {
+    display: inline-block;
+    background: var(--black);
+    color: var(--white);
+    border: 2px solid var(--black);
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 12px 28px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-main:hover {
+    background: var(--white);
+    color: var(--black);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.btn-outline {
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--black);
+    border-radius: 12px;
+    padding: 12px 28px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-outline:hover {
+    background: var(--black);
+    color: var(--white);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== FORMULARIOS ==================== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 12px 16px;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: var(--black);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--black);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    outline: none;
+}
+
+/* ==================== TARJETAS ==================== */
+.card {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--black);
+}
+
+.card-img-top {
+    border-radius: 12px 12px 0 0;
+    height: 280px;
+    object-fit: cover;
+    filter: grayscale(0%);
+    transition: transform 0.4s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.08);
+}
+
+.card-body {
+    padding: 20px;
+    background: linear-gradient(to bottom, var(--white) 0%, #fafafa 100%);
+}
+
+.card-title {
+    font-weight: 700;
+    color: var(--black);
+    font-size: 1.05rem;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+}
+
+.card-text,
+.card p {
+    color: var(--medium-gray);
+    font-size: 0.95rem;
+}
+
+/* ==================== PRECIO ==================== */
+.price-tag {
+    color: var(--black) !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* ==================== TABLAS ==================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table thead {
+    background: var(--dark-gray);
+    color: var(--white);
+}
+
+table th, table td {
+    padding: 12px 16px;
+    border: 1px solid var(--light-gray);
+    text-align: left;
+}
+
+table tbody tr:nth-child(even) {
+    background: var(--extra-light-gray);
+}
+
+table tbody tr:hover {
+    background: var(--light-gray);
+}
+
+/* ==================== LINKS ==================== */
+a {
+    color: var(--black);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--medium-gray);
+}
+
+/* ==================== CONTENEDORES ==================== */
+.section-title {
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+    color: var(--medium-gray);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* ==================== ALERTAS ==================== */
+.alert {
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--light-gray);
+    background: var(--white);
+    color: var(--black);
+}
+
+.alert-success {
+    border-left: 5px solid var(--dark-gray);
+}
+
+.alert-error {
+    border-left: 5px solid var(--black);
+}
+
+/* ==================== BOTONES PEQUEÑOS ==================== */
+.btn-small {
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+}
+
+/* ==================== FOOTER ==================== */
+footer {
+    background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+    color: var(--white);
+    padding: 30px 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+footer p {
+    opacity: 0.9;
+}
+
+/* ==================== ANIMACIONES ==================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 240px;
+    }
+
+    .btn-main, .btn-outline {
+        width: 100%;
+    }
+}

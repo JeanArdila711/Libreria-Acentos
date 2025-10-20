@@ -11,49 +11,81 @@
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/monochrome.css' %}">
 
     <style>
     :root {
-        --primary: #343537;
-        --accent: #2D9CDB;
-        --bg: #F5F7FB;
-        --card: #FFFFFF;
-        --text: #1F2937;
-        --muted: #6B7280;
-        --border: #E5E7EB;
-        --danger: #E76F51;
-        --success: #10b981;
+        --black: #1a1a1a;
+        --dark-gray: #2d2d2d;
+        --medium-gray: #4a4a4a;
+        --light-gray: #e5e5e5;
+        --extra-light-gray: #f5f5f5;
+        --white: #ffffff;
+        --hero-start: #2c5f5f;
+        --hero-mid: #3d8080;
+        --hero-end: #4da5a5;
+    }
+
+    * {
+        box-sizing: border-box;
     }
 
     body {
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: var(--bg);
-        color: var(--text);
+        background-color: var(--extra-light-gray);
+        color: var(--black);
         min-height: 100vh;
+        line-height: 1.6;
+        letter-spacing: -0.011em;
     }
 
-    /* 🔝 Header fijo y sólido */
+    /* 🎨 SCROLLBAR personalizado estilo Google */
+    ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--extra-light-gray);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--medium-gray);
+        border-radius: 6px;
+        border: 3px solid var(--extra-light-gray);
+        transition: background 0.3s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--dark-gray);
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--medium-gray) var(--extra-light-gray);
+    }
+
     header {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        color: white;
-        padding: 0.8rem 0;
+        background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+        color: var(--white);
+        padding: 1rem 0;
         text-align: center;
         position: sticky;
         top: 0;
         z-index: 1030;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     h1.app-title {
         margin: 0;
         font-size: 1.8rem;
-        letter-spacing: .5px;
-        font-weight: 700;
+        letter-spacing: -0.02em;
+        font-weight: 600;
     }
 
-    /* 👤 Avatar mejorado con tooltip */
     .user-avatar-container {
         position: relative;
         display: flex;
@@ -62,144 +94,204 @@
     }
 
     .user-avatar {
-        width: 38px;
-        height: 38px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--dark-gray) 0%, var(--medium-gray) 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 1.2rem;
+        color: var(--white);
+        font-size: 1.3rem;
         cursor: pointer;
-        transition: all 0.3s ease;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .user-avatar:hover {
-        transform: scale(1.1) rotate(5deg);
-        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        border-color: rgba(255, 255, 255, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        border-color: rgba(255, 255, 255, 0.3);
+        background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%);
     }
 
-    /* Tooltip del usuario - aparece ARRIBA */
-    .user-tooltip {
+    .user-dropdown {
         position: absolute;
-        bottom: calc(100% + 12px);
-        left: 50%;
-        transform: translateX(-50%) translateY(-5px);
-        background-color: rgba(0, 0, 0, 0.9);
-        color: white;
-        padding: 8px 14px;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        white-space: nowrap;
+        top: calc(100% + 12px);
+        right: 0;
+        min-width: 260px;
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
         opacity: 0;
         visibility: hidden;
-        transition: all 0.3s ease;
-        pointer-events: none;
-        z-index: 1050;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        transform: translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2000;
+        overflow: hidden;
+        border: 1px solid var(--light-gray);
     }
 
-    /* Flecha del tooltip apuntando HACIA ABAJO */
-    .user-tooltip::after {
+    .user-dropdown::before {
         content: '';
         position: absolute;
-        bottom: -6px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-top: 6px solid rgba(0, 0, 0, 0.9);
+        top: -6px;
+        right: 16px;
+        width: 12px;
+        height: 12px;
+        background: var(--white);
+        transform: rotate(45deg);
+        border-left: 1px solid var(--light-gray);
+        border-top: 1px solid var(--light-gray);
     }
 
-    .user-avatar-container:hover .user-tooltip {
+    .user-avatar-container:hover .user-dropdown,
+    .user-dropdown:hover {
         opacity: 1;
         visibility: visible;
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
     }
 
-    /* Botones de auth compactos */
-    .auth-buttons {
+    .dropdown-header {
+        padding: 20px;
+        background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+        color: var(--white);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .dropdown-user-info {
         display: flex;
-        gap: 8px;
         align-items: center;
+        gap: 12px;
     }
 
-    .btn-auth {
+    .dropdown-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dropdown-user-details h6 {
+        margin: 0;
+        font-size: 1rem;
         font-weight: 600;
-        padding: 8px 18px;
-        border-radius: 10px;
+        letter-spacing: -0.01em;
+    }
+
+    .dropdown-user-details p {
+        margin: 2px 0 0 0;
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+
+    .dropdown-body {
+        padding: 8px 0;
+        background: var(--white);
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        color: var(--black);
         text-decoration: none;
-        text-align: center;
+        transition: all 0.2s ease;
         cursor: pointer;
-        display: inline-block;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        position: relative;
-        overflow: hidden;
-        font-size: 0.9rem;
-    }
-
-    .btn-login {
-        background-color: transparent;
-        color: white;
-        border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    .btn-login:hover {
-        background-color: rgba(255, 255, 255, 0.15);
-        border-color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
-    }
-
-    .btn-signup {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
         border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        font-size: 0.95rem;
+        font-weight: 500;
     }
 
-    .btn-signup:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        filter: brightness(1.1);
+    .dropdown-item i {
+        width: 20px;
+        font-size: 1.1rem;
+        color: var(--medium-gray);
+        transition: all 0.2s ease;
     }
 
-    /* 🛒 Carrito mejorado */
+    .dropdown-item:hover {
+        background: var(--extra-light-gray);
+        color: var(--black);
+    }
+
+    .dropdown-item:hover i {
+        color: var(--black);
+        transform: translateX(2px);
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: var(--light-gray);
+        margin: 8px 0;
+    }
+
+    .dropdown-item.logout {
+        color: var(--medium-gray);
+    }
+
+    .dropdown-item.logout i {
+        color: var(--medium-gray);
+    }
+
+    .dropdown-item.logout:hover {
+        background: var(--black);
+        color: var(--white);
+    }
+
+    .dropdown-item.logout:hover i {
+        color: var(--white);
+    }
+
+    .dropdown-item.login,
+    .dropdown-item.signup {
+        font-weight: 600;
+        color: var(--black);
+    }
+
+    .dropdown-item.login i,
+    .dropdown-item.signup i {
+        color: var(--black);
+    }
+
     .btn-cart {
         font-weight: 600;
-        background-color: white;
-        color: var(--primary);
-        border: 2px solid var(--primary);
-        border-radius: 12px;
+        background-color: var(--white);
+        color: var(--black);
+        border: 2px solid var(--black);
+        border-radius: 10px;
         padding: 8px 20px;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         align-items: center;
         gap: 8px;
         position: relative;
+        text-decoration: none;
     }
 
     .btn-cart:hover {
-        background-color: var(--primary);
-        color: white;
+        background-color: var(--black);
+        color: var(--white);
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
 
     .cart-badge {
         position: absolute;
         top: -8px;
         right: -8px;
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
+        background: var(--black);
+        color: var(--white);
         border-radius: 50%;
         width: 22px;
         height: 22px;
@@ -208,100 +300,93 @@
         justify-content: center;
         font-size: 0.75rem;
         font-weight: 700;
-        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
-        animation: pulse 2s infinite;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        border: 2px solid var(--white);
     }
 
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-    }
-
-    /* 💎 Navbar mejorado - TODO EN UNA LÍNEA */
     nav {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        color: white;
+        background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+        color: var(--white);
         padding: 0.8rem 1.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         position: sticky;
-        top: 60px;
+        top: 65px;
         z-index: 1020;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
         gap: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* Lado izquierdo del navbar */
     .navbar-left {
         display: flex;
         align-items: center;
         gap: 15px;
     }
 
-    /* Lado derecho del navbar */
     .navbar-right {
         display: flex;
         align-items: center;
         gap: 12px;
     }
 
-    /* 🍔 Botón hamburguesa mejorado */
     .btn-hamburguesa {
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: var(--white);
         font-size: 1.8rem;
         cursor: pointer;
         padding: 6px 12px;
         border-radius: 10px;
         transition: all 0.3s ease;
     }
+    
     .btn-hamburguesa:hover {
-        transform: scale(1.1);
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: scale(1.05);
     }
 
-    /* 🧱 Menú lateral mejorado */
     .offcanvas {
         width: 320px !important;
-        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-        color: white;
+        background: linear-gradient(180deg, var(--black) 0%, var(--dark-gray) 100%);
+        color: var(--white);
         border-right: none;
-        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.4);
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3);
     }
     
     .offcanvas-header {
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding: 1.5rem;
     }
     
     .offcanvas-title {
         font-size: 1.3rem;
-        font-weight: 700;
-        color: white;
+        font-weight: 600;
+        color: var(--white);
+        letter-spacing: -0.01em;
     }
     
     .menu-link {
         display: flex;
         align-items: center;
         gap: 12px;
-        color: #e8e8e8;
+        color: rgba(255, 255, 255, 0.9);
         font-weight: 500;
         text-decoration: none;
         padding: 14px 18px;
         margin: 4px 12px;
-        border-radius: 12px;
-        transition: all 0.25s ease;
+        border-radius: 10px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
     }
     
     .menu-link:hover {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
-        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--white);
         transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     .menu-link i {
@@ -310,100 +395,105 @@
         text-align: center;
     }
 
-    /* 📄 Contenido principal */
     .main-content-wrapper {
         width: 96%;
         max-width: 1400px;
-        margin: 25px auto;
+        margin: 30px auto;
     }
 
     .content {
-        background-color: var(--card);
-        padding: 28px;
+        background-color: var(--white);
+        padding: 32px;
         border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--light-gray);
     }
 
     footer {
         text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        color: white;
-        border-top: 1px solid var(--border);
-        margin-top: 40px;
+        padding: 30px 20px;
+        background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+        color: var(--white);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 50px;
     }
 
-    /* 💫 Botón flotante de volver atrás mejorado */
-    .btn-back {
-        position: fixed;
-        left: 25px;
-        bottom: 25px;
-        z-index: 1050;
-        background: linear-gradient(135deg, white 0%, #f8f9fa 100%);
-        color: #2d3e50;
-        border: 2px solid #ddd;
+    footer p {
+        opacity: 0.9;
+    }
+
+    /* 💫 Mini header para navegación */
+    .navigation-header {
+        background: linear-gradient(135deg, var(--extra-light-gray) 0%, var(--white) 100%);
+        border-bottom: 2px solid var(--light-gray);
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border-radius: 12px 12px 0 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: none;
+    }
+
+    .navigation-header.show {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .btn-nav {
+        background: var(--white);
+        color: var(--black);
+        border: 2px solid var(--black);
         font-weight: 600;
-        border-radius: 12px;
-        padding: 12px 22px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         align-items: center;
         gap: 8px;
         cursor: pointer;
         text-decoration: none;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateX(-20px);
+        font-size: 0.9rem;
     }
 
-    .btn-back.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(0);
+    .btn-nav:hover {
+        background: var(--black);
+        color: var(--white);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .btn-back:hover {
-        background: linear-gradient(135deg, #2d3e50 0%, #34495e 100%);
-        color: white;
-        transform: translateX(-5px) scale(1.05);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-        text-decoration: none;
-    }
-
-    .btn-back i {
+    .btn-nav i {
         font-size: 1.1rem;
-        transition: transform 0.3s ease;
+        transition: transform 0.2s ease;
     }
 
-    .btn-back:hover i {
-        transform: translateX(-3px);
+    .btn-nav:hover i {
+        transform: scale(1.15);
     }
 
-    /* Versión responsive del botón */
-    @media (max-width: 768px) {
-        .btn-back {
-            left: 15px;
-            bottom: 15px;
-            padding: 10px 18px;
-            font-size: 0.9rem;
-        }
-        
-        .btn-back span {
-            display: none; /* Solo ícono en móvil */
-        }
-        
-        .btn-back {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            padding: 0;
-            justify-content: center;
-        }
+    .btn-nav-home {
+        border-color: var(--medium-gray);
+        color: var(--medium-gray);
     }
 
-    /* Animaciones de entrada */
+    .btn-nav-home:hover {
+        background: var(--medium-gray);
+        color: var(--white);
+        border-color: var(--medium-gray);
+    }
+
     @keyframes slideInFromTop {
         from {
             opacity: 0;
@@ -415,18 +505,17 @@
         }
     }
 
-    header, .auth-top-bar, nav {
-        animation: slideInFromTop 0.6s ease-out;
+    header, nav {
+        animation: slideInFromTop 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* 🔄 LOADER DE CARGA ELEGANTE */
     .page-loader {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--white);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -441,7 +530,7 @@
 
     .loader-content {
         text-align: center;
-        color: white;
+        color: var(--black);
     }
 
     .spinner {
@@ -456,18 +545,18 @@
         width: 100%;
         height: 100%;
         border: 4px solid transparent;
-        border-top-color: white;
+        border-top-color: var(--black);
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
 
     .spinner-ring:nth-child(2) {
-        border-top-color: rgba(255, 255, 255, 0.6);
+        border-top-color: var(--medium-gray);
         animation-duration: 1.5s;
     }
 
     .spinner-ring:nth-child(3) {
-        border-top-color: rgba(255, 255, 255, 0.3);
+        border-top-color: var(--light-gray);
         animation-duration: 2s;
     }
 
@@ -479,16 +568,15 @@
     .loader-text {
         font-size: 1.2rem;
         font-weight: 600;
-        letter-spacing: 1px;
+        letter-spacing: -0.01em;
         animation: fadeInOut 1.5s ease-in-out infinite;
     }
 
     @keyframes fadeInOut {
-        0%, 100% { opacity: 0.5; }
+        0%, 100% { opacity: 0.4; }
         50% { opacity: 1; }
     }
 
-    /* 📬 NOTIFICACIONES TOAST MODERNAS */
     .toast-container-custom {
         position: fixed;
         top: 90px;
@@ -501,22 +589,23 @@
     }
 
     .toast-custom {
-        background: white;
+        background: var(--white);
         border-radius: 12px;
         padding: 16px 20px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         display: flex;
         align-items: center;
         gap: 14px;
         min-width: 320px;
-        animation: slideInRight 0.4s ease-out;
+        animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
+        border: 1px solid var(--light-gray);
         border-left: 4px solid;
     }
 
     .toast-custom.removing {
-        animation: slideOutRight 0.4s ease-out forwards;
+        animation: slideOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
     @keyframes slideInRight {
@@ -542,19 +631,19 @@
     }
 
     .toast-custom.success {
-        border-left-color: #10b981;
+        border-left-color: var(--dark-gray);
     }
 
     .toast-custom.error {
-        border-left-color: #ef4444;
+        border-left-color: var(--black);
     }
 
     .toast-custom.warning {
-        border-left-color: #f59e0b;
+        border-left-color: var(--medium-gray);
     }
 
     .toast-custom.info {
-        border-left-color: #3b82f6;
+        border-left-color: var(--light-gray);
     }
 
     .toast-icon {
@@ -569,23 +658,23 @@
     }
 
     .toast-custom.success .toast-icon {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
+        background: var(--dark-gray);
+        color: var(--white);
     }
 
     .toast-custom.error .toast-icon {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
+        background: var(--black);
+        color: var(--white);
     }
 
     .toast-custom.warning .toast-icon {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: white;
+        background: var(--medium-gray);
+        color: var(--white);
     }
 
     .toast-custom.info .toast-icon {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
+        background: var(--light-gray);
+        color: var(--black);
     }
 
     .toast-content {
@@ -596,19 +685,19 @@
         font-weight: 600;
         font-size: 0.95rem;
         margin-bottom: 4px;
-        color: #1f2937;
+        color: var(--black);
     }
 
     .toast-message {
         font-size: 0.85rem;
-        color: #6b7280;
+        color: var(--medium-gray);
         line-height: 1.4;
     }
 
     .toast-close {
         background: none;
         border: none;
-        color: #9ca3af;
+        color: var(--medium-gray);
         font-size: 1.3rem;
         cursor: pointer;
         padding: 0;
@@ -623,8 +712,8 @@
     }
 
     .toast-close:hover {
-        background: #f3f4f6;
-        color: #1f2937;
+        background: var(--extra-light-gray);
+        color: var(--black);
     }
 
     .toast-progress {
@@ -632,7 +721,7 @@
         bottom: 0;
         left: 0;
         height: 3px;
-        background: linear-gradient(90deg, rgba(0,0,0,0.1), rgba(0,0,0,0.2));
+        background: var(--light-gray);
         animation: progressBar 4s linear forwards;
     }
 
@@ -641,7 +730,6 @@
         to { width: 0%; }
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         h1.app-title {
             font-size: 1.4rem;
@@ -653,20 +741,11 @@
         }
 
         .navbar-left a span {
-            display: none; /* Oculta "Biblioteca Acentos" en móvil */
-        }
-        
-        .btn-auth {
-            padding: 7px 14px;
-            font-size: 0.85rem;
-        }
-
-        .btn-auth span {
-            display: none; /* Solo íconos en móvil */
+            display: none;
         }
 
         .btn-cart span {
-            display: none; /* Solo ícono del carrito en móvil */
+            display: none;
         }
 
         .toast-container-custom {
@@ -679,6 +758,36 @@
             min-width: auto;
             width: 100%;
         }
+
+        .user-dropdown {
+            min-width: 260px;
+            right: -10px;
+        }
+
+        .dropdown-header {
+            padding: 16px;
+        }
+
+        .dropdown-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 1.3rem;
+        }
+
+        /* Mini header responsive */
+        .navigation-header {
+            padding: 10px 15px;
+            margin-bottom: 15px;
+        }
+
+        .btn-nav {
+            padding: 7px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-nav i {
+            font-size: 1rem;
+        }
     }
 
     @media (max-width: 480px) {
@@ -690,12 +799,16 @@
             padding: 4px 10px;
             font-size: 1.5rem;
         }
+
+        .user-dropdown {
+            min-width: calc(100vw - 40px);
+            right: -20px;
+        }
     }
     </style>
 </head>
 
 <body>
-    <!-- 🔄 LOADER DE CARGA -->
     <div class="page-loader" id="pageLoader">
         <div class="loader-content">
             <div class="spinner">
@@ -707,24 +820,18 @@
         </div>
     </div>
 
-    <!-- 📬 CONTENEDOR DE TOASTS -->
     <div class="toast-container-custom" id="toastContainer"></div>
 
-    <!-- Los mensajes de Django se convierten en toasts -->
     {% if messages %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             {% for message in messages %}
-                showToast(
-                    '{{ message.tags }}',
-                    '{{ message|escapejs }}'
-                );
+                showToast('{{ message.tags }}', '{{ message|escapejs }}');
             {% endfor %}
         });
     </script>
     {% endif %}
 
-    <!-- Header -->
     <header>
         <div class="logo-container" style="display:flex; align-items:center; gap:15px; justify-content:center;">
             <img src="{% static 'img/Logo.png' %}" alt="Biblioteca Acentos"
@@ -733,21 +840,17 @@
         </div>
     </header>
 
-    <!-- Navbar - TODO EN UNA LÍNEA -->
     <nav>
-        <!-- Lado izquierdo: Hamburguesa + Logo -->
         <div class="navbar-left">
             <button class="btn-hamburguesa" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral">
                 <i class="bi bi-list"></i>
             </button>
             <a href="{% url 'home' %}" class="text-white text-decoration-none fw-bold fs-5" style="display: flex; align-items: center; gap: 8px;">
-                <i class="bi bi-book"></i> Biblioteca Acentos
+                <i class="bi bi-book"></i> <span>Biblioteca Acentos</span>
             </a>
         </div>
 
-        <!-- Lado derecho: Carrito + Auth -->
         <div class="navbar-right">
-            <!-- Carrito -->
             <a href="{% url 'cart_view' %}" class="btn-cart">
                 <i class="bi bi-cart3 fs-5"></i>
                 <span>Carrito</span>
@@ -756,33 +859,78 @@
                 {% endif %}
             </a>
 
-            <!-- Auth: Avatar o botones Login/Signup -->
             {% if user.is_authenticated %}
                 <div class="user-avatar-container">
                     <div class="user-avatar">
                         <i class="bi bi-person-circle"></i>
-                        <div class="user-tooltip">
-                            👋 {{ user.first_name|default:user.username }}
+                    </div>
+                    
+                    <div class="user-dropdown">
+                        <div class="dropdown-header">
+                            <div class="dropdown-user-info">
+                                <div class="dropdown-avatar">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <div class="dropdown-user-details">
+                                    <h6>{{ user.first_name|default:user.username }}</h6>
+                                    <p>{{ user.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown-body">
+                            <a href="#" class="dropdown-item">
+                                <i class="bi bi-person"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="bi bi-box-seam"></i>
+                                <span>Mis Pedidos</span>
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="bi bi-heart"></i>
+                                <span>Favoritos</span>
+                            </a>
+                            
+                            <div class="dropdown-divider"></div>
+                            
+                            <a href="#" class="dropdown-item">
+                                <i class="bi bi-gear"></i>
+                                <span>Configuración</span>
+                            </a>
+                            <a href="{% url 'logout' %}" class="dropdown-item logout">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Cerrar Sesión</span>
+                            </a>
                         </div>
                     </div>
                 </div>
             {% else %}
-                <div class="auth-buttons">
-                    <a href="{% url 'login' %}" class="btn-auth btn-login">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
-                    </a>
-                    <a href="{% url 'signup' %}" class="btn-auth btn-signup">
-                        <i class="bi bi-person-plus"></i> Sign Up
-                    </a>
+                <div class="user-avatar-container">
+                    <div class="user-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    
+                    <div class="user-dropdown">
+                        <div class="dropdown-body">
+                            <a href="{% url 'login' %}" class="dropdown-item login">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                <span>Iniciar Sesión</span>
+                            </a>
+                            <a href="{% url 'signup' %}" class="dropdown-item signup">
+                                <i class="bi bi-person-plus"></i>
+                                <span>Registrarse</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             {% endif %}
         </div>
     </nav>
 
-    <!-- Menú lateral -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="menuLateral">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title"><i class="bi bi-journal-bookmark me-2"></i>Menú Principal</h5>
+            <h5 class="offcanvas-title"><i class="bi bi-compass me-2"></i>Navegación</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
@@ -793,65 +941,71 @@
                 </a>
                 <a href="{% url 'book_list' %}" class="menu-link">
                     <i class="bi bi-book-half"></i>
-                    <span>Catálogo</span>
+                    <span>Catálogo de Libros</span>
                 </a>
                 <a href="{% url 'promociones' %}" class="menu-link">
                     <i class="bi bi-stars"></i>
                     <span>Promociones</span>
                 </a>
                 <a href="#" class="menu-link">
-                    <i class="bi bi-box-seam"></i>
-                    <span>Pedidos</span>
+                    <i class="bi bi-info-circle"></i>
+                    <span>Acerca de</span>
                 </a>
+                <a href="#" class="menu-link">
+                    <i class="bi bi-envelope"></i>
+                    <span>Contacto</span>
+                </a>
+                <a href="#" class="menu-link">
+                    <i class="bi bi-question-circle"></i>
+                    <span>Ayuda / FAQ</span>
+                </a>
+                
+                {% if not user.is_authenticated %}
                 <hr class="my-3" style="border-color: rgba(255,255,255,0.2);">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="menu-link" style="color: #ff6b6b;">
-                        <i class="bi bi-door-open"></i>
-                        <span>Cerrar sesión</span>
-                    </a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="menu-link">
-                        <i class="bi bi-person-lock"></i>
-                        <span>Iniciar sesión</span>
-                    </a>
-                    <a href="{% url 'signup' %}" class="menu-link">
-                        <i class="bi bi-pencil-square"></i>
-                        <span>Registrarse</span>
-                    </a>
+                <a href="{% url 'login' %}" class="menu-link" style="color: rgba(255,255,255,0.9);">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Iniciar Sesión</span>
+                </a>
+                <a href="{% url 'signup' %}" class="menu-link" style="color: rgba(255,255,255,0.9);">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Crear Cuenta</span>
+                </a>
                 {% endif %}
             </nav>
         </div>
     </div>
 
-    <!-- Contenido -->
     <div class="main-content-wrapper">
+        <!-- Mini header de navegación -->
+        <div id="navigationHeader" class="navigation-header">
+            <button id="btnBack" class="btn-nav">
+                <i class="bi bi-arrow-left"></i>
+                <span>Volver</span>
+            </button>
+            <a href="{% url 'home' %}" class="btn-nav btn-nav-home">
+                <i class="bi bi-house-door-fill"></i>
+                <span>Inicio</span>
+            </a>
+        </div>
+
         <div class="content" data-aos="fade-up">
             {% block content %}{% endblock %}
         </div>
     </div>
 
-    <!-- Botón volver - MEJORADO (al final del body) -->
-    <button id="btnBack" class="btn-back">
-        <i class="bi bi-arrow-left"></i>
-        <span>Volver</span>
-    </button>
-
-    <!-- Footer -->
     <footer>
         <p style="margin: 0; font-size: 0.95rem;">
             <i class="bi bi-book-fill me-2"></i>
             Plataforma de digitalización de la Librería Acentos (Universidad EAFIT)
         </p>
         <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.8;">
-            © 2024 - Desarrollado con <i class="bi bi-heart-fill text-danger"></i>
+            © 2024 - Desarrollado con <i class="bi bi-heart-fill"></i>
         </p>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
-        // 🔄 LOADER: Ocultar cuando la página termine de cargar
         window.addEventListener('load', function() {
             const loader = document.getElementById('pageLoader');
             setTimeout(() => {
@@ -859,46 +1013,38 @@
             }, 500);
         });
 
-        // ⬅️ BOTÓN VOLVER ATRÁS - Versión simplificada y robusta
         (function() {
+            const navigationHeader = document.getElementById('navigationHeader');
             const btnBack = document.getElementById('btnBack');
-            if (!btnBack) return; // Si no existe, salir
+            
+            if (!navigationHeader || !btnBack) return;
             
             const homeUrl = "{% url 'home' %}";
             const currentPath = window.location.pathname;
+            const hiddenPages = [homeUrl, '/login/', '/signup/', '/logout/'];
             
-            // Páginas donde NO mostrar el botón
-            const hiddenPages = ['/', homeUrl, '/login/', '/signup/', '/logout/'];
-            
-            // Función para mostrar/ocultar el botón
-            function toggleButton() {
-                const shouldShow = !hiddenPages.some(page => currentPath === page || currentPath.startsWith(page));
-                
-                if (shouldShow) {
-                    btnBack.classList.add('show');
-                } else {
-                    btnBack.classList.remove('show');
-                }
+            function isHiddenPage() {
+                const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/$/, '');
+                return hiddenPages.some(page => {
+                    const normalizedHidden = page === '/' ? '/' : page.replace(/\/$/, '');
+                    return normalizedPath === normalizedHidden;
+                });
             }
             
-            // Mostrar el botón si corresponde
-            toggleButton();
+            if (!isHiddenPage()) {
+                navigationHeader.classList.add('show');
+            }
             
-            // Manejar el click
             btnBack.addEventListener('click', function(e) {
                 e.preventDefault();
-                
-                // Si hay historial previo, volver
                 if (document.referrer && document.referrer.includes(window.location.host)) {
                     window.history.back();
                 } else {
-                    // Si no, ir al home
                     window.location.href = homeUrl;
                 }
             });
         })();
 
-        // 📬 SISTEMA DE NOTIFICACIONES TOAST
         function showToast(type, message, duration = 4000) {
             const container = document.getElementById('toastContainer');
             
@@ -954,7 +1100,6 @@
             }, 400);
         }
 
-        // Inicializar AOS (animaciones)
         if (window.AOS) {
             AOS.init({ 
                 once: true, 
