@@ -7,7 +7,7 @@ def common_context(request):
     featured_books = Book.objects.all()[:12]
 
     return {
-        'app_name': "Biblioteca Acentos",
+        'app_name': "INKALAB Libros",
         'all_genres': genres,
         'all_authors': authors,
         'featured_books': featured_books,
