@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 
+
 {% block title %}Inicio - {{ app_name }}{% endblock %}
+
 
 {% block content %}
 <!-- 🌊 HERO PRINCIPAL - ÚNICO ELEMENTO CON COLOR -->
@@ -24,6 +26,7 @@
         </a>
     </div>
 </section>
+
 
 <!-- 🧠 RECOMENDACIÓN EXPRESS - MONOCROMÁTICO -->
 <section class="prompt-section text-center" style="margin-top: 70px;">
@@ -55,12 +58,14 @@
     </div>
 </section>
 
+
 <!-- 📚 LIBROS DESTACADOS - MONOCROMÁTICO -->
 <section class="featured-books" style="margin-top: 80px;">
     <div class="container text-center">
         <h2 style="font-weight: 700; color: #1a1a1a; margin-bottom: 40px; letter-spacing: -0.02em;">
             Libros recomendados
         </h2>
+
 
         <div class="row justify-content-center g-4">
             {% for book in featured_books %}
@@ -74,7 +79,14 @@
                         <div class="card-body text-start">
                             <h5 class="card-title">{{ book.title }}</h5>
                             <p class="text-muted mb-1">{{ book.authors }}</p>
-                            <p class="fw-bold price-tag mb-0">
+                            <p class="fw-bold price-tag mb-1">
+                                {% if book.precio %}
+                                    ${{ book.precio|floatformat:0 }}
+                                {% else %}
+                                    Precio no disponible
+                                {% endif %}
+                            </p>
+                            <p class="fw-bold mb-0" style="color: #4a4a4a; font-size: 0.95rem;">
                                 {% if book.average_rating %}
                                     ⭐ {{ book.average_rating|floatformat:2 }}
                                 {% else %}
@@ -90,11 +102,13 @@
             {% endfor %}
         </div>
 
+
         <a href="{% url 'book_list' %}" class="btn btn-catalog mt-5">
             Ver todo el catálogo →
         </a>
     </div>
 </section>
+
 
 <!-- 🏫 FOOTER INSTITUCIONAL - MONOCROMÁTICO -->
 <section class="footer-info text-center mt-5" 
@@ -109,6 +123,7 @@
     </p>
 </section>
 
+
 <!-- 🎨 ESTILOS MONOCROMÁTICOS ELEGANTES -->
 <style>
 /* ==================== HERO SECTION ==================== */
@@ -118,11 +133,13 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
+
 /* ==================== BÚSQUEDA ==================== */
 .search-input:focus {
     border-color: #1a1a1a;
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
+
 
 .search-btn:hover {
     background-color: #2d2d2d;
@@ -130,12 +147,14 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
+
 /* ==================== BOOK CARDS ==================== */
 .book-card-link {
     text-decoration: none;
     color: inherit;
     display: block;
 }
+
 
 .book-card {
     border-radius: 12px;
@@ -146,6 +165,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+
 .book-card img {
     height: 280px;
     object-fit: cover;
@@ -153,21 +173,25 @@
     filter: grayscale(0%);
 }
 
+
 .book-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
     border-color: #1a1a1a;
 }
 
+
 .book-card:hover img {
     transform: scale(1.08);
 }
+
 
 /* Card body con degradado sutil */
 .book-card .card-body {
     background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
     padding: 20px;
 }
+
 
 .book-card .card-title {
     font-weight: 700;
@@ -178,14 +202,17 @@
     letter-spacing: -0.01em;
 }
 
+
 .book-card:hover .card-title {
     color: #2d2d2d;
 }
+
 
 .book-card .text-muted {
     color: #6b7280 !important;
     font-size: 0.9rem;
 }
+
 
 /* Precio elegante en negro */
 .price-tag {
@@ -194,6 +221,7 @@
     font-weight: 700 !important;
     letter-spacing: -0.01em;
 }
+
 
 /* ==================== BOTÓN CATÁLOGO ==================== */
 .btn-catalog {
@@ -209,6 +237,7 @@
     font-size: 1rem;
 }
 
+
 .btn-catalog:hover {
     background-color: #1a1a1a;
     color: white;
@@ -216,33 +245,40 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
+
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
     .hero-section h1 {
         font-size: 1.8rem !important;
     }
 
+
     .hero-section p {
         font-size: 1rem !important;
     }
+
 
     .prompt-section input {
         width: 100% !important;
     }
 
+
     .search-btn {
         width: 100%;
     }
 
+
     .book-card img {
         height: 240px;
     }
+
 
     .btn-catalog {
         width: 100%;
         padding: 12px 24px;
     }
 }
+
 
 /* ==================== ANIMACIONES SUAVES ==================== */
 @keyframes fadeInUp {
@@ -255,6 +291,7 @@
         transform: translateY(0);
     }
 }
+
 
 .featured-books {
     animation: fadeInUp 0.6s ease-out;
