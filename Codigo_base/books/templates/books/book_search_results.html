@@ -1,35 +1,363 @@
 {% extends "base.html" %}
+{% load static %}
+
 
 {% block title %}Resultados de Búsqueda - {{ app_name }}{% endblock %}
 
-{% block content %}
-    <h1>Resultados de Búsqueda</h1>
 
+{% block breadcrumbs %}
+<div class="breadcrumb-container fade-in-up">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none">
+          <i class="bi bi-house-door"></i> Inicio
+        </a>
+      </li>
+      <li class="breadcrumb-separator mx-2">›</li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'book_list' %}" class="text-decoration-none">
+          <i class="bi bi-book-half"></i> Catálogo
+        </a>
+      </li>
+      <li class="breadcrumb-separator mx-2">›</li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="bi bi-search"></i> Resultados de búsqueda
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<!-- Encabezado de Búsqueda -->
+<div class="search-header fade-in-up mb-4">
+  <div class="search-header-content">
+    <h1 class="search-title">
+      <i class="bi bi-search"></i> Resultados de Búsqueda
+    </h1>
     {% if books %}
-        <p>Se encontraron {{ books.count }} libro(s) que coinciden con "{{ request.GET.q }}":</p>
-        <div class="book-grid">
-            {% for book in books %}
-                <div class="book-item">
-                    <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
-                         alt="Portada de {{ book.title }}"
-                         onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
-                    <h3>{{ book.title }}</h3>
-                    <p><strong>Autor:</strong> {{ book.authors }}</p>
-                    <p><strong>Género:</strong> {{ book.genre }}</p>
-                    {% if book.publication_date %}
-                        <p><strong>Año:</strong> {{ book.publication_date }}</p>
-                    {% endif %}
-                    <div class="book-detail">
-                        <details>
-                            <summary>Ver Descripción</summary>
-                            <p>{{ book.description|default:"No hay descripción disponible" }}</p>
-                        </details>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No se encontraron libros que coincidan con "{{ request.GET.q }}".</p>
+    <p class="search-subtitle">
+      Se encontraron <strong>{{ books.count }}</strong> libro(s) que coinciden con 
+      <span class="search-query">"{{ request.GET.q }}"</span>
+    </p>
     {% endif %}
-    <p><a href="{% url 'book_list' %}">Ver todos los libros</a></p>
+  </div>
+</div>
+
+
+{% if books %}
+<!-- Grid de Resultados -->
+<div class="results-container fade-in-up">
+  <div class="book-grid">
+    {% for book in books %}
+    <div class="book-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'50' }}">
+      <a href="{% url 'book_detail' book.id %}" class="book-image-link">
+        <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
+             alt="Portada de {{ book.title }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
+      </a>
+      <div class="book-info">
+        <h3 class="book-title">
+          <a href="{% url 'book_detail' book.id %}" class="book-link">{{ book.title|truncatewords:6 }}</a>
+        </h3>
+        <p class="book-author">
+          <i class="bi bi-person me-1"></i>{{ book.authors|truncatewords:3 }}
+        </p>
+        <p class="book-genre">
+          <i class="bi bi-bookmark me-1"></i>{{ book.genre }}
+        </p>
+        
+        <div class="book-pricing">
+          <span class="book-price">
+            {% if book.precio %}
+              ${{ book.precio|floatformat:0 }}
+            {% else %}
+              Precio no disponible
+            {% endif %}
+          </span>
+          <span class="book-rating">
+            {% if book.average_rating %}
+              ⭐ {{ book.average_rating|floatformat:2 }}
+            {% else %}
+              Sin calificación
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="book-footer">
+          <a href="{% url 'book_detail' book.id %}" class="view-details-btn">
+            Ver detalles <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+<!-- Botón Volver -->
+<div class="back-action mt-5 text-center fade-in-up">
+  <a href="{% url 'book_list' %}" class="btn btn-outline btn-lg">
+    <i class="bi bi-arrow-left me-2"></i>Ver todo el catálogo
+  </a>
+</div>
+
+
+{% else %}
+<!-- Sin Resultados -->
+<div class="no-results fade-in-up">
+  <i class="bi bi-search"></i>
+  <h3>No se encontraron resultados</h3>
+  <p>No encontramos libros que coincidan con <span class="search-query">"{{ request.GET.q }}"</span></p>
+  <p class="text-muted mb-4">Intenta con otros términos de búsqueda o explora nuestro catálogo completo</p>
+  <a href="{% url 'book_list' %}" class="btn btn-main btn-lg">
+    <i class="bi bi-bookshelf me-2"></i>Explorar catálogo completo
+  </a>
+</div>
+{% endif %}
+
+
+<style>
+/* 🔍 ENCABEZADO DE BÚSQUEDA */
+.search-header {
+  background: linear-gradient(135deg, var(--extra-light-gray) 0%, var(--white) 100%);
+  border: 2px solid var(--light-gray);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+.search-title {
+  color: var(--black);
+  font-weight: 800;
+  font-size: 2rem;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+.search-subtitle {
+  color: var(--medium-gray);
+  font-size: 1.1rem;
+  margin: 0;
+}
+.search-query {
+  color: var(--black);
+  font-weight: 700;
+  background: var(--extra-light-gray);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--light-gray);
+}
+
+
+/* 📚 GRID DE RESULTADOS */
+.results-container {
+  margin-top: 40px;
+}
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
+@media (max-width: 768px) {
+  .book-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .book-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* 🃏 TARJETAS DE LIBRO */
+.book-item {
+  background: linear-gradient(180deg, var(--white), var(--extra-light-gray));
+  border: 1px solid var(--light-gray);
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+.book-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  border-color: var(--black);
+}
+.book-image-link {
+  display: block;
+  overflow: hidden;
+}
+.book-image-link img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.book-item:hover img {
+  transform: scale(1.08);
+}
+
+
+/* 📝 INFO DEL LIBRO */
+.book-info {
+  padding: 16px;
+}
+.book-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+.book-link {
+  color: var(--black);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.book-link:hover {
+  color: var(--medium-gray);
+}
+.book-author,
+.book-genre {
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+  margin: 4px 0;
+}
+
+
+/* 💰 PRECIO Y RATING */
+.book-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--light-gray);
+  border-bottom: 1px solid var(--light-gray);
+}
+.book-price {
+  color: var(--black);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
+.book-rating {
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+
+/* 🎯 FOOTER DE TARJETA */
+.book-footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+.view-details-btn {
+  color: var(--black);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+.view-details-btn:hover {
+  color: var(--medium-gray);
+  transform: translateX(3px);
+}
+
+
+/* ❌ SIN RESULTADOS */
+.no-results {
+  background: var(--white);
+  border: 2px dashed var(--light-gray);
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+.no-results i {
+  color: var(--medium-gray);
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+.no-results h3 {
+  color: var(--black);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.no-results p {
+  color: var(--medium-gray);
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+
+/* 🔘 BOTONES */
+.btn-outline {
+  background: var(--white);
+  color: var(--black);
+  border: 2px solid var(--black);
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 12px 28px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-outline:hover {
+  background: var(--black);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+.btn-main {
+  background: var(--black);
+  color: var(--white);
+  border: 2px solid var(--black);
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 12px 28px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-main:hover {
+  background: var(--white);
+  color: var(--black);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+.btn-lg {
+  font-size: 1.05rem;
+}
+
+
+/* 📱 RESPONSIVE */
+@media (max-width: 768px) {
+  .search-title {
+    font-size: 1.6rem;
+  }
+  .search-subtitle {
+    font-size: 1rem;
+  }
+  .no-results {
+    padding: 40px 20px;
+  }
+  .no-results i {
+    font-size: 3rem;
+  }
+}
+</style>
 {% endblock %}

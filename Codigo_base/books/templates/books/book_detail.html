@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 
+
 {% block title %}{{ book.title }} - Detalle{% endblock %}
+
 
 {% block breadcrumbs %}
 <div class="breadcrumb-container fade-in-up mb-4">
@@ -27,6 +29,7 @@
 </div>
 {% endblock %}
 
+
 {% block content %}
 <div class="container py-5 fade-in-up">
     <div class="row align-items-start g-4">
@@ -38,6 +41,7 @@
                      class="img-fluid rounded-3 shadow-sm book-cover"
                      onerror="this.onerror=null;this.src='https://placehold.co/300x450?text=Sin+Imagen';">
 
+
                 <!-- Badge -->
                 <div class="book-badge">
                     <span class="badge bg-dark text-white">
@@ -47,9 +51,11 @@
             </div>
         </div>
 
+
         <!-- 📄 Detalles del libro -->
         <div class="col-md-8" data-aos="fade-left">
             <h1 class="fw-bold mb-3 book-title">{{ book.title }}</h1>
+
 
             <div class="book-meta mb-4">
                 <div class="meta-item"><i class="bi bi-person"></i><span>Autor(es):</span> {{ book.authors }}</div>
@@ -58,25 +64,42 @@
                 <div class="meta-item"><i class="bi bi-people"></i><span>Grupo edad:</span> {{ book.dominant_age_group|default:"No especificado" }}</div>
             </div>
 
-            <!-- ⭐ Calificación -->
-            <div class="price-section mb-4">
-                <h3 class="price-amount mb-2">
-                    {% if book.average_rating %}
-                        ⭐ {{ book.average_rating|floatformat:2 }} / 5.0
+
+            <!-- 💰 Precio -->
+            <div class="price-section mb-3">
+                <h3 class="price-amount mb-0">
+                    {% if book.precio %}
+                        ${{ book.precio|floatformat:0 }}
                     {% else %}
-                        Sin calificación
+                        Precio no disponible
                     {% endif %}
                 </h3>
-                <p class="text-muted small">
-                    <i class="bi bi-people"></i> {{ book.ratings_count|default:"0" }} calificaciones
-                </p>
             </div>
+
+
+            <!-- ⭐ Calificación -->
+            <div class="rating-section mb-4">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="rating-stars">
+                        {% if book.average_rating %}
+                            ⭐ {{ book.average_rating|floatformat:2 }} / 5.0
+                        {% else %}
+                            Sin calificación
+                        {% endif %}
+                    </span>
+                    <span class="text-muted small">
+                        ({{ book.ratings_count|default:"0" }} calificaciones)
+                    </span>
+                </div>
+            </div>
+
 
             <!-- 📜 Descripción -->
             <div class="book-description mb-4">
                 <h5><i class="bi bi-card-text"></i> Descripción</h5>
                 <p>{{ book.description|default:"No hay descripción disponible para este libro." }}</p>
             </div>
+
 
             <!-- 🛒 Botones principales -->
             <div class="action-buttons d-flex flex-wrap gap-3 mt-4">
@@ -87,6 +110,7 @@
                     </button>
                 </form>
 
+
                 <form action="{% url 'buy_now' book.id %}" method="post" class="flex-fill">
                     {% csrf_token %}
                     <button class="btn btn-main btn-lg w-100">
@@ -94,6 +118,7 @@
                     </button>
                 </form>
             </div>
+
 
             <!-- ❤️ Botones secundarios -->
             <div class="secondary-actions d-flex gap-2 mt-3">
@@ -107,8 +132,10 @@
         </div>
     </div>
 
+
     <!-- 🔸 Separador -->
     <hr class="divider-custom my-5">
+
 
     <!-- 📚 Libros relacionados -->
     <div class="related-books-section" data-aos="fade-up">
@@ -124,6 +151,7 @@
         </div>
     </div>
 </div>
+
 
 <style>
 /* 🧱 ESTRUCTURA DEL DETALLE (Monocromático) */
@@ -159,18 +187,35 @@
     color: var(--medium-gray);
     padding: 5px 0;
 }
+
+
+/* 💰 PRECIO - DESTACADO */
 .price-section {
     background: var(--white);
-    border: 2px solid var(--black);
+    border: 3px solid var(--black);
     padding: 20px;
     border-radius: 12px;
     text-align: left;
 }
 .price-amount {
     color: var(--black);
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
 }
+
+
+/* ⭐ RATING - DISCRETO */
+.rating-section {
+    padding: 12px 0;
+}
+.rating-stars {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--black);
+}
+
+
 .book-description {
     background: var(--extra-light-gray);
     padding: 20px;
@@ -203,7 +248,7 @@
 }
 @media (max-width: 768px) {
     .book-title { font-size: 1.6rem; }
-    .price-amount { font-size: 1.8rem; }
+    .price-amount { font-size: 2rem; }
     .action-buttons { flex-direction: column; }
 }
 </style>

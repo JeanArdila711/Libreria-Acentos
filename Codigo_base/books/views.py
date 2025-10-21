@@ -352,11 +352,11 @@ def cart_view(request):
         except (ValueError, Book.DoesNotExist):
             continue
 
-        # El modelo actual no tiene campo price, se puede agregar después si es necesario
-        price = 0.0
-
+        # ✅ Usamos el nuevo campo "precio"
+        price = float(book.precio or 0.0)
         subtotal = round(price * qty, 2)
         total_price += subtotal
+
         cart_items.append({
             "book": book,
             "quantity": qty,
@@ -367,6 +367,7 @@ def cart_view(request):
         "cart_items": cart_items,
         "total_price": round(total_price, 2),
     })
+
 
 
 def clear_cart(request):

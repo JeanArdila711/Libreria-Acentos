@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
+
 {% block title %}Catálogo de Libros - {{ app_name }}{% endblock %}
+
 
 {% block breadcrumbs %}
 <div class="breadcrumb-container fade-in-up">
@@ -20,12 +22,14 @@
 </div>
 {% endblock %}
 
+
 {% block content %}
 <!-- Encabezado -->
 <div class="catalog-header fade-in-up mb-4 text-center">
   <h1 class="fw-bold catalog-title"><i class="bi bi-bookshelf"></i> Catálogo Completo</h1>
   <p class="catalog-subtitle">Explora nuestra colección de {{ books.paginator.count }} libros disponibles</p>
 </div>
+
 
 <!-- CONTENEDOR PRINCIPAL -->
 <div class="catalog-container">
@@ -36,6 +40,7 @@
         <h5 class="m-0"><i class="bi bi-funnel me-2"></i>Filtros</h5>
         <a href="?" class="clear-filters-btn"><i class="bi bi-x-circle me-1"></i>Limpiar</a>
       </div>
+
 
       <form method="get" action="">
         <!-- Buscar -->
@@ -48,6 +53,7 @@
             <i class="bi bi-search search-icon"></i>
           </div>
         </div>
+
 
         <!-- Género -->
         <div class="filter-section">
@@ -64,6 +70,7 @@
           </div>
         </div>
 
+
         <!-- Autor -->
         <div class="filter-section">
           <label class="filter-label"><i class="bi bi-person me-2"></i>Autor</label>
@@ -79,6 +86,7 @@
           </div>
         </div>
 
+
         <!-- Botones -->
         <div class="filter-actions p-3">
           <button type="submit" class="btn btn-main w-100 mb-2">
@@ -92,6 +100,7 @@
     </div>
   </aside>
 
+
   <!-- Libros -->
   <div class="books-content" data-aos="fade-left">
     <div class="results-info mb-3">
@@ -104,6 +113,7 @@
       </span>
       {% endif %}
     </div>
+
 
     <!-- Grid de Libros -->
     <div class="book-grid">
@@ -119,10 +129,19 @@
             <a href="{% url 'book_detail' book.id %}" class="book-link">{{ book.title|truncatewords:6 }}</a>
           </h3>
           <p class="book-author"><i class="bi bi-person me-1"></i>{{ book.authors|truncatewords:3 }}</p>
-          <div class="book-footer">
+          <div class="book-pricing">
             <span class="book-price">
+              {% if book.precio %}
+                ${{ book.precio|floatformat:0 }}
+              {% else %}
+                Precio no disponible
+              {% endif %}
+            </span>
+            <span class="book-rating">
               {% if book.average_rating %} ⭐ {{ book.average_rating|floatformat:2 }} {% else %} Sin calificación {% endif %}
             </span>
+          </div>
+          <div class="book-footer">
             <a href="{% url 'book_detail' book.id %}" class="view-details-btn">
               Ver más <i class="bi bi-arrow-right ms-1"></i>
             </a>
@@ -138,6 +157,7 @@
       </div>
       {% endfor %}
     </div>
+
 
     <!-- Paginación -->
     {% if is_paginated %}
@@ -169,6 +189,7 @@
   </div>
 </div>
 
+
 <style>
 /* --- Layout firme: sidebar izquierda, grid derecha --- */
 .catalog-container {
@@ -177,6 +198,7 @@
   gap: 30px;
   align-items: start;
 }
+
 
 /* Sidebar fijo */
 .filters-sidebar { position: sticky; top: 140px; align-self: start; }
@@ -197,6 +219,7 @@
 }
 .clear-filters-btn { color: var(--white); text-decoration: none; opacity: 0.85; }
 .clear-filters-btn:hover { opacity: 1; }
+
 
 .filter-section {
   padding: 18px 20px;
@@ -235,6 +258,7 @@
 .filter-scroll-box::-webkit-scrollbar { width: 8px; }
 .filter-scroll-box::-webkit-scrollbar-thumb { background: var(--dark-gray); border-radius: 8px; }
 
+
 /* ✅ Alineación vertical limpia de los filtros */
 .custom-checkbox {
   display: flex;
@@ -261,6 +285,7 @@
 }
 .form-check { padding-left: 0; }
 
+
 /* --- Resto igual --- */
 .catalog-header {
   background: linear-gradient(180deg, var(--extra-light-gray), var(--white));
@@ -271,6 +296,7 @@
 }
 .catalog-title { color: var(--black); font-weight: 800; letter-spacing: -0.01em; margin-bottom: 6px; }
 .catalog-subtitle { color: var(--medium-gray); }
+
 
 /* Grid */
 .books-content { min-width: 0; }
@@ -286,6 +312,7 @@
   .filters-sidebar { position: static; }
 }
 @media (max-width: 480px) { .book-grid { grid-template-columns: 1fr; } }
+
 
 /* Tarjetas */
 .book-item {
@@ -309,16 +336,43 @@
 .book-link { color: var(--black); text-decoration: none; }
 .book-link:hover { color: var(--medium-gray); }
 .book-author { color: var(--medium-gray); font-size: 0.9rem; margin: 0 0 12px 0; }
+
+
+/* 💰 Precio y Rating */
+.book-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--light-gray);
+}
+.book-price {
+  color: var(--black);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
+.book-rating {
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+
 .book-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  border-top: 1px solid var(--light-gray);
-  padding-top: 10px;
 }
-.book-price { color: var(--black); font-weight: 700; }
-.view-details-btn { color: var(--black); font-weight: 600; text-decoration: none; }
+.view-details-btn {
+  color: var(--black);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
 .view-details-btn:hover { color: var(--medium-gray); transform: translateX(3px); }
+
 
 /* Resultados y paginación */
 .results-info {
@@ -353,6 +407,7 @@
 }
 .pagination-custom .page-link:hover { background: var(--black); color: var(--white); }
 .pagination-custom .page-item.active .page-link { background: var(--black); color: var(--white); }
+
 
 /* Sin resultados */
 .no-results {

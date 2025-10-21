@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 
+
 {% block title %}Carrito - {{ app_name }}{% endblock %}
+
 
 {% block content %}
 <div class="container my-5 fade-in-up">
@@ -9,13 +11,16 @@
         🛒 Tu carrito de compras
     </h2>
 
+
     {% if cart_items and cart_items|length > 0 %}
     <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
         <table class="table align-middle mb-0">
             <thead class="text-center" style="background: var(--black); color: var(--white);">
                 <tr>
-                    <th>Libro</th>
-                    <th style="width:160px;">Cantidad</th>
+                    <th class="text-start">Libro</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
                     <th>Calificación</th>
                     <th>Acciones</th>
                 </tr>
@@ -31,33 +36,65 @@
                             <small class="text-muted">{{ item.book.authors }}</small>
                         </div>
                     </td>
+
+
                     <td class="text-center">
-                        <div class="d-flex justify-content-center align-items-center gap-2">
-                            <form method="post" action="{% url 'update_cart' item.book.id 'decrease' %}" style="display:inline;">
+                        <span class="fw-bold" style="color: var(--black); font-size: 1.05rem;">
+                            {% if item.book.precio %}
+                                ${{ item.book.precio|floatformat:0 }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </span>
+                    </td>
+
+
+                    <td class="text-center">
+                        <div class="quantity-controls">
+                            <form method="post" action="{% url 'update_cart' item.book.id 'decrease' %}" class="quantity-form">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline btn-sm rounded-circle fw-bold" style="width:32px; height:32px;">-</button>
+                                <button type="submit" class="quantity-btn decrease-btn">
+                                    <i class="bi bi-dash"></i>
+                                </button>
                             </form>
-                            <span class="fw-semibold">{{ item.quantity }}</span>
-                            <form method="post" action="{% url 'update_cart' item.book.id 'increase' %}" style="display:inline;">
+                            <span class="quantity-display">{{ item.quantity }}</span>
+                            <form method="post" action="{% url 'update_cart' item.book.id 'increase' %}" class="quantity-form">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline btn-sm rounded-circle fw-bold" style="width:32px; height:32px;">+</button>
+                                <button type="submit" class="quantity-btn increase-btn">
+                                    <i class="bi bi-plus"></i>
+                                </button>
                             </form>
                         </div>
                     </td>
 
+
                     <td class="text-center">
-                        {% if item.book.average_rating %}
-                            ⭐ {{ item.book.average_rating|floatformat:2 }}
-                        {% else %}
-                            Sin calificación
-                        {% endif %}
+                        <span class="fw-bold" style="color: var(--black); font-size: 1.1rem;">
+                            {% if item.book.precio %}
+                                ${{ item.book.precio|floatformat:0 }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </span>
                     </td>
+
+
+                    <td class="text-center">
+                        <span class="rating-badge">
+                            {% if item.book.average_rating %}
+                                ⭐ {{ item.book.average_rating|floatformat:2 }}
+                            {% else %}
+                                Sin rating
+                            {% endif %}
+                        </span>
+                    </td>
+
 
                     <td class="text-center">
                         <form method="post" action="{% url 'remove_from_cart' item.book.id %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-outline btn-small">
-                                🗑️ Eliminar
+                                <i class="bi bi-trash"></i> Eliminar
                             </button>
                         </form>
                     </td>
@@ -67,25 +104,49 @@
         </table>
     </div>
 
-    <div class="text-end mt-4">
-        <h4>Libros en carrito: <span class="fw-bold" style="color: var(--black);">{{ cart_items|length }}</span></h4>
-        <div class="mt-3 d-flex justify-content-end gap-3 flex-wrap">
-            <a href="{% url 'book_list' %}" class="btn btn-outline">⬅️ Seguir explorando</a>
-            <form method="post" action="{% url 'clear_cart' %}">
+
+    <div class="cart-summary mt-4">
+        <div class="summary-card">
+            <div class="summary-row">
+                <span class="summary-label">Total de libros:</span>
+                <span class="summary-value">{{ cart_items|length }}</span>
+            </div>
+            <div class="summary-row total-row">
+    <span class="summary-label">Total general:</span>
+    <span class="summary-value total-value">
+        ${{ total_price|floatformat:0 }}
+    </span>
+</div>
+
+        </div>
+
+
+        <div class="cart-actions mt-3">
+            <a href="{% url 'book_list' %}" class="btn btn-outline">
+                <i class="bi bi-arrow-left"></i> Seguir explorando
+            </a>
+            <form method="post" action="{% url 'clear_cart' %}" style="display: inline;">
                 {% csrf_token %}
-                <button class="btn btn-outline">🧹 Vaciar carrito</button>
+                <button class="btn btn-outline">
+                    <i class="bi bi-trash3"></i> Vaciar carrito
+                </button>
             </form>
-            <a href="#" class="btn btn-main">📚 Guardar lista</a>
+            <a href="#" class="btn btn-main">
+                <i class="bi bi-bookmark-check"></i> Guardar lista
+            </a>
         </div>
     </div>
 
+
     {% else %}
     <div class="text-center p-5 border rounded-4 shadow-sm" style="background: var(--white); border-color: var(--light-gray);">
+        <i class="bi bi-cart-x" style="font-size: 3rem; color: var(--medium-gray); display: block; margin-bottom: 1rem;"></i>
         <h5 class="mb-3 text-muted">Tu carrito está vacío 😕</h5>
         <a href="{% url 'book_list' %}" class="btn btn-main">Explorar libros</a>
     </div>
     {% endif %}
 </div>
+
 
 <style>
 /* 🧱 TABLA */
@@ -95,12 +156,133 @@
 }
 .table th, .table td {
     vertical-align: middle;
-    padding: 14px;
+    padding: 16px;
     border-color: var(--light-gray);
+}
+.table th {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+.table tbody tr {
+    transition: background 0.2s ease;
 }
 .table tbody tr:hover {
     background: var(--extra-light-gray);
 }
+
+
+/* 🎛️ CONTROLES DE CANTIDAD - MEJORADOS */
+.quantity-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--extra-light-gray);
+    border: 2px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 4px 8px;
+}
+.quantity-form {
+    display: inline;
+    margin: 0;
+}
+.quantity-btn {
+    background: var(--white);
+    border: 1px solid var(--black);
+    color: var(--black);
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+.quantity-btn:hover {
+    background: var(--black);
+    color: var(--white);
+    transform: scale(1.05);
+}
+.quantity-btn:active {
+    transform: scale(0.95);
+}
+.quantity-display {
+    min-width: 32px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--black);
+}
+
+
+/* 🏷️ RATING BADGE */
+.rating-badge {
+    background: var(--extra-light-gray);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--black);
+    display: inline-block;
+}
+
+
+/* 📊 RESUMEN DEL CARRITO */
+.cart-summary {
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+.summary-card {
+    background: var(--extra-light-gray);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+.summary-row:last-child {
+    border-bottom: none;
+}
+.summary-label {
+    font-size: 1rem;
+    color: var(--medium-gray);
+}
+.summary-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--black);
+}
+.total-row {
+    padding-top: 16px;
+    margin-top: 8px;
+    border-top: 2px solid var(--black);
+}
+.total-value {
+    font-size: 1.5rem;
+    color: var(--black);
+}
+
+
+/* 🎯 ACCIONES DEL CARRITO */
+.cart-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 
 /* BOTONES */
 .btn-outline {
@@ -109,11 +291,17 @@
     border: 2px solid var(--black);
     font-weight: 600;
     border-radius: 10px;
+    padding: 10px 20px;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 .btn-outline:hover {
     background: var(--black);
     color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .btn-main {
     background: var(--black);
@@ -121,30 +309,51 @@
     border: 2px solid var(--black);
     font-weight: 600;
     border-radius: 10px;
+    padding: 10px 20px;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 .btn-main:hover {
     background: var(--white);
     color: var(--black);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .btn-small {
-    padding: 6px 14px;
+    padding: 8px 16px;
     font-size: 0.9rem;
 }
 
-/* TOTAL */
-.text-end h4 {
-    font-size: 1.4rem;
-    color: var(--black);
-}
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-    table {
-        font-size: 0.9rem;
+    .table {
+        font-size: 0.85rem;
+    }
+    .table th, .table td {
+        padding: 10px 8px;
     }
     h2 {
         font-size: 1.5rem;
+    }
+    .cart-actions {
+        flex-direction: column;
+    }
+    .cart-actions .btn,
+    .cart-actions form {
+        width: 100%;
+    }
+    .cart-actions .btn {
+        justify-content: center;
+    }
+    .quantity-controls {
+        gap: 6px;
+    }
+    .quantity-btn {
+        width: 26px;
+        height: 26px;
     }
 }
 </style>
