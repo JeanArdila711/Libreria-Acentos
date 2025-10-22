@@ -93,8 +93,11 @@ class BookListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Géneros
         context['genres'] = Book.objects.values_list('genre', flat=True).exclude(genre='').distinct().order_by('genre')
 
+        # Autores
         autores_raw = Book.objects.values_list('authors', flat=True).exclude(authors='').distinct()
         autores_set = set()
         for autores in autores_raw:
@@ -102,14 +105,36 @@ class BookListView(ListView):
                 autores_set.add(autor.strip())
         context['authors'] = sorted(autores_set)
 
+        # Filtros seleccionados
         request = self.request
         context['selected_genres'] = request.GET.getlist('genre')
         context['selected_authors'] = request.GET.getlist('author')
+        
+        # Contar filtros activos
+        active_filters = 0
+        if request.GET.get('q'):
+            active_filters += 1
+        if request.GET.getlist('genre'):
+            active_filters += len(request.GET.getlist('genre'))
+        if request.GET.getlist('author'):
+            active_filters += len(request.GET.getlist('author'))
+        if request.GET.get('price_range'):
+            active_filters += 1
+        if request.GET.get('rating'):
+            active_filters += 1
+        if request.GET.get('year'):
+            active_filters += 1
+        
+        context['active_filters_count'] = active_filters
+        
         return context
 
     def get_queryset(self):
         qs = super().get_queryset()
-        search = self.request.GET.get('q', '').strip()
+        request = self.request
+        
+        # 🔍 Búsqueda por texto
+        search = request.GET.get('q', '').strip()
         if search:
             qs = qs.filter(
                 Q(title__icontains=search) |
@@ -117,21 +142,68 @@ class BookListView(ListView):
                 Q(genre__icontains=search)
             )
 
-        genres = self.request.GET.getlist('genre') or self.request.GET.get('genre')
+        # 📚 Filtro por Género
+        genres = request.GET.getlist('genre')
         if genres:
-            if isinstance(genres, str):
-                genres = [genres]
             qs = qs.filter(genre__in=genres)
 
-        authors = self.request.GET.getlist('author') or self.request.GET.get('author')
+        # 👤 Filtro por Autor
+        authors = request.GET.getlist('author')
         if authors:
-            if isinstance(authors, str):
-                authors = [authors]
             qs = qs.filter(authors__in=authors)
 
-        # El campo language_code ya no existe en el nuevo modelo
+        # 💰 Filtro por Rango de Precio
+        price_range = request.GET.get('price_range', '').strip()
+        if price_range:
+            try:
+                min_price, max_price = map(int, price_range.split('-'))
+                qs = qs.filter(precio__gte=min_price, precio__lte=max_price)
+            except ValueError:
+                pass
 
-        return qs.order_by('title')
+        # ⭐ Filtro por Rating
+        rating = request.GET.get('rating', '').strip()
+        if rating:
+            try:
+                rating_value = float(rating)
+                qs = qs.filter(average_rating__gte=rating_value)
+            except ValueError:
+                pass
+
+        # 📅 Filtro por Año
+        year_range = request.GET.get('year', '').strip()
+        if year_range:
+            try:
+                start_year, end_year = map(int, year_range.split('-'))
+                qs = qs.filter(publication_date__gte=start_year, publication_date__lte=end_year)
+            except ValueError:
+                pass
+
+        # 📊 Ordenamiento
+        sort_by = request.GET.get('sort_by', '').strip()
+        
+        if sort_by == 'price_low':
+            qs = qs.order_by('precio')
+        elif sort_by == 'price_high':
+            qs = qs.order_by('-precio')
+        elif sort_by == 'rating_high':
+            qs = qs.order_by('-average_rating')
+        elif sort_by == 'rating_low':
+            qs = qs.order_by('average_rating')
+        elif sort_by == 'year_new':
+            qs = qs.order_by('-publication_date')
+        elif sort_by == 'year_old':
+            qs = qs.order_by('publication_date')
+        elif sort_by == 'title_az':
+            qs = qs.order_by('title')
+        elif sort_by == 'title_za':
+            qs = qs.order_by('-title')
+        else:
+            # Orden por defecto
+            qs = qs.order_by('title')
+
+        return qs
+
 
 
 class BookSearchView(ListView):

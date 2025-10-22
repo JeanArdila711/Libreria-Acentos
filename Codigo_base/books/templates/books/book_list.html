@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
-
 {% block title %}Catálogo de Libros - {{ app_name }}{% endblock %}
-
 
 {% block breadcrumbs %}
 <div class="breadcrumb-container fade-in-up">
@@ -22,7 +20,6 @@
 </div>
 {% endblock %}
 
-
 {% block content %}
 <!-- Encabezado -->
 <div class="catalog-header fade-in-up mb-4 text-center">
@@ -30,98 +27,271 @@
   <p class="catalog-subtitle">Explora nuestra colección de {{ books.paginator.count }} libros disponibles</p>
 </div>
 
-
 <!-- CONTENEDOR PRINCIPAL -->
 <div class="catalog-container">
-  <!-- Filtros -->
-  <aside class="filters-sidebar" data-aos="fade-right">
+  <!-- Filtros Mejorados -->
+  <aside class="filters-sidebar">
     <div class="filters-card">
       <div class="filters-header">
-        <h5 class="m-0"><i class="bi bi-funnel me-2"></i>Filtros</h5>
-        <a href="?" class="clear-filters-btn"><i class="bi bi-x-circle me-1"></i>Limpiar</a>
+        <div class="filters-header-content">
+          <i class="bi bi-funnel-fill me-2"></i>
+          <span class="filters-title">Filtros</span>
+          {% if request.GET.q or selected_genres or selected_authors or request.GET.price_range or request.GET.rating or request.GET.year %}
+          <span class="filters-badge">•</span>
+          {% endif %}
+        </div>
+        <a href="?" class="clear-filters-btn">
+          <i class="bi bi-x-circle-fill me-1"></i>Limpiar
+        </a>
       </div>
 
-
-      <form method="get" action="">
-        <!-- Buscar -->
+      <form method="get" action="" id="filterForm">
+        
+        <!-- 🔍 Búsqueda Rápida -->
         <div class="filter-section">
-          <label class="filter-label"><i class="bi bi-search me-2"></i>Buscar</label>
-          <div class="search-input-wrapper">
-            <input type="text" name="q" id="search" class="form-control search-input"
-                   placeholder="Título, autor o género..."
-                   value="{{ request.GET.q|default:'' }}">
-            <i class="bi bi-search search-icon"></i>
-          </div>
-        </div>
-
-
-        <!-- Género -->
-        <div class="filter-section">
-          <label class="filter-label"><i class="bi bi-bookmark me-2"></i>Género</label>
-          <div class="filter-scroll-box">
-            {% for g in genres %}
-            <div class="form-check custom-checkbox">
-              <input class="form-check-input" type="checkbox" name="genre"
-                     id="genre_{{ forloop.counter }}" value="{{ g }}"
-                     {% if g in selected_genres %}checked{% endif %}>
-              <label class="form-check-label" for="genre_{{ forloop.counter }}">{{ g }}</label>
+          <button type="button" class="filter-toggle active" data-target="search-filter">
+            <div class="filter-toggle-left">
+              <i class="bi bi-search"></i>
+              <span>Búsqueda</span>
             </div>
-            {% endfor %}
-          </div>
-        </div>
-
-
-        <!-- Autor -->
-        <div class="filter-section">
-          <label class="filter-label"><i class="bi bi-person me-2"></i>Autor</label>
-          <div class="filter-scroll-box">
-            {% for a in authors %}
-            <div class="form-check custom-checkbox">
-              <input class="form-check-input" type="checkbox" name="author"
-                     id="author_{{ forloop.counter }}" value="{{ a }}"
-                     {% if a in selected_authors %}checked{% endif %}>
-              <label class="form-check-label" for="author_{{ forloop.counter }}">{{ a }}</label>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-
-
-        <!-- Botones -->
-        <div class="filter-actions p-3">
-          <button type="submit" class="btn btn-main w-100 mb-2">
-            <i class="bi bi-check-circle me-1"></i>Aplicar Filtros
+            <i class="bi bi-chevron-down toggle-icon"></i>
           </button>
-          <a href="?" class="btn btn-outline w-100">
-            <i class="bi bi-arrow-counterclockwise me-1"></i>Resetear
+          <div class="filter-content show" id="search-filter">
+            <div class="search-input-wrapper">
+              <input type="text" name="q" id="search" class="form-control search-input"
+                     placeholder="Título, autor, género..."
+                     value="{{ request.GET.q|default:'' }}">
+              <i class="bi bi-search search-icon"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 📊 Ordenar Por -->
+        <div class="filter-section">
+          <button type="button" class="filter-toggle" data-target="sort-filter">
+            <div class="filter-toggle-left">
+              <i class="bi bi-sort-down"></i>
+              <span>Ordenar por</span>
+            </div>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+          </button>
+          <div class="filter-content" id="sort-filter">
+            <select name="sort_by" class="form-select filter-select">
+              <option value="">Relevancia</option>
+              <option value="price_low" {% if request.GET.sort_by == 'price_low' %}selected{% endif %}>Precio: Menor a Mayor</option>
+              <option value="price_high" {% if request.GET.sort_by == 'price_high' %}selected{% endif %}>Precio: Mayor a Menor</option>
+              <option value="rating_high" {% if request.GET.sort_by == 'rating_high' %}selected{% endif %}>Rating: Mayor a Menor</option>
+              <option value="rating_low" {% if request.GET.sort_by == 'rating_low' %}selected{% endif %}>Rating: Menor a Mayor</option>
+              <option value="year_new" {% if request.GET.sort_by == 'year_new' %}selected{% endif %}>Más Nuevos</option>
+              <option value="year_old" {% if request.GET.sort_by == 'year_old' %}selected{% endif %}>Más Antiguos</option>
+              <option value="title_az" {% if request.GET.sort_by == 'title_az' %}selected{% endif %}>Título: A-Z</option>
+              <option value="title_za" {% if request.GET.sort_by == 'title_za' %}selected{% endif %}>Título: Z-A</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 💰 Rango de Precio -->
+        <div class="filter-section">
+          <button type="button" class="filter-toggle" data-target="price-filter">
+            <div class="filter-toggle-left">
+              <i class="bi bi-cash-stack"></i>
+              <span>Precio</span>
+            </div>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+          </button>
+          <div class="filter-content" id="price-filter">
+            <div class="price-range-options">
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="price_range" id="price_all" value="" 
+                       {% if not request.GET.price_range %}checked{% endif %}>
+                <label class="form-check-label" for="price_all">
+                  Todos los precios
+                </label>
+              </div>
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="price_range" id="price_1" value="0-30000"
+                       {% if request.GET.price_range == '0-30000' %}checked{% endif %}>
+                <label class="form-check-label" for="price_1">
+                  Menos de $30,000
+                </label>
+              </div>
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="price_range" id="price_2" value="30000-50000"
+                       {% if request.GET.price_range == '30000-50000' %}checked{% endif %}>
+                <label class="form-check-label" for="price_2">
+                  $30,000 - $50,000
+                </label>
+              </div>
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="price_range" id="price_3" value="50000-80000"
+                       {% if request.GET.price_range == '50000-80000' %}checked{% endif %}>
+                <label class="form-check-label" for="price_3">
+                  $50,000 - $80,000
+                </label>
+              </div>
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="price_range" id="price_4" value="80000-999999"
+                       {% if request.GET.price_range == '80000-999999' %}checked{% endif %}>
+                <label class="form-check-label" for="price_4">
+                  Más de $80,000
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⭐ Calificación -->
+        <div class="filter-section">
+          <button type="button" class="filter-toggle" data-target="rating-filter">
+            <div class="filter-toggle-left">
+              <i class="bi bi-star-fill"></i>
+              <span>Calificación</span>
+            </div>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+          </button>
+          <div class="filter-content" id="rating-filter">
+            <div class="rating-options">
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="rating" id="rating_all" value=""
+                       {% if not request.GET.rating %}checked{% endif %}>
+                <label class="form-check-label" for="rating_all">
+                  Todas las calificaciones
+                </label>
+              </div>
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="rating" id="rating_5" value="5"
+                       {% if request.GET.rating == '5' %}checked{% endif %}>
+                <label class="form-check-label rating-label" for="rating_5">
+                  <span class="stars">⭐⭐⭐⭐⭐</span>
+                  <span class="rating-text">5 estrellas</span>
+                </label>
+              </div>
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="rating" id="rating_4" value="4"
+                       {% if request.GET.rating == '4' %}checked{% endif %}>
+                <label class="form-check-label rating-label" for="rating_4">
+                  <span class="stars">⭐⭐⭐⭐</span>
+                  <span class="rating-text">4+ estrellas</span>
+                </label>
+              </div>
+              <div class="form-check custom-radio">
+                <input class="form-check-input" type="radio" name="rating" id="rating_3" value="3"
+                       {% if request.GET.rating == '3' %}checked{% endif %}>
+                <label class="form-check-label rating-label" for="rating_3">
+                  <span class="stars">⭐⭐⭐</span>
+                  <span class="rating-text">3+ estrellas</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 📅 Año de Publicación -->
+        <div class="filter-section">
+          <button type="button" class="filter-toggle" data-target="year-filter">
+            <div class="filter-toggle-left">
+              <i class="bi bi-calendar-event"></i>
+              <span>Año</span>
+            </div>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+          </button>
+          <div class="filter-content" id="year-filter">
+            <select name="year" class="form-select filter-select">
+              <option value="">Todos los años</option>
+              <option value="2020-2025" {% if request.GET.year == '2020-2025' %}selected{% endif %}>2020 - 2025</option>
+              <option value="2010-2019" {% if request.GET.year == '2010-2019' %}selected{% endif %}>2010 - 2019</option>
+              <option value="2000-2009" {% if request.GET.year == '2000-2009' %}selected{% endif %}>2000 - 2009</option>
+              <option value="1990-1999" {% if request.GET.year == '1990-1999' %}selected{% endif %}>1990 - 1999</option>
+              <option value="1900-1989" {% if request.GET.year == '1900-1989' %}selected{% endif %}>Antes de 1990</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 📚 Género -->
+        <div class="filter-section">
+          <button type="button" class="filter-toggle" data-target="genre-filter">
+            <div class="filter-toggle-left">
+              <i class="bi bi-bookmark-fill"></i>
+              <span>Género</span>
+              {% if selected_genres %}
+              <span class="filter-count">{{ selected_genres|length }}</span>
+              {% endif %}
+            </div>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+          </button>
+          <div class="filter-content" id="genre-filter">
+            <div class="filter-scroll-box">
+              {% for g in genres %}
+              <div class="form-check custom-checkbox">
+                <input class="form-check-input" type="checkbox" name="genre"
+                       id="genre_{{ forloop.counter }}" value="{{ g }}"
+                       {% if g in selected_genres %}checked{% endif %}>
+                <label class="form-check-label" for="genre_{{ forloop.counter }}">{{ g }}</label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- 👤 Autor -->
+        <div class="filter-section">
+          <button type="button" class="filter-toggle" data-target="author-filter">
+            <div class="filter-toggle-left">
+              <i class="bi bi-person-fill"></i>
+              <span>Autor</span>
+              {% if selected_authors %}
+              <span class="filter-count">{{ selected_authors|length }}</span>
+              {% endif %}
+            </div>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+          </button>
+          <div class="filter-content" id="author-filter">
+            <div class="filter-scroll-box">
+              {% for a in authors %}
+              <div class="form-check custom-checkbox">
+                <input class="form-check-input" type="checkbox" name="author"
+                       id="author_{{ forloop.counter }}" value="{{ a }}"
+                       {% if a in selected_authors %}checked{% endif %}>
+                <label class="form-check-label" for="author_{{ forloop.counter }}">{{ a }}</label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-apply">
+            <i class="bi bi-check-circle-fill me-2"></i>Aplicar Filtros
+          </button>
+          <a href="?" class="btn btn-reset">
+            <i class="bi bi-arrow-counterclockwise me-2"></i>Resetear Todo
           </a>
         </div>
       </form>
     </div>
   </aside>
 
-
-  <!-- Libros -->
-  <div class="books-content" data-aos="fade-left">
+  <!-- Contenido de Libros -->
+  <div class="books-content">
     <div class="results-info mb-3">
       <span class="results-count">
         <i class="bi bi-card-list me-1"></i>Mostrando {{ books|length }} de {{ books.paginator.count }} libros
       </span>
-      {% if request.GET.q or selected_genres or selected_authors %}
+      {% if request.GET.q or selected_genres or selected_authors or request.GET.price_range or request.GET.rating or request.GET.year %}
       <span class="active-filters">
-        <i class="bi bi-filter-circle me-1"></i>Filtros activos
+        <i class="bi bi-filter-circle-fill me-1"></i>Filtros activos
       </span>
       {% endif %}
     </div>
 
-
-    <!-- Grid de Libros -->
     <div class="book-grid">
       {% for book in books %}
-      <div class="book-item fade-in-up" data-aos-delay="{{ forloop.counter0|add:'50' }}">
+      <div class="book-item">
         <a href="{% url 'book_detail' book.id %}" class="book-image-link">
           <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
                alt="Portada de {{ book.title }}"
+               loading="lazy"
                onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
         </a>
         <div class="book-info">
@@ -138,7 +308,7 @@
               {% endif %}
             </span>
             <span class="book-rating">
-              {% if book.average_rating %} ⭐ {{ book.average_rating|floatformat:2 }} {% else %} Sin calificación {% endif %}
+              {% if book.average_rating %}⭐ {{ book.average_rating|floatformat:2 }}{% else %}Sin calificación{% endif %}
             </span>
           </div>
           <div class="book-footer">
@@ -157,7 +327,6 @@
       </div>
       {% endfor %}
     </div>
-
 
     <!-- Paginación -->
     {% if is_paginated %}
@@ -189,122 +358,403 @@
   </div>
 </div>
 
-
 <style>
-/* --- Layout firme: sidebar izquierda, grid derecha --- */
+/* 🚀 OPTIMIZACIÓN DE RENDIMIENTO */
+* {
+  will-change: auto;
+}
+
+/* Layout */
 .catalog-container {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: 340px minmax(0, 1fr);
   gap: 30px;
   align-items: start;
 }
 
-
-/* Sidebar fijo */
-.filters-sidebar { position: sticky; top: 140px; align-self: start; }
-.filters-card {
-  background: var(--white);
-  border: 1px solid var(--light-gray);
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
+/* Sidebar Sticky */
+.filters-sidebar {
+  position: sticky;
+  top: 140px;
+  align-self: start;
 }
+
+.filters-card {
+  background: linear-gradient(180deg, var(--white) 0%, var(--extra-light-gray) 100%);
+  border: 2px solid var(--light-gray);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.filters-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header de Filtros */
 .filters-header {
-  background: linear-gradient(135deg, var(--black), var(--dark-gray));
+  background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
   color: var(--white);
-  padding: 16px 22px;
+  padding: 18px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
-.clear-filters-btn { color: var(--white); text-decoration: none; opacity: 0.85; }
-.clear-filters-btn:hover { opacity: 1; }
 
+.filters-header-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
 
+.filters-badge {
+  background: #ff4444;
+  color: var(--white);
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+.clear-filters-btn {
+  color: var(--white);
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.clear-filters-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-2px);
+}
+
+/* Secciones de Filtros */
 .filter-section {
-  padding: 18px 20px;
   border-bottom: 1px solid var(--light-gray);
-  background: linear-gradient(180deg, var(--extra-light-gray), var(--white));
 }
-.filter-section:last-child { border-bottom: none; }
-.filter-label { font-weight: 600; color: var(--black); }
-.search-input-wrapper { position: relative; }
+
+.filter-section:last-of-type {
+  border-bottom: none;
+}
+
+/* Botón Toggle Colapsable - MÁS RÁPIDO */
+.filter-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  color: var(--black);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.filter-toggle:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.filter-toggle.active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.filter-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-toggle-left i {
+  font-size: 1.1rem;
+  color: var(--dark-gray);
+}
+
+.filter-count {
+  background: var(--black);
+  color: var(--white);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+}
+
+.toggle-icon {
+  transition: transform 0.2s ease;
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+}
+
+.filter-toggle.active .toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* Contenido de Filtros - ANIMACIÓN MÁS RÁPIDA */
+.filter-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease-out, padding 0.25s ease-out;
+  padding: 0 22px;
+}
+
+.filter-content.show {
+  max-height: 600px;
+  padding: 0 22px 16px;
+}
+
+/* Input de Búsqueda */
+.search-input-wrapper {
+  position: relative;
+}
+
 .search-input {
-  padding-left: 36px;
+  padding-left: 38px;
   border: 2px solid var(--light-gray);
   border-radius: 10px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .search-input:focus {
   border-color: var(--black);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  outline: none;
 }
+
 .search-icon {
   position: absolute;
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--medium-gray);
+  font-size: 1rem;
+  pointer-events: none;
 }
-.filter-scroll-box {
-  max-height: 220px;
-  overflow-y: auto;
-  background: var(--extra-light-gray);
-  border-radius: 8px;
-  padding: 8px;
+
+/* Select Mejorado */
+.filter-select {
+  border: 2px solid var(--light-gray);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 0.9rem;
+  color: var(--black);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  background-color: var(--white);
+}
+
+.filter-select:focus {
+  border-color: var(--black);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  outline: none;
+}
+
+/* Radio Buttons - MÁS RÁPIDOS */
+.custom-radio {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+  cursor: pointer;
 }
-.filter-scroll-box::-webkit-scrollbar { width: 8px; }
-.filter-scroll-box::-webkit-scrollbar-thumb { background: var(--dark-gray); border-radius: 8px; }
 
+.custom-radio:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
 
-/* ✅ Alineación vertical limpia de los filtros */
-.custom-checkbox {
+.custom-radio .form-check-input {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  transition: all 0.15s ease;
+}
+
+.custom-radio .form-check-input:checked {
+  background-color: var(--black);
+  border-color: var(--black);
+}
+
+.custom-radio .form-check-label {
+  cursor: pointer;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--black);
+  flex: 1;
+}
+
+.rating-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 4px;
-  margin: 0;
+}
+
+.rating-label .stars {
+  font-size: 0.85rem;
+}
+
+.rating-label .rating-text {
+  color: var(--medium-gray);
+  font-size: 0.85rem;
+}
+
+/* Checkboxes */
+.filter-scroll-box {
+  max-height: 240px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.filter-scroll-box::-webkit-scrollbar {
+  width: 5px;
+}
+
+.filter-scroll-box::-webkit-scrollbar-thumb {
+  background: var(--medium-gray);
+  border-radius: 10px;
+}
+
+.filter-scroll-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-bottom: 2px;
   border-radius: 6px;
-  transition: background 0.2s ease;
+  transition: background 0.15s ease;
+  cursor: pointer;
 }
+
 .custom-checkbox:hover {
-  background: #f3f3f3;
+  background: rgba(0, 0, 0, 0.04);
 }
+
 .custom-checkbox .form-check-input {
+  cursor: pointer;
+  width: 17px;
+  height: 17px;
   margin: 0;
-  position: static;
-  transform: none;
+  transition: all 0.15s ease;
 }
+
+.custom-checkbox .form-check-input:checked {
+  background-color: var(--black);
+  border-color: var(--black);
+}
+
 .custom-checkbox .form-check-label {
+  cursor: pointer;
   margin: 0;
-  padding: 0;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--black);
+  flex: 1;
 }
-.form-check { padding-left: 0; }
 
+/* Botones de Acción - MÁS RÁPIDOS */
+.filter-actions {
+  padding: 18px 22px;
+  background: linear-gradient(180deg, var(--extra-light-gray), var(--white));
+  border-top: 1px solid var(--light-gray);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-/* --- Resto igual --- */
+.btn-apply,
+.btn-reset {
+  width: 100%;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-apply {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+.btn-apply:hover {
+  background: var(--dark-gray);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-apply:active {
+  transform: translateY(0);
+}
+
+.btn-reset {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--light-gray);
+}
+
+.btn-reset:hover {
+  background: var(--extra-light-gray);
+  border-color: var(--black);
+  transform: translateY(-1px);
+}
+
+.btn-reset:active {
+  transform: translateY(0);
+}
+
+/* Resto de estilos */
 .catalog-header {
   background: linear-gradient(180deg, var(--extra-light-gray), var(--white));
   border: 1px solid var(--light-gray);
-  border-radius: 18px;
-  padding: 30px 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 28px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 .catalog-title { color: var(--black); font-weight: 800; letter-spacing: -0.01em; margin-bottom: 6px; }
 .catalog-subtitle { color: var(--medium-gray); }
 
-
-/* Grid */
 .books-content { min-width: 0; }
 .book-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
+  gap: 22px;
 }
+
 @media (max-width: 1200px) { .book-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 768px) {
   .catalog-container { grid-template-columns: 1fr; }
@@ -313,52 +763,64 @@
 }
 @media (max-width: 480px) { .book-grid { grid-template-columns: 1fr; } }
 
-
-/* Tarjetas */
+/* Tarjetas de Libros - OPTIMIZADAS */
 .book-item {
   background: linear-gradient(180deg, var(--white), var(--extra-light-gray));
   border: 1px solid var(--light-gray);
-  border-radius: 14px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   overflow: hidden;
 }
-.book-item:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1); }
+
+.book-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.book-image-link {
+  display: block;
+  overflow: hidden;
+  background: var(--extra-light-gray);
+}
+
 .book-image-link img {
   width: 100%;
   height: 280px;
   object-fit: cover;
-  transition: transform 0.35s ease;
+  transition: transform 0.25s ease;
+  display: block;
 }
-.book-item:hover img { transform: scale(1.06); }
-.book-info { padding: 16px; }
-.book-title { font-size: 1rem; margin: 0 0 8px 0; }
-.book-link { color: var(--black); text-decoration: none; }
+
+.book-item:hover img {
+  transform: scale(1.05);
+}
+
+.book-info { padding: 15px; }
+.book-title { font-size: 0.98rem; margin: 0 0 8px 0; font-weight: 700; }
+.book-link { color: var(--black); text-decoration: none; transition: color 0.15s ease; }
 .book-link:hover { color: var(--medium-gray); }
-.book-author { color: var(--medium-gray); font-size: 0.9rem; margin: 0 0 12px 0; }
+.book-author { color: var(--medium-gray); font-size: 0.88rem; margin: 0 0 10px 0; }
 
-
-/* 💰 Precio y Rating */
 .book-pricing {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--light-gray);
 }
 .book-price {
   color: var(--black);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   letter-spacing: -0.01em;
 }
 .book-rating {
   color: var(--medium-gray);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
 }
-
 
 .book-footer {
   display: flex;
@@ -368,55 +830,97 @@
 .view-details-btn {
   color: var(--black);
   font-weight: 600;
+  font-size: 0.88rem;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
-.view-details-btn:hover { color: var(--medium-gray); transform: translateX(3px); }
+.view-details-btn:hover { color: var(--medium-gray); transform: translateX(2px); }
 
-
-/* Resultados y paginación */
 .results-info {
   background: var(--white);
   border: 1px solid var(--light-gray);
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  padding: 12px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 12px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
 }
-.active-filters { color: var(--medium-gray); }
+.active-filters { color: var(--medium-gray); font-size: 0.9rem; }
+
 .pagination-custom {
   display: flex;
   gap: 6px;
   list-style: none;
   padding: 0;
   margin: 0;
+  justify-content: center;
 }
 .pagination-custom .page-link {
   border: 1px solid var(--light-gray);
   color: var(--black);
   border-radius: 8px;
-  padding: 8px 14px;
-  min-width: 40px;
+  padding: 8px 12px;
+  min-width: 38px;
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.15s ease;
+  text-decoration: none;
 }
-.pagination-custom .page-link:hover { background: var(--black); color: var(--white); }
+.pagination-custom .page-link:hover { background: var(--black); color: var(--white); transform: translateY(-1px); }
 .pagination-custom .page-item.active .page-link { background: var(--black); color: var(--white); }
+.pagination-custom .page-item.disabled .page-link { opacity: 0.4; cursor: not-allowed; }
 
-
-/* Sin resultados */
 .no-results {
   background: var(--extra-light-gray);
-  border: 1px solid var(--light-gray);
+  border: 2px dashed var(--light-gray);
   border-radius: 12px;
   padding: 40px 20px;
   text-align: center;
+  grid-column: 1 / -1;
 }
-.no-results i { color: var(--medium-gray); font-size: 3rem; display: block; margin-bottom: 10px; }
+.no-results i { color: var(--medium-gray); font-size: 3rem; display: block; margin-bottom: 10px; opacity: 0.5; }
 </style>
+
+<script>
+// 🚀 JavaScript Optimizado para Filtros
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleButtons = document.querySelectorAll('.filter-toggle');
+  
+  // Usar event delegation para mejor rendimiento
+  document.querySelector('.filters-card').addEventListener('click', function(e) {
+    const toggle = e.target.closest('.filter-toggle');
+    if (!toggle) return;
+    
+    e.preventDefault();
+    const targetId = toggle.getAttribute('data-target');
+    const content = document.getElementById(targetId);
+    
+    // Toggle con requestAnimationFrame para suavidad
+    requestAnimationFrame(() => {
+      toggle.classList.toggle('active');
+      content.classList.toggle('show');
+    });
+  });
+
+  // Auto-submit cuando cambia el ordenamiento
+  const sortSelect = document.querySelector('select[name="sort_by"]');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+      this.form.submit();
+    });
+  }
+
+  // Lazy loading de imágenes (ya incluido con loading="lazy")
+  // Smooth scroll para paginación
+  document.querySelectorAll('.pagination-custom a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+});
+</script>
 {% endblock %}
