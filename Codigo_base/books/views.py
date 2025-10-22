@@ -367,8 +367,15 @@ def add_to_cart(request, book_id):
     request.session['cart'] = cart
     request.session.modified = True
 
-    messages.success(request, f"Agregado al carrito: {book.title}")
-    return redirect('cart_view')
+    messages.success(request, f"✓ {book.title} agregado al carrito")
+    
+    # Redirigir a la página anterior en lugar del carrito
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    else:
+        return redirect('book_detail', book_id=book_id)
+
 
 
 def update_cart(request, book_id, action):

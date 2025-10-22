@@ -372,66 +372,85 @@
     }
 
 
-    /* 🔍 BUSCADOR EN NAVBAR */
-    .search-form {
+    /* 🔍 BUSCADOR EXPANDIBLE ELEGANTE */
+    .search-wrapper {
+        position: relative;
         display: flex;
         align-items: center;
     }
 
-    .search-input-group {
+    .search-form-expandable {
+        position: relative;
         display: flex;
         align-items: center;
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
     }
 
-    .search-input-group:focus-within {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.4);
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-    }
-
-    .search-input-nav {
-        background: transparent;
-        border: none;
-        color: var(--white);
-        padding: 8px 12px;
+    .search-input-expandable {
+        position: absolute;
+        right: 45px;
+        width: 0;
+        height: 40px;
+        padding: 0 15px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        color: var(--black);
         font-size: 0.9rem;
         outline: none;
-        width: 200px;
-        transition: width 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
     }
 
-    .search-input-nav::placeholder {
-        color: rgba(255, 255, 255, 0.6);
+    .search-input-expandable::placeholder {
+        color: var(--medium-gray);
     }
 
-    .search-input-nav:focus {
-        width: 250px;
+    .search-input-expandable.active {
+        width: 280px;
+        opacity: 1;
+        pointer-events: all;
+        border-color: var(--white);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
 
-    .btn-search {
-        background: transparent;
-        border: none;
+    .search-input-expandable:focus {
+        background: var(--white);
+        border-color: var(--white);
+    }
+
+    .btn-search-icon {
+        position: relative;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         color: var(--white);
-        padding: 8px 12px;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    .btn-search:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: scale(1.1);
-    }
-
-    .btn-search i {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 1.1rem;
+    }
+
+    .btn-search-icon:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: scale(1.05);
+    }
+
+    .btn-search-icon.active {
+        background: var(--white);
+        color: var(--black);
+        border-color: var(--white);
+    }
+
+    .btn-search-icon i {
+        pointer-events: none;
     }
 
 
@@ -954,18 +973,15 @@
         }
 
         /* Buscador responsive */
-        .search-input-nav {
-            width: 140px;
+        .search-input-expandable.active {
+            width: 200px;
             font-size: 0.85rem;
-            padding: 6px 10px;
         }
         
-        .search-input-nav:focus {
-            width: 160px;
-        }
-        
-        .btn-search {
-            padding: 6px 10px;
+        .btn-search-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 1rem;
         }
     }
 
@@ -987,16 +1003,14 @@
             right: -20px;
         }
 
-        .search-input-nav {
-            width: 100px;
+        .search-input-expandable.active {
+            width: 160px;
+            right: 42px;
         }
         
-        .search-input-nav:focus {
-            width: 120px;
-        }
-        
-        .search-input-group {
-            border-width: 1px;
+        .btn-search-icon {
+            width: 36px;
+            height: 36px;
         }
     }
     </style>
@@ -1049,19 +1063,20 @@
 
 
         <div class="navbar-right">
-            <!-- 🔍 BUSCADOR -->
-            <form method="get" action="{% url 'book_search' %}" class="search-form">
-                <div class="search-input-group">
+            <!-- 🔍 BUSCADOR EXPANDIBLE ELEGANTE -->
+            <div class="search-wrapper">
+                <form method="get" action="{% url 'book_search' %}" class="search-form-expandable">
                     <input type="text" 
                            name="q" 
                            placeholder="Buscar libros..." 
-                           class="search-input-nav"
+                           class="search-input-expandable"
+                           id="searchInput"
                            required>
-                    <button type="submit" class="btn-search">
+                    <button type="button" class="btn-search-icon" id="searchToggle">
                         <i class="bi bi-search"></i>
                     </button>
-                </div>
-            </form>
+                </form>
+            </div>
 
             <!-- 🛒 CARRITO -->
             <a href="{% url 'cart_view' %}" class="btn-cart">
@@ -1331,6 +1346,60 @@
                 easing: 'ease-out-cubic'
             });
         }
+
+
+        // 🔍 JavaScript para búsqueda expandible
+        (function() {
+            const searchToggle = document.getElementById('searchToggle');
+            const searchInput = document.getElementById('searchInput');
+            const searchForm = document.querySelector('.search-form-expandable');
+            
+            if (!searchToggle || !searchInput) return;
+            
+            let isExpanded = false;
+            
+            // Toggle al hacer clic en el botón
+            searchToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Si está expandido y hay texto, hacer submit
+                if (isExpanded && searchInput.value.trim()) {
+                    searchForm.submit();
+                    return;
+                }
+                
+                // Toggle expansión
+                isExpanded = !isExpanded;
+                
+                if (isExpanded) {
+                    searchInput.classList.add('active');
+                    searchToggle.classList.add('active');
+                    setTimeout(() => searchInput.focus(), 400);
+                } else {
+                    searchInput.classList.remove('active');
+                    searchToggle.classList.remove('active');
+                    searchInput.value = '';
+                }
+            });
+            
+            // Submit al presionar Enter
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && searchInput.value.trim()) {
+                    searchForm.submit();
+                }
+            });
+            
+            // Cerrar al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!searchToggle.contains(e.target) && !searchInput.contains(e.target)) {
+                    if (isExpanded && !searchInput.value.trim()) {
+                        searchInput.classList.remove('active');
+                        searchToggle.classList.remove('active');
+                        isExpanded = false;
+                    }
+                }
+            });
+        })();
     </script>
 </body>
 </html>

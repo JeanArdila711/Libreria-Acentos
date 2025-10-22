@@ -46,25 +46,6 @@
       </div>
 
       <form method="get" action="" id="filterForm">
-        
-        <!-- 🔍 Búsqueda Rápida -->
-        <div class="filter-section">
-          <button type="button" class="filter-toggle active" data-target="search-filter">
-            <div class="filter-toggle-left">
-              <i class="bi bi-search"></i>
-              <span>Búsqueda</span>
-            </div>
-            <i class="bi bi-chevron-down toggle-icon"></i>
-          </button>
-          <div class="filter-content show" id="search-filter">
-            <div class="search-input-wrapper">
-              <input type="text" name="q" id="search" class="form-control search-input"
-                     placeholder="Título, autor, género..."
-                     value="{{ request.GET.q|default:'' }}">
-              <i class="bi bi-search search-icon"></i>
-            </div>
-          </div>
-        </div>
 
         <!-- 📊 Ordenar Por -->
         <div class="filter-section">
