@@ -24,3 +24,86 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+    
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+# Modelo de Favoritos
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'book')  # Un usuario no puede marcar el mismo libro 2 veces
+        ordering = ['-added_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.book.title}"
+
+
+# Modelo de Pedidos
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pendiente'),
+        ('processing', 'Procesando'),
+        ('shipped', 'Enviado'),
+        ('delivered', 'Entregado'),
+        ('cancelled', 'Cancelado'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    order_number = models.CharField(max_length=100, unique=True, editable=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    shipping_address = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Pedido #{self.order_number} - {self.user.username}"
+
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            # Generar número de orden único
+            import uuid
+            self.order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
+
+
+# Items del pedido (detalle)
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # Precio al momento de la compra
+
+    def __str__(self):
+        return f"{self.quantity}x {self.book.title}"
+
+    @property
+    def subtotal(self):
+        return self.quantity * self.price
+
+
+# Modelo de Notificaciones/Preferencias de Usuario
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    bio = models.TextField(max_length=500, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    
+    # Preferencias de notificaciones
+    email_notifications = models.BooleanField(default=True)
+    newsletter = models.BooleanField(default=True)
+    new_releases_alert = models.BooleanField(default=True)
+    discount_alerts = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"

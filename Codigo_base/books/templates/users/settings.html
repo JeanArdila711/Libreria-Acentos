@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 800px;">
+    <div class="content-card">
+        <div class="content-card-header">
+            <h5><i class="bi bi-gear-fill me-2"></i>Configuración</h5>
+            <a href="{% url 'user_profile' %}" class="btn-secondary-custom">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+        <div class="content-card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Notificaciones por Email -->
+                <div class="settings-section">
+                    <h6><i class="bi bi-envelope-fill me-2"></i>Notificaciones por Email</h6>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h6>Notificaciones Generales</h6>
+                            <p>Recibe emails sobre actualizaciones de pedidos y novedades</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" name="email_notifications" {% if profile.email_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h6>Newsletter</h6>
+                            <p>Recibe nuestro boletín con las mejores ofertas y recomendaciones</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" name="newsletter" {% if profile.newsletter %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h6>Nuevos Lanzamientos</h6>
+                            <p>Sé el primero en conocer los nuevos libros que llegan</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" name="new_releases_alert" {% if profile.new_releases_alert %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h6>Alertas de Descuentos</h6>
+                            <p>Recibe notificaciones cuando haya promociones especiales</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" name="discount_alerts" {% if profile.discount_alerts %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Privacidad y Seguridad -->
+                <div class="settings-section">
+                    <h6><i class="bi bi-shield-fill-check me-2"></i>Privacidad y Seguridad</h6>
+                    <div class="setting-link-item">
+                        <div class="setting-info">
+                            <h6>Cambiar Contraseña</h6>
+                            <p>Actualiza tu contraseña de acceso</p>
+                        </div>
+                        <a href="{% url 'password_change' %}" class="btn-setting-action">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Cuenta -->
+                <div class="settings-section">
+                    <h6><i class="bi bi-person-fill-gear me-2"></i>Mi Cuenta</h6>
+                    <div class="setting-link-item">
+                        <div class="setting-info">
+                            <h6>Eliminar Cuenta</h6>
+                            <p class="text-danger">Esta acción es permanente e irreversible</p>
+                        </div>
+                        <button type="button" class="btn-setting-danger" onclick="confirmDelete()">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Botón Guardar -->
+                <div class="settings-footer">
+                    <button type="submit" class="btn-save-settings">
+                        <i class="bi bi-check-circle-fill me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.settings-section {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.settings-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.settings-section h6 {
+    margin: 0 0 20px 0;
+    font-weight: 700;
+    color: var(--black);
+    font-size: 1.1rem;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--extra-light-gray);
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.setting-item:hover {
+    border-color: var(--black);
+}
+
+.setting-info {
+    flex: 1;
+}
+
+.setting-info h6 {
+    margin: 0 0 4px 0;
+    font-weight: 600;
+    color: var(--black);
+    font-size: 0.95rem;
+}
+
+.setting-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--medium-gray);
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--light-gray);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--black);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Setting Link Item */
+.setting-link-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--extra-light-gray);
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.setting-link-item:hover {
+    border-color: var(--black);
+    transform: translateX(4px);
+}
+
+.btn-setting-action {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+}
+
+.btn-setting-action:hover {
+    background: var(--dark-gray);
+    transform: scale(1.1);
+}
+
+.btn-setting-danger {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+}
+
+.btn-setting-danger:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+}
+
+.settings-footer {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.btn-save-settings {
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-save-settings:hover {
+    background: var(--dark-gray);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+</style>
+
+<script>
+function confirmDelete() {
+    if (confirm('⚠️ ¿Estás seguro de que quieres eliminar tu cuenta?\n\nEsta acción es permanente y no se puede deshacer.')) {
+        if (confirm('Esta es tu última oportunidad. ¿Realmente quieres eliminar tu cuenta?')) {
+            alert('Funcionalidad de eliminación de cuenta pendiente de implementación');
+            // Aquí iría la lógica para eliminar la cuenta
+        }
+    }
+}
+</script>
+{% endblock %}

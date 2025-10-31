@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Favoritos - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="content-card">
+        <div class="content-card-header">
+            <h5><i class="bi bi-heart-fill me-2"></i>Mis Favoritos</h5>
+            <a href="{% url 'user_profile' %}" class="btn-secondary-custom">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+        <div class="content-card-body">
+            {% if favorites %}
+                <div class="favorites-grid">
+                    {% for favorite in favorites %}
+                    <div class="favorite-card">
+                        <div class="favorite-image-container">
+                            <a href="{% url 'book_detail' favorite.book.id %}">
+                                <img src="{{ favorite.book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}" 
+                                     alt="{{ favorite.book.title }}" class="favorite-image">
+                            </a>
+                            <button class="btn-remove-favorite" onclick="removeFavorite({{ favorite.book.id }})">
+                                <i class="bi bi-heart-fill"></i>
+                            </button>
+                        </div>
+                        <div class="favorite-info">
+                            <h6 class="favorite-title">
+                                <a href="{% url 'book_detail' favorite.book.id %}">{{ favorite.book.title|truncatewords:8 }}</a>
+                            </h6>
+                            <p class="favorite-author">{{ favorite.book.authors|truncatewords:3 }}</p>
+                            <div class="favorite-footer">
+                                <span class="favorite-price">${{ favorite.book.precio|floatformat:0 }}</span>
+                                <a href="{% url 'add_to_cart' favorite.book.id %}" class="btn-add-cart">
+                                    <i class="bi bi-cart-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-heart"></i>
+                    <h5>No tienes favoritos aún</h5>
+                    <p>Empieza a guardar tus libros favoritos para verlos aquí</p>
+                    <a href="{% url 'book_list' %}" class="btn-primary-custom">
+                        <i class="bi bi-search me-2"></i>Explorar Libros
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+}
+
+.favorite-card {
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.favorite-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    border-color: var(--black);
+}
+
+.favorite-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.favorite-image {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.favorite-card:hover .favorite-image {
+    transform: scale(1.05);
+}
+
+.btn-remove-favorite {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    color: #e74c3c;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.btn-remove-favorite:hover {
+    background: #e74c3c;
+    color: white;
+    transform: scale(1.1);
+}
+
+.favorite-info {
+    padding: 16px;
+}
+
+.favorite-title {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.favorite-title a {
+    color: var(--black);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.favorite-title a:hover {
+    color: var(--medium-gray);
+}
+
+.favorite-author {
+    margin: 0 0 12px 0;
+    font-size: 0.85rem;
+    color: var(--medium-gray);
+}
+
+.favorite-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--light-gray);
+}
+
+.favorite-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.btn-add-cart {
+    background: var(--black);
+    color: var(--white);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-add-cart:hover {
+    background: var(--dark-gray);
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .favorites-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 16px;
+    }
+}
+</style>
+
+<script>
+function removeFavorite(bookId) {
+    if (confirm('¿Eliminar este libro de favoritos?')) {
+        window.location.href = `/favoritos/toggle/${bookId}/`;
+    }
+}
+</script>
+{% endblock %}

@@ -74,11 +74,24 @@ class HomePageView(TemplateView):
     template_name = "home.html"
 
     def get_context_data(self, **kwargs):
-        from random import sample
         ctx = super().get_context_data(**kwargs)
-        books = list(Book.objects.all())
-        ctx['featured_books'] = sample(books, min(len(books), 10))  # 🔹 ahora muestra 10 libros
+        
+        # Top 4 mejor valorados
+        ctx['top_rated_books'] = Book.objects.filter(
+            average_rating__isnull=False
+        ).order_by('-average_rating')[:4]
+        
+        # Últimos 8 agregados (novedades)
+        ctx['new_books'] = Book.objects.all().order_by('-id')[:8]
+        
+        # Featured books (para explorar por género)
+        ctx['featured_books'] = Book.objects.all()[:16]
+        
+        # Estadísticas
+        ctx['total_books'] = Book.objects.count()
+        
         return ctx
+
 
 
 class AboutPageView(TemplateView):
@@ -126,6 +139,12 @@ class BookListView(ListView):
             active_filters += 1
         
         context['active_filters_count'] = active_filters
+
+        top_4_books = Book.objects.filter(
+            average_rating__isnull=False
+        ).order_by('-average_rating')[:4]
+
+        context['top_4_books'] = top_4_books
         
         return context
 
@@ -203,6 +222,23 @@ class BookListView(ListView):
             qs = qs.order_by('title')
 
         return qs
+    
+class Top100BooksView(ListView):
+    model = Book
+    template_name = "books/top_100.html"
+    context_object_name = "top_books"
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Book.objects.filter(
+            average_rating__isnull=False
+        ).order_by('-average_rating')[:100]
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_count'] = 100
+        return context
+
 
 
 
@@ -463,4 +499,260 @@ def buy_now(request, book_id):
     cart[key] = cart.get(key, 0) + 1
     request.session['cart'] = cart
     request.session.modified = True
+    return redirect('cart_view')
+
+
+# --------- USER PROFILE ------------
+
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views import View
+
+@method_decorator(login_required, name='dispatch')
+class UserProfileView(View):
+    template_name = "users/profile.html"
+
+    def get(self, request):
+        return render(request, self.template_name, {"user": request.user})
+
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.db.models import Sum, Count
+from .models import Favorite, Order, OrderItem, UserProfile
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+
+# ==========================================
+# 🔹 VISTA DE PERFIL CON PESTAÑAS
+# ==========================================
+@method_decorator(login_required, name='dispatch')
+class UserProfileView(View):
+    template_name = "users/profile.html"
+
+    def get(self, request):
+        # Obtener o crear perfil del usuario
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        
+        # Estadísticas del usuario
+        total_orders = Order.objects.filter(user=request.user).count()
+        total_spent = Order.objects.filter(user=request.user).aggregate(
+            total=Sum('total_price')
+        )['total'] or 0
+        total_favorites = Favorite.objects.filter(user=request.user).count()
+        
+        # Último pedido
+        last_order = Order.objects.filter(user=request.user).first()
+        
+        context = {
+            "user": request.user,
+            "profile": profile,
+            "total_orders": total_orders,
+            "total_spent": total_spent,
+            "total_favorites": total_favorites,
+            "last_order": last_order,
+        }
+        return render(request, self.template_name, context)
+
+
+# ==========================================
+# 🔹 EDITAR PERFIL
+# ==========================================
+@login_required
+def edit_profile(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        # Actualizar información del usuario
+        request.user.first_name = request.POST.get('first_name', '')
+        request.user.last_name = request.POST.get('last_name', '')
+        request.user.email = request.POST.get('email', '')
+        request.user.save()
+        
+        # Actualizar perfil
+        profile.phone = request.POST.get('phone', '')
+        profile.bio = request.POST.get('bio', '')
+        
+        # Manejar foto de perfil
+        if request.FILES.get('avatar'):
+            profile.avatar = request.FILES['avatar']
+        
+        profile.save()
+        
+        messages.success(request, "✓ Perfil actualizado correctamente")
+        return redirect('user_profile')
+    
+    return render(request, 'users/edit_profile.html', {'profile': profile})
+
+
+# ==========================================
+# 🔹 MIS PEDIDOS
+# ==========================================
+@login_required
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user).prefetch_related('items__book')
+    return render(request, 'users/orders.html', {'orders': orders})
+
+
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, 'users/order_detail.html', {'order': order})
+
+
+# ==========================================
+# 🔹 FAVORITOS
+# ==========================================
+@login_required
+def my_favorites(request):
+    favorites = Favorite.objects.filter(user=request.user).select_related('book')
+    return render(request, 'users/favorites.html', {'favorites': favorites})
+
+
+@login_required
+def toggle_favorite(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, book=book)
+    
+    if not created:
+        favorite.delete()
+        messages.success(request, f"❤️ {book.title} eliminado de favoritos")
+    else:
+        messages.success(request, f"❤️ {book.title} agregado a favoritos")
+    
+    # Redirigir a la página anterior
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    else:
+        return redirect('book_detail', book_id=book_id)
+
+
+# ==========================================
+# 🔹 ESTADÍSTICAS
+# ==========================================
+@login_required
+def user_statistics(request):
+    # Estadísticas generales
+    total_orders = Order.objects.filter(user=request.user).count()
+    total_spent = Order.objects.filter(user=request.user).aggregate(
+        total=Sum('total_price')
+    )['total'] or 0
+    
+    # Géneros más comprados
+    genre_stats = OrderItem.objects.filter(order__user=request.user).values(
+        'book__genre'
+    ).annotate(
+        count=Count('id')
+    ).order_by('-count')[:5]
+    
+    # Autores más comprados
+    author_stats = OrderItem.objects.filter(order__user=request.user).values(
+        'book__authors'
+    ).annotate(
+        count=Count('id')
+    ).order_by('-count')[:5]
+    
+    # Determinar nivel de usuario
+    if total_orders == 0:
+        level = "Nuevo"
+        level_icon = "🌱"
+    elif total_orders < 5:
+        level = "Bronce"
+        level_icon = "🥉"
+    elif total_orders < 15:
+        level = "Plata"
+        level_icon = "🥈"
+    else:
+        level = "Oro"
+        level_icon = "🥇"
+    
+    context = {
+        'total_orders': total_orders,
+        'total_spent': total_spent,
+        'genre_stats': genre_stats,
+        'author_stats': author_stats,
+        'level': level,
+        'level_icon': level_icon,
+    }
+    
+    return render(request, 'users/statistics.html', context)
+
+
+# ==========================================
+# 🔹 CONFIGURACIÓN Y PREFERENCIAS
+# ==========================================
+@login_required
+def user_settings(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        # Actualizar preferencias
+        profile.email_notifications = request.POST.get('email_notifications') == 'on'
+        profile.newsletter = request.POST.get('newsletter') == 'on'
+        profile.new_releases_alert = request.POST.get('new_releases_alert') == 'on'
+        profile.discount_alerts = request.POST.get('discount_alerts') == 'on'
+        profile.save()
+        
+        messages.success(request, "✓ Preferencias guardadas correctamente")
+        return redirect('user_settings')
+    
+    return render(request, 'users/settings.html', {'profile': profile})
+
+
+# ==========================================
+# 🔹 CREAR PEDIDO DESDE EL CARRITO
+# ==========================================
+@login_required
+def create_order_from_cart(request):
+    if request.method == 'POST':
+        cart = request.session.get('cart', {})
+        
+        if not cart:
+            messages.error(request, "Tu carrito está vacío")
+            return redirect('cart_view')
+        
+        # Calcular total
+        total = 0
+        order_items_data = []
+        
+        for book_id_str, qty in cart.items():
+            try:
+                qty = int(qty)
+                book = Book.objects.get(pk=int(book_id_str))
+                price = float(book.precio or 0)
+                subtotal = price * qty
+                total += subtotal
+                
+                order_items_data.append({
+                    'book': book,
+                    'quantity': qty,
+                    'price': price
+                })
+            except (Book.DoesNotExist, ValueError):
+                continue
+        
+        # Crear pedido
+        order = Order.objects.create(
+            user=request.user,
+            total_price=total,
+            shipping_address=request.POST.get('shipping_address', '')
+        )
+        
+        # Crear items del pedido
+        for item_data in order_items_data:
+            OrderItem.objects.create(
+                order=order,
+                book=item_data['book'],
+                quantity=item_data['quantity'],
+                price=item_data['price']
+            )
+        
+        # Limpiar carrito
+        request.session['cart'] = {}
+        request.session.modified = True
+        
+        messages.success(request, f"✓ Pedido #{order.order_number} creado exitosamente")
+        return redirect('order_detail', order_id=order.id)
+    
     return redirect('cart_view')

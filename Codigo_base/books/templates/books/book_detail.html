@@ -121,16 +121,16 @@
 
 
             <!-- ❤️ Botones secundarios -->
-            <div class="secondary-actions d-flex gap-2 mt-3">
-                <button class="btn btn-outline btn-small">
-                    <i class="bi bi-heart"></i> Favoritos
-                </button>
-                <button class="btn btn-outline btn-small">
-                    <i class="bi bi-share"></i> Compartir
-                </button>
-            </div>
-        </div>
-    </div>
+            <!-- ❤️ Botones secundarios -->
+<div class="secondary-actions d-flex gap-2 mt-3">
+    <a href="{% url 'toggle_favorite' book.id %}" class="btn btn-outline btn-small">
+        <i class="bi bi-heart-fill"></i> Agregar a Favoritos
+    </a>
+    <button class="btn btn-outline btn-small">
+        <i class="bi bi-share"></i> Compartir
+    </button>
+</div>
+
 
 
     <!-- 🔸 Separador -->

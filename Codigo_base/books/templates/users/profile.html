@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Perfil - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar de Perfil -->
+        <div class="col-md-3">
+            <div class="profile-card">
+                <div class="text-center mb-4">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="Avatar" class="profile-avatar">
+                    {% else %}
+                        <i class="bi bi-person-circle profile-avatar-icon"></i>
+                    {% endif %}
+                    <h4 class="mt-3 mb-1">{{ user.first_name|default:user.username }}</h4>
+                    <p class="text-muted mb-0">{{ user.email }}</p>
+                </div>
+                
+                <div class="profile-menu">
+                    <a href="{% url 'user_profile' %}" class="profile-menu-item active">
+                        <i class="bi bi-person-fill"></i>
+                        <span>Mi Perfil</span>
+                    </a>
+                    <a href="{% url 'my_orders' %}" class="profile-menu-item">
+                        <i class="bi bi-box-seam"></i>
+                        <span>Mis Pedidos</span>
+                        {% if total_orders > 0 %}
+                            <span class="badge-count">{{ total_orders }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'my_favorites' %}" class="profile-menu-item">
+                        <i class="bi bi-heart-fill"></i>
+                        <span>Favoritos</span>
+                        {% if total_favorites > 0 %}
+                            <span class="badge-count">{{ total_favorites }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'user_statistics' %}" class="profile-menu-item">
+                        <i class="bi bi-bar-chart-fill"></i>
+                        <span>Estadísticas</span>
+                    </a>
+                    <a href="{% url 'user_settings' %}" class="profile-menu-item">
+                        <i class="bi bi-gear-fill"></i>
+                        <span>Configuración</span>
+                    </a>
+                    
+                    <hr class="my-3">
+                    
+                    <a href="{% url 'logout' %}" class="profile-menu-item logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenido Principal -->
+        <div class="col-md-9">
+            <!-- Tarjetas de Estadísticas -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="bi bi-cart-check-fill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ total_orders }}</h3>
+                            <p>Pedidos Realizados</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="bi bi-cash-coin"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${{ total_spent|floatformat:0 }}</h3>
+                            <p>Total Gastado</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="bi bi-heart-fill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ total_favorites }}</h3>
+                            <p>Favoritos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información del Perfil -->
+            <div class="content-card">
+                <div class="content-card-header">
+                    <h5><i class="bi bi-person-fill me-2"></i>Información Personal</h5>
+                    <a href="{% url 'edit_profile' %}" class="btn-edit">
+                        <i class="bi bi-pencil-fill me-1"></i>Editar
+                    </a>
+                </div>
+                <div class="content-card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="info-label">Nombre de Usuario</label>
+                            <p class="info-value">{{ user.username }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="info-label">Correo Electrónico</label>
+                            <p class="info-value">{{ user.email }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="info-label">Nombre Completo</label>
+                            <p class="info-value">
+                                {% if user.first_name or user.last_name %}
+                                    {{ user.first_name }} {{ user.last_name }}
+                                {% else %}
+                                    <span class="text-muted">No especificado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="info-label">Teléfono</label>
+                            <p class="info-value">
+                                {% if profile.phone %}
+                                    {{ profile.phone }}
+                                {% else %}
+                                    <span class="text-muted">No especificado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-12">
+                            <label class="info-label">Biografía</label>
+                            <p class="info-value">
+                                {% if profile.bio %}
+                                    {{ profile.bio }}
+                                {% else %}
+                                    <span class="text-muted">No has agregado una biografía</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Último Pedido -->
+            {% if last_order %}
+            <div class="content-card mt-4">
+                <div class="content-card-header">
+                    <h5><i class="bi bi-box-seam me-2"></i>Último Pedido</h5>
+                    <a href="{% url 'my_orders' %}" class="btn-edit">Ver todos</a>
+                </div>
+                <div class="content-card-body">
+                    <div class="order-summary">
+                        <div class="order-summary-info">
+                            <h6>Pedido #{{ last_order.order_number }}</h6>
+                            <p class="text-muted mb-0">{{ last_order.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="order-summary-status">
+                            <span class="order-status status-{{ last_order.status }}">
+                                {{ last_order.get_status_display }}
+                            </span>
+                            <p class="order-total">${{ last_order.total_price|floatformat:0 }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Sidebar de Perfil */
+.profile-card {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--light-gray);
+}
+
+.profile-avatar-icon {
+    font-size: 100px;
+    color: var(--medium-gray);
+}
+
+.profile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: var(--black);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.profile-menu-item i {
+    font-size: 1.1rem;
+    width: 20px;
+}
+
+.profile-menu-item:hover {
+    background: var(--extra-light-gray);
+    transform: translateX(5px);
+}
+
+.profile-menu-item.active {
+    background: var(--black);
+    color: var(--white);
+}
+
+.profile-menu-item.logout {
+    color: var(--medium-gray);
+}
+
+.profile-menu-item.logout:hover {
+    background: var(--black);
+    color: var(--white);
+}
+
+.badge-count {
+    margin-left: auto;
+    background: var(--black);
+    color: var(--white);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.profile-menu-item.active .badge-count {
+    background: var(--white);
+    color: var(--black);
+}
+
+/* Tarjetas de Estadísticas */
+.stat-card {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.stat-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--medium-gray);
+}
+
+/* Tarjetas de Contenido */
+.content-card {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.content-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--light-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--extra-light-gray);
+}
+
+.content-card-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.content-card-body {
+    padding: 24px;
+}
+
+.btn-edit {
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn-edit:hover {
+    background: var(--dark-gray);
+    transform: translateY(-2px);
+}
+
+.info-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--medium-gray);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: var(--black);
+    margin: 0;
+}
+
+/* Último Pedido */
+.order-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-summary-info h6 {
+    margin: 0 0 4px 0;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.order-summary-status {
+    text-align: right;
+}
+
+.order-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.order-status.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.order-status.status-processing {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.order-status.status-shipped {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.order-status.status-delivered {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.order-status.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.order-total {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--black);
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .col-md-3 {
+        margin-bottom: 20px;
+    }
+}
+</style>
+{% endblock %}

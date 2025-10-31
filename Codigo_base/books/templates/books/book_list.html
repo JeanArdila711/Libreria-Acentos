@@ -336,11 +336,73 @@
       </div>
     </div>
     {% endif %}
+
+    <!-- 🏆 PREVIEW TOP 4 MEJORES LIBROS -->
+{% if top_4_books %}
+<section class="top-preview-section fade-in-up mt-5">
+  <div class="top-preview-header">
+    <div class="top-preview-title-wrapper">
+      <h2 class="top-preview-title">
+        <i class="bi bi-trophy-fill me-2"></i>Los Mejores Valorados
+      </h2>
+      <p class="top-preview-subtitle">Descubre los libros con las calificaciones más altas</p>
+    </div>
+    <a href="{% url 'top_100' %}" class="btn-see-all">
+      Ver Top 100 <i class="bi bi-arrow-right ms-2"></i>
+    </a>
+  </div>
+
+  <div class="top-preview-grid">
+    {% for book in top_4_books %}
+    <div class="top-preview-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:0|divisibleby:2|yesno:'0,100' }}">
+      <div class="top-preview-rank">#{{ forloop.counter }}</div>
+      <a href="{% url 'book_detail' book.id %}" class="top-preview-image-link">
+        <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
+             alt="Portada de {{ book.title }}"
+             loading="lazy"
+             onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
+        <div class="top-preview-overlay">
+          <i class="bi bi-eye-fill"></i>
+          <span>Ver detalles</span>
+        </div>
+      </a>
+      <div class="top-preview-info">
+        <h3 class="top-preview-book-title">
+          <a href="{% url 'book_detail' book.id %}">{{ book.title|truncatewords:5 }}</a>
+        </h3>
+        <p class="top-preview-author">{{ book.authors|truncatewords:2 }}</p>
+        <div class="top-preview-rating">
+          <span class="rating-stars">⭐ {{ book.average_rating|floatformat:2 }}</span>
+          <span class="rating-count">({{ book.ratings_count|default:0 }})</span>
+        </div>
+        <div class="top-preview-price">
+          {% if book.precio %}
+            ${{ book.precio|floatformat:0 }}
+          {% else %}
+            Consultar
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="top-preview-cta">
+    <a href="{% url 'top_100' %}" class="btn-view-full-list">
+      <i class="bi bi-stars me-2"></i>
+      Ver los 100 mejores libros
+      <i class="bi bi-arrow-right ms-2"></i>
+    </a>
+  </div>
+</section>
+{% endif %}
+
+
   </div>
 </div>
 
 <style>
-/* 🚀 OPTIMIZACIÓN DE RENDIMIENTO */
+/* 🚀 ESTILOS EXISTENTES (mantén todos los que ya tienes) */
 * {
   will-change: auto;
 }
@@ -434,7 +496,7 @@
   border-bottom: none;
 }
 
-/* Botón Toggle Colapsable - MÁS RÁPIDO */
+/* Botón Toggle Colapsable */
 .filter-toggle {
   width: 100%;
   background: none;
@@ -490,7 +552,7 @@
   transform: rotate(180deg);
 }
 
-/* Contenido de Filtros - ANIMACIÓN MÁS RÁPIDA */
+/* Contenido de Filtros */
 .filter-content {
   max-height: 0;
   overflow: hidden;
@@ -501,35 +563,6 @@
 .filter-content.show {
   max-height: 600px;
   padding: 0 22px 16px;
-}
-
-/* Input de Búsqueda */
-.search-input-wrapper {
-  position: relative;
-}
-
-.search-input {
-  padding-left: 38px;
-  border: 2px solid var(--light-gray);
-  border-radius: 10px;
-  font-size: 0.9rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.search-input:focus {
-  border-color: var(--black);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
-  outline: none;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--medium-gray);
-  font-size: 1rem;
-  pointer-events: none;
 }
 
 /* Select Mejorado */
@@ -550,7 +583,7 @@
   outline: none;
 }
 
-/* Radio Buttons - MÁS RÁPIDOS */
+/* Radio Buttons */
 .custom-radio {
   display: flex;
   align-items: center;
@@ -660,7 +693,7 @@
   flex: 1;
 }
 
-/* Botones de Acción - MÁS RÁPIDOS */
+/* Botones de Acción */
 .filter-actions {
   padding: 18px 22px;
   background: linear-gradient(180deg, var(--extra-light-gray), var(--white));
@@ -736,15 +769,7 @@
   gap: 22px;
 }
 
-@media (max-width: 1200px) { .book-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 768px) {
-  .catalog-container { grid-template-columns: 1fr; }
-  .book-grid { grid-template-columns: repeat(2, 1fr); }
-  .filters-sidebar { position: static; }
-}
-@media (max-width: 480px) { .book-grid { grid-template-columns: 1fr; } }
-
-/* Tarjetas de Libros - OPTIMIZADAS */
+/* Tarjetas de Libros */
 .book-item {
   background: linear-gradient(180deg, var(--white), var(--extra-light-gray));
   border: 1px solid var(--light-gray);
@@ -864,6 +889,233 @@
   grid-column: 1 / -1;
 }
 .no-results i { color: var(--medium-gray); font-size: 3rem; display: block; margin-bottom: 10px; opacity: 0.5; }
+
+/* 🏆 TOP PREVIEW SECTION - COMPACTO */
+.top-preview-section {
+  background: linear-gradient(135deg, var(--white) 0%, var(--extra-light-gray) 100%);
+  border: 2px solid var(--black);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.top-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.top-preview-title-wrapper {
+  flex: 1;
+}
+
+.top-preview-title {
+  color: var(--black);
+  font-weight: 800;
+  font-size: 1.8rem;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.top-preview-subtitle {
+  color: var(--medium-gray);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.btn-see-all {
+  background: var(--black);
+  color: var(--white);
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid var(--black);
+}
+
+.btn-see-all:hover {
+  background: var(--white);
+  color: var(--black);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.top-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.top-preview-item {
+  background: var(--white);
+  border: 2px solid var(--light-gray);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.top-preview-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+  border-color: var(--black);
+}
+
+.top-preview-rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--black);
+  color: var(--white);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.top-preview-image-link {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--extra-light-gray);
+}
+
+.top-preview-image-link img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.top-preview-item:hover .top-preview-image-link img {
+  transform: scale(1.08);
+}
+
+.top-preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.top-preview-item:hover .top-preview-overlay {
+  opacity: 1;
+}
+
+.top-preview-overlay i {
+  font-size: 2rem;
+}
+
+.top-preview-info {
+  padding: 14px;
+}
+
+.top-preview-book-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.top-preview-book-title a {
+  color: var(--black);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.top-preview-book-title a:hover {
+  color: var(--medium-gray);
+}
+
+.top-preview-author {
+  color: var(--medium-gray);
+  font-size: 0.8rem;
+  margin: 0 0 10px 0;
+}
+
+.top-preview-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.top-preview-price {
+  color: var(--black);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.top-preview-cta {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 2px solid var(--light-gray);
+}
+
+.btn-view-full-list {
+  background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+  color: var(--white);
+  padding: 14px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid var(--black);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-view-full-list:hover {
+  background: linear-gradient(135deg, var(--white) 0%, var(--extra-light-gray) 100%);
+  color: var(--black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) { 
+  .top-preview-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } 
+}
+
+@media (max-width: 768px) {
+  .top-preview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .top-preview-section { padding: 20px; }
+}
+
+@media (max-width: 480px) { 
+  .top-preview-grid { grid-template-columns: 1fr; }
+}
+
 </style>
 
 <script>
@@ -895,7 +1147,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Lazy loading de imágenes (ya incluido con loading="lazy")
   // Smooth scroll para paginación
   document.querySelectorAll('.pagination-custom a').forEach(link => {
     link.addEventListener('click', function(e) {

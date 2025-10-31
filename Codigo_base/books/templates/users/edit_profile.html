@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Perfil - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 800px;">
+    <div class="content-card">
+        <div class="content-card-header">
+            <h5><i class="bi bi-pencil-square me-2"></i>Editar Perfil</h5>
+            <a href="{% url 'user_profile' %}" class="btn-secondary-custom">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+        <div class="content-card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Foto de Perfil -->
+                <div class="text-center mb-4">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="Avatar" class="edit-avatar" id="avatarPreview">
+                    {% else %}
+                        <i class="bi bi-person-circle edit-avatar-icon" id="avatarPreview"></i>
+                    {% endif %}
+                    <div class="mt-3">
+                        <label for="avatar" class="btn-upload">
+                            <i class="bi bi-camera-fill me-2"></i>Cambiar Foto
+                        </label>
+                        <input type="file" id="avatar" name="avatar" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" name="first_name" class="form-control custom-input" 
+                               value="{{ user.first_name }}" placeholder="Tu nombre">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Apellido</label>
+                        <input type="text" name="last_name" class="form-control custom-input" 
+                               value="{{ user.last_name }}" placeholder="Tu apellido">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input type="email" name="email" class="form-control custom-input" 
+                           value="{{ user.email }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Teléfono</label>
+                    <input type="text" name="phone" class="form-control custom-input" 
+                           value="{{ profile.phone }}" placeholder="+57 300 123 4567">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Biografía</label>
+                    <textarea name="bio" class="form-control custom-input" rows="4" 
+                              placeholder="Cuéntanos algo sobre ti...">{{ profile.bio }}</textarea>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn-save flex-fill">
+                        <i class="bi bi-check-circle-fill me-2"></i>Guardar Cambios
+                    </button>
+                    <a href="{% url 'user_profile' %}" class="btn-cancel">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.content-card {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.content-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--light-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--extra-light-gray);
+}
+
+.content-card-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.content-card-body {
+    padding: 32px;
+}
+
+.edit-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--light-gray);
+}
+
+.edit-avatar-icon {
+    font-size: 120px;
+    color: var(--medium-gray);
+}
+
+.btn-upload {
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.btn-upload:hover {
+    background: var(--dark-gray);
+    transform: translateY(-2px);
+}
+
+.custom-input {
+    border: 2px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.custom-input:focus {
+    border-color: var(--black);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    outline: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--black);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.btn-save {
+    background: var(--black);
+    color: var(--white);
+    border: 2px solid var(--black);
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-save:hover {
+    background: var(--dark-gray);
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--black);
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-cancel:hover {
+    background: var(--black);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-secondary-custom {
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--light-gray);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn-secondary-custom:hover {
+    border-color: var(--black);
+}
+</style>
+
+<script>
+// Preview de imagen
+document.getElementById('avatar').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('avatarPreview');
+            preview.outerHTML = `<img src="${e.target.result}" alt="Avatar" class="edit-avatar" id="avatarPreview">`;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

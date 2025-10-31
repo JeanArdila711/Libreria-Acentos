@@ -131,9 +131,13 @@
                     <i class="bi bi-trash3"></i> Vaciar carrito
                 </button>
             </form>
-            <a href="#" class="btn btn-main">
-                <i class="bi bi-bookmark-check"></i> Guardar lista
-            </a>
+            <form method="post" action="{% url 'create_order' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-main">
+        <i class="bi bi-credit-card"></i> Finalizar Compra
+    </button>
+</form>
+
         </div>
     </div>
 

@@ -1109,30 +1109,31 @@
                         </div>
                         
                         <div class="dropdown-body">
-                            <a href="#" class="dropdown-item">
-                                <i class="bi bi-person"></i>
-                                <span>Mi Perfil</span>
-                            </a>
-                            <a href="#" class="dropdown-item">
-                                <i class="bi bi-box-seam"></i>
-                                <span>Mis Pedidos</span>
-                            </a>
-                            <a href="#" class="dropdown-item">
-                                <i class="bi bi-heart"></i>
-                                <span>Favoritos</span>
-                            </a>
-                            
-                            <div class="dropdown-divider"></div>
-                            
-                            <a href="#" class="dropdown-item">
-                                <i class="bi bi-gear"></i>
-                                <span>Configuración</span>
-                            </a>
-                            <a href="{% url 'logout' %}" class="dropdown-item logout">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span>Cerrar Sesión</span>
-                            </a>
-                        </div>
+    <a href="{% url 'user_profile' %}" class="dropdown-item">
+        <i class="bi bi-person"></i>
+        <span>Mi Perfil</span>
+    </a>
+    <a href="{% url 'my_orders' %}" class="dropdown-item">
+        <i class="bi bi-box-seam"></i>
+        <span>Mis Pedidos</span>
+    </a>
+    <a href="{% url 'my_favorites' %}" class="dropdown-item">
+        <i class="bi bi-heart"></i>
+        <span>Favoritos</span>
+    </a>
+    
+    <div class="dropdown-divider"></div>
+    
+    <a href="{% url 'user_settings' %}" class="dropdown-item">
+        <i class="bi bi-gear"></i>
+        <span>Configuración</span>
+    </a>
+    <a href="{% url 'logout' %}" class="dropdown-item logout">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Cerrar Sesión</span>
+    </a>
+</div>
+
                     </div>
                 </div>
             {% else %}

@@ -1,300 +1,785 @@
 {% extends "base.html" %}
 {% load static %}
 
-
 {% block title %}Inicio - {{ app_name }}{% endblock %}
 
-
 {% block content %}
-<!-- 🌊 HERO PRINCIPAL - ÚNICO ELEMENTO CON COLOR -->
-<section class="hero-section text-center text-white" 
-    style="background: linear-gradient(120deg, #2c5f5f, #3d8080, #4da5a5);
-           padding: 80px 20px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
-    <div class="container">
-        <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.02em;">
-            Bienvenido a INKALAB LIBROS 📚
-        </h1>
-        <p style="font-size: 1.15rem; max-width: 720px; margin: 0 auto 30px; opacity: 0.95;">
-            Explora, descubre y enamórate de tu próxima lectura. Inspirado por la Universidad EAFIT.
-        </p>
-        <a href="{% url 'recommend_book' %}" 
-           class="btn btn-lg shadow hero-btn"
-           style="background-color: rgba(255, 255, 255, 0.95); color: #2c5f5f; border: none;
-                  border-radius: 12px; padding: 14px 32px; font-weight: 600;
-                  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
-            🔍 Descubre tu próxima lectura
-        </a>
+<!-- 1. HERO BANNER MEJORADO -->
+<section class="hero-banner fade-in-up">
+    <div class="hero-content">
+        <h1 class="hero-title">Bienvenido a INKALAB LIBROS 📚</h1>
+        <p class="hero-subtitle">Explora, descubre y enamórate de tu próxima lectura. Inspirado por la Universidad EAFIT.</p>
+        <div class="hero-actions">
+            <a href="{% url 'book_list' %}" class="btn-hero-primary">
+                <i class="bi bi-compass me-2"></i>Descubre tu próxima lectura
+            </a>
+            <a href="{% url 'top_100' %}" class="btn-hero-secondary">
+                <i class="bi bi-trophy-fill me-2"></i>Ver Top 100
+            </a>
+        </div>
     </div>
 </section>
 
+<!-- 2. TOP 4 MEJORES VALORADOS -->
+<section class="home-section">
+    <div class="section-header">
+        <div class="section-title-wrapper">
+            <h2 class="section-title">
+                <i class="bi bi-star-fill me-2"></i>Los Mejores Valorados
+            </h2>
+            <p class="section-subtitle">Los libros favoritos de nuestra comunidad</p>
+        </div>
+        <a href="{% url 'top_100' %}" class="btn-see-more">
+            Ver todos <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+    </div>
+    <div class="books-carousel">
+        {% for book in top_rated_books %}
+        <div class="book-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:0|divisibleby:2|yesno:'0,100' }}">
+            <div class="book-rank">#{{ forloop.counter }}</div>
+            <a href="{% url 'book_detail' book.id %}" class="book-image">
+                <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
+                     alt="{{ book.title }}"
+                     loading="lazy"
+                     onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
+                <div class="book-overlay">
+                    <i class="bi bi-eye-fill"></i>
+                </div>
+            </a>
+            <div class="book-info">
+                <h3 class="book-title">
+                    <a href="{% url 'book_detail' book.id %}">{{ book.title|truncatewords:5 }}</a>
+                </h3>
+                <p class="book-author">{{ book.authors|truncatewords:2 }}</p>
+                <div class="book-rating">
+                    <span class="stars">⭐ {{ book.average_rating|floatformat:2 }}</span>
+                </div>
+                <div class="book-price">
+                    {% if book.precio %}
+                        ${{ book.precio|floatformat:0 }}
+                    {% else %}
+                        Consultar
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
 
-<!-- 🧠 RECOMENDACIÓN EXPRESS - MONOCROMÁTICO -->
-<section class="prompt-section text-center" style="margin-top: 70px;">
-    <div class="container">
-        <h2 style="font-weight: 700; color: #1a1a1a; margin-bottom: 20px; letter-spacing: -0.02em;">
-            ¿No sabes qué leer? Cuéntanos qué te gusta 👇
-        </h2>
-        <form method="post" action="{% url 'recommend_book' %}" 
-              style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+<!-- 3. RECOMENDADOR IA -->
+<section class="recommender-section">
+    <div class="recommender-card">
+        <div class="recommender-header">
+            <div class="recommender-icon">
+                <i class="bi bi-robot"></i>
+            </div>
+            <div>
+                <h2 class="recommender-title">¿No sabes qué leer? Cuéntanos qué te gusta 👇</h2>
+                <p class="recommender-subtitle">Nuestro asistente IA te ayudará a encontrar el libro perfecto</p>
+            </div>
+        </div>
+        <form action="{% url 'recommend_book' %}" method="post" class="recommender-form">
             {% csrf_token %}
-            <input type="text" name="prompt" 
-                   placeholder="Ejemplo: novelas de aventuras con historia romántica" 
-                   required 
-                   class="search-input"
-                   style="width: 60%; min-width: 280px; padding: 14px 20px; 
-                          border-radius: 12px; border: 2px solid #e5e5e5; 
-                          outline: none; font-size: 1rem;
-                          transition: all 0.3s ease;
-                          background: white;">
-            <button type="submit" 
-                    class="search-btn"
-                    style="background-color: #1a1a1a; color: white; border: none;
-                           border-radius: 12px; padding: 14px 28px; font-weight: 600; 
-                           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                           cursor: pointer;">
-                Recomendar
+            <input type="text" 
+                   name="prompt" 
+                   placeholder="Ejemplo: novelas de aventuras con historia romántica"
+                   class="recommender-input"
+                   required>
+            <button type="submit" class="btn-recommend">
+                <i class="bi bi-magic me-2"></i>Recomendar
             </button>
         </form>
     </div>
 </section>
 
-
-<!-- 📚 LIBROS DESTACADOS - MONOCROMÁTICO -->
-<section class="featured-books" style="margin-top: 80px;">
-    <div class="container text-center">
-        <h2 style="font-weight: 700; color: #1a1a1a; margin-bottom: 40px; letter-spacing: -0.02em;">
-            Libros recomendados
-        </h2>
-
-
-        <div class="row justify-content-center g-4">
-            {% for book in featured_books %}
-            <div class="col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'100' }}">
-                <a href="{% url 'book_detail' book.id %}" class="book-card-link">
-                    <div class="card h-100 book-card">
-                        <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
-                             alt="Portada de {{ book.title }}"
-                             class="card-img-top"
-                             onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
-                        <div class="card-body text-start">
-                            <h5 class="card-title">{{ book.title }}</h5>
-                            <p class="text-muted mb-1">{{ book.authors }}</p>
-                            <p class="fw-bold price-tag mb-1">
-                                {% if book.precio %}
-                                    ${{ book.precio|floatformat:0 }}
-                                {% else %}
-                                    Precio no disponible
-                                {% endif %}
-                            </p>
-                            <p class="fw-bold mb-0" style="color: #4a4a4a; font-size: 0.95rem;">
-                                {% if book.average_rating %}
-                                    ⭐ {{ book.average_rating|floatformat:2 }}
-                                {% else %}
-                                    Sin calificación
-                                {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                </a>
+<!-- 4. NOVEDADES (Últimos agregados) -->
+<section class="home-section">
+    <div class="section-header">
+        <div class="section-title-wrapper">
+            <h2 class="section-title">
+                <i class="bi bi-stars me-2"></i>Recién Llegados
+            </h2>
+            <p class="section-subtitle">Los últimos libros agregados al catálogo</p>
+        </div>
+        <a href="{% url 'book_list' %}?sort_by=year_new" class="btn-see-more">
+            Ver todos <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+    </div>
+    <div class="books-carousel">
+        {% for book in new_books %}
+        <div class="book-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:0|divisibleby:2|yesno:'0,100' }}">
+            <div class="book-badge new">NUEVO</div>
+            <a href="{% url 'book_detail' book.id %}" class="book-image">
+                <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
+                     alt="{{ book.title }}"
+                     loading="lazy"
+                     onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
+                <div class="book-overlay">
+                    <i class="bi bi-eye-fill"></i>
+                </div>
+            </a>
+            <div class="book-info">
+                <h3 class="book-title">
+                    <a href="{% url 'book_detail' book.id %}">{{ book.title|truncatewords:5 }}</a>
+                </h3>
+                <p class="book-author">{{ book.authors|truncatewords:2 }}</p>
+                <div class="book-rating">
+                    {% if book.average_rating %}
+                        <span class="stars">⭐ {{ book.average_rating|floatformat:2 }}</span>
+                    {% else %}
+                        <span class="no-rating">Sin valorar</span>
+                    {% endif %}
+                </div>
+                <div class="book-price">
+                    {% if book.precio %}
+                        ${{ book.precio|floatformat:0 }}
+                    {% else %}
+                        Consultar
+                    {% endif %}
+                </div>
             </div>
-            {% empty %}
-            <p style="color: #6b7280;">No hay libros destacados aún.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 5. LIBROS POR GÉNERO (con tabs) -->
+<section class="genres-section">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="bi bi-bookmark-fill me-2"></i>Explora por Género
+        </h2>
+    </div>
+    
+    <div class="genre-tabs">
+        <button class="genre-tab active" data-genre="fiction">Ficción</button>
+        <button class="genre-tab" data-genre="non-fiction">No Ficción</button>
+        <button class="genre-tab" data-genre="mystery">Misterio</button>
+        <button class="genre-tab" data-genre="fantasy">Fantasía</button>
+        <button class="genre-tab" data-genre="romance">Romance</button>
+    </div>
+
+    <div class="genre-content">
+        <div class="books-carousel" id="genre-books">
+            {% for book in featured_books|slice:":8" %}
+            <div class="book-card-mini" data-aos="fade-up">
+                <a href="{% url 'book_detail' book.id %}" class="book-mini-image">
+                    <img src="{{ book.image_url|default:'https://placehold.co/150x200?text=Sin+Imagen' }}"
+                         alt="{{ book.title }}"
+                         loading="lazy">
+                </a>
+                <h4 class="book-mini-title">
+                    <a href="{% url 'book_detail' book.id %}">{{ book.title|truncatewords:4 }}</a>
+                </h4>
+                <p class="book-mini-rating">⭐ {{ book.average_rating|floatformat:1|default:"N/A" }}</p>
+            </div>
             {% endfor %}
         </div>
+    </div>
+</section>
 
+<!-- 6. ESTADÍSTICAS RÁPIDAS -->
+<section class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-card" data-aos="fade-up">
+            <div class="stat-icon">
+                <i class="bi bi-book-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">{{ total_books|default:"10,000+" }}</h3>
+                <p class="stat-label">Libros disponibles</p>
+            </div>
+        </div>
+        <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-icon">
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">{{ total_ratings|default:"50,000+" }}</h3>
+                <p class="stat-label">Valoraciones</p>
+            </div>
+        </div>
+        <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="stat-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">{{ total_users|default:"1,500+" }}</h3>
+                <p class="stat-label">Lectores activos</p>
+            </div>
+        </div>
+        <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="stat-icon">
+                <i class="bi bi-bookmark-heart-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">{{ total_genres|default:"50+" }}</h3>
+                <p class="stat-label">Géneros literarios</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-        <a href="{% url 'book_list' %}" class="btn btn-catalog mt-5">
-            Ver todo el catálogo →
+<!-- 7. CTA FINAL -->
+<section class="cta-section">
+    <div class="cta-card">
+        <h2 class="cta-title">¿Listo para encontrar tu próximo libro favorito?</h2>
+        <p class="cta-text">Únete a miles de lectores que ya descubrieron su pasión por la lectura</p>
+        <a href="{% url 'book_list' %}" class="btn-cta">
+            <i class="bi bi-search me-2"></i>Explorar catálogo completo
         </a>
     </div>
 </section>
 
-
-<!-- 🏫 FOOTER INSTITUCIONAL - MONOCROMÁTICO -->
-<section class="footer-info text-center mt-5" 
-    style="background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%); 
-           padding: 40px 20px; border-radius: 16px;
-           border: 1px solid #e5e5e5;">
-    <p style="margin-bottom: 8px; color: #1a1a1a; font-weight: 600; font-size: 1.05rem;">
-        📍 INKALAB LIBROS — Universidad EAFIT
-    </p>
-    <p style="color: #4a4a4a;">
-        Desarrollado por estudiantes de Ingeniería de Sistemas. Proyecto académico de digitalización 📘
-    </p>
-</section>
-
-
-<!-- 🎨 ESTILOS MONOCROMÁTICOS ELEGANTES -->
 <style>
-/* ==================== HERO SECTION ==================== */
-.hero-btn:hover {
-    background-color: white !important;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+/* CONTAINER GENERAL */
+.home-section {
+    max-width: 1400px;
+    margin: 50px auto;
+    padding: 0 20px;
 }
 
-
-/* ==================== BÚSQUEDA ==================== */
-.search-input:focus {
-    border-color: #1a1a1a;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+/* HERO BANNER */
+.hero-banner {
+    background: linear-gradient(135deg, #2c5f5f 0%, #3d8080 50%, #4da5a5 100%);
+    color: var(--white);
+    padding: 80px 20px;
+    text-align: center;
+    margin-bottom: 60px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
 }
 
-
-.search-btn:hover {
-    background-color: #2d2d2d;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
 }
 
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 32px;
+    opacity: 0.95;
+}
 
-/* ==================== BOOK CARDS ==================== */
-.book-card-link {
+.hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-hero-primary,
+.btn-hero-secondary {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-weight: 700;
     text-decoration: none;
-    color: inherit;
-    display: block;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.05rem;
 }
 
+.btn-hero-primary {
+    background: var(--white);
+    color: #2c5f5f;
+    border: 2px solid var(--white);
+}
+
+.btn-hero-primary:hover {
+    background: transparent;
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.btn-hero-secondary {
+    background: rgba(255,255,255,0.15);
+    color: var(--white);
+    border: 2px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(10px);
+}
+
+.btn-hero-secondary:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.5);
+    transform: translateY(-2px);
+}
+
+/* SECTION HEADER */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--black);
+    margin: 0 0 8px 0;
+}
+
+.section-subtitle {
+    color: var(--medium-gray);
+    margin: 0;
+}
+
+.btn-see-more {
+    background: var(--black);
+    color: var(--white);
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-see-more:hover {
+    background: var(--dark-gray);
+    transform: translateY(-2px);
+}
+
+/* BOOKS CAROUSEL */
+.books-carousel {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+}
 
 .book-card {
+    background: var(--white);
+    border: 2px solid var(--light-gray);
     border-radius: 12px;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid #e5e5e5;
-    background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    position: relative;
 }
-
-
-.book-card img {
-    height: 280px;
-    object-fit: cover;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: grayscale(0%);
-}
-
 
 .book-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-    border-color: #1a1a1a;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+    border-color: var(--black);
 }
 
+.book-rank {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--black);
+    color: var(--white);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
 
-.book-card:hover img {
+.book-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #ff4444;
+    color: var(--white);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(255,68,68,0.4);
+}
+
+.book-image {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    background: var(--extra-light-gray);
+}
+
+.book-image img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.book-card:hover .book-image img {
     transform: scale(1.08);
 }
 
-
-/* Card body con degradado sutil */
-.book-card .card-body {
-    background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
-    padding: 20px;
+.book-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
+.book-card:hover .book-overlay {
+    opacity: 1;
+}
 
-.book-card .card-title {
+.book-overlay i {
+    color: var(--white);
+    font-size: 2.5rem;
+}
+
+.book-info {
+    padding: 16px;
+}
+
+.book-title {
+    font-size: 1rem;
     font-weight: 700;
-    color: #1a1a1a;
-    transition: color 0.3s ease;
-    font-size: 1.05rem;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
+    margin: 0 0 8px 0;
 }
 
-
-.book-card:hover .card-title {
-    color: #2d2d2d;
-}
-
-
-.book-card .text-muted {
-    color: #6b7280 !important;
-    font-size: 0.9rem;
-}
-
-
-/* Precio elegante en negro */
-.price-tag {
-    color: #1a1a1a !important;
-    font-size: 1.15rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.01em;
-}
-
-
-/* ==================== BOTÓN CATÁLOGO ==================== */
-.btn-catalog {
-    display: inline-block;
-    background: white;
-    color: #1a1a1a;
-    border: 2px solid #1a1a1a;
-    font-weight: 600;
-    padding: 14px 36px;
-    border-radius: 12px;
+.book-title a {
+    color: var(--black);
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.book-title a:hover {
+    color: var(--medium-gray);
+}
+
+.book-author {
+    color: var(--medium-gray);
+    font-size: 0.85rem;
+    margin: 0 0 12px 0;
+}
+
+.book-rating {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.stars {
+    font-weight: 700;
+    color: var(--black);
+}
+
+.no-rating {
+    color: var(--medium-gray);
+    font-size: 0.85rem;
+}
+
+.book-price {
+    color: var(--black);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* RECOMMENDER SECTION */
+.recommender-section {
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.recommender-card {
+    background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+    color: var(--white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+
+.recommender-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.recommender-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.recommender-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.recommender-subtitle {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.recommender-form {
+    display: flex;
+    gap: 12px;
+}
+
+.recommender-input {
+    flex: 1;
+    padding: 14px 20px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
     font-size: 1rem;
 }
 
-
-.btn-catalog:hover {
-    background-color: #1a1a1a;
-    color: white;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+.recommender-input::placeholder {
+    color: rgba(255,255,255,0.6);
 }
 
+.recommender-input:focus {
+    outline: none;
+    border-color: var(--white);
+    background: rgba(255,255,255,0.15);
+}
 
-/* ==================== RESPONSIVE ==================== */
+.btn-recommend {
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-recommend:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,255,255,0.3);
+}
+
+/* GENRES SECTION */
+.genres-section {
+    max-width: 1400px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.genre-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.genre-tab {
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    color: var(--black);
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.genre-tab:hover {
+    border-color: var(--black);
+}
+
+.genre-tab.active {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.book-card-mini {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.book-card-mini:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.book-mini-image {
+    display: block;
+}
+
+.book-mini-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.book-mini-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 10px;
+    margin: 0;
+}
+
+.book-mini-title a {
+    color: var(--black);
+    text-decoration: none;
+}
+
+.book-mini-rating {
+    padding: 0 10px 10px;
+    margin: 0;
+    font-size: 0.8rem;
+  color: var(--medium-gray);
+}
+
+/* STATS SECTION */
+.stats-section {
+    max-width: 1400px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.stat-card {
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    border-color: var(--black);
+}
+
+.stat-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--black), var(--dark-gray));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 2rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--black);
+    margin: 0 0 4px 0;
+}
+
+.stat-label {
+    color: var(--medium-gray);
+    margin: 0;
+}
+
+/* CTA SECTION */
+.cta-section {
+    max-width: 1000px;
+    margin: 80px auto 60px;
+    padding: 0 20px;
+}
+
+.cta-card {
+    background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+    color: var(--white);
+    padding: 60px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 16px 0;
+}
+
+.cta-text {
+    font-size: 1.2rem;
+    margin: 0 0 32px 0;
+    opacity: 0.9;
+}
+
+.btn-cta {
+    background: var(--white);
+    color: var(--black);
+    padding: 16px 40px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.btn-cta:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(255,255,255,0.3);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+    .books-carousel {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
-    .hero-section h1 {
-        font-size: 1.8rem !important;
+    .hero-title {
+        font-size: 2rem;
     }
-
-
-    .hero-section p {
-        font-size: 1rem !important;
+    .books-carousel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-
-    .prompt-section input {
-        width: 100% !important;
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
-
-
-    .search-btn {
-        width: 100%;
-    }
-
-
-    .book-card img {
-        height: 240px;
-    }
-
-
-    .btn-catalog {
-        width: 100%;
-        padding: 12px 24px;
+    .recommender-form {
+        flex-direction: column;
     }
 }
 
-
-/* ==================== ANIMACIONES SUAVES ==================== */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+@media (max-width: 480px) {
+    .books-carousel {
+        grid-template-columns: 1fr;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-.featured-books {
-    animation: fadeInUp 0.6s ease-out;
 }
 </style>
 {% endblock %}

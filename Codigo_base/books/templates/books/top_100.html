@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+
+{% block title %}Top 100 Mejores Libros - {{ app_name }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-container fade-in-up">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none">
+          <i class="bi bi-house-door"></i> Inicio
+        </a>
+      </li>
+      <li class="breadcrumb-separator mx-2">›</li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'book_list' %}" class="text-decoration-none">
+          <i class="bi bi-book-half"></i> Catálogo
+        </a>
+      </li>
+      <li class="breadcrumb-separator mx-2">›</li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="bi bi-trophy-fill"></i> Top 100
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="top100-page">
+  <!-- Header -->
+  <div class="top100-header fade-in-up">
+    <div class="top100-header-content">
+      <h1 class="top100-title">
+        <i class="bi bi-trophy-fill me-3"></i>Top 100 Mejores Libros
+      </h1>
+      <p class="top100-subtitle">Los libros con las calificaciones más altas de nuestro catálogo</p>
+    </div>
+    <div class="top100-badge">
+      <i class="bi bi-star-fill"></i>
+      <span>Mejor valorados</span>
+    </div>
+  </div>
+
+  <!-- Grid de libros -->
+  <div class="top100-grid">
+    {% for book in top_books %}
+    <div class="top100-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|divisibleby:5|yesno:'0,50,100,150,200' }}">
+      <div class="top100-rank">#{{ forloop.counter }}</div>
+      <a href="{% url 'book_detail' book.id %}" class="top100-image-link">
+        <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
+             alt="Portada de {{ book.title }}"
+             loading="lazy"
+             onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
+        <div class="top100-overlay">
+          <i class="bi bi-eye-fill"></i>
+          <span>Ver detalles</span>
+        </div>
+      </a>
+      <div class="top100-info">
+        <h3 class="top100-book-title">
+          <a href="{% url 'book_detail' book.id %}">{{ book.title|truncatewords:5 }}</a>
+        </h3>
+        <p class="top100-author">{{ book.authors|truncatewords:2 }}</p>
+        <div class="top100-rating">
+          <span class="rating-stars">⭐ {{ book.average_rating|floatformat:2 }}</span>
+          <span class="rating-count">({{ book.ratings_count|default:0 }})</span>
+        </div>
+        <div class="top100-price">
+          {% if book.precio %}
+            ${{ book.precio|floatformat:0 }}
+          {% else %}
+            Consultar
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Paginación -->
+  {% if is_paginated %}
+  <div class="pagination-container mt-5">
+    <ul class="pagination-custom">
+      <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+        <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">
+          <i class="bi bi-chevron-left"></i>
+        </a>
+      </li>
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+      <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+        <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">
+          <i class="bi bi-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+    <div class="page-info">
+      Página <strong>{{ page_obj.number }}</strong> de <strong>{{ page_obj.paginator.num_pages }}</strong>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.top100-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.top100-header {
+  background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+  color: var(--white);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.top100-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.02em;
+}
+
+.top100-subtitle {
+  font-size: 1.05rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.top100-badge {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 12px 24px;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.top100-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.top100-item {
+  background: var(--white);
+  border: 2px solid var(--light-gray);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.top100-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+  border-color: var(--black);
+}
+
+.top100-rank {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--black);
+  color: var(--white);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.top100-image-link {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--extra-light-gray);
+}
+
+.top100-image-link img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.top100-item:hover .top100-image-link img {
+  transform: scale(1.1);
+}
+
+.top100-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.top100-item:hover .top100-overlay {
+  opacity: 1;
+}
+
+.top100-overlay i {
+  font-size: 2.5rem;
+}
+
+.top100-info {
+  padding: 16px;
+}
+
+.top100-book-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.top100-book-title a {
+  color: var(--black);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.top100-book-title a:hover {
+  color: var(--medium-gray);
+}
+
+.top100-author {
+  color: var(--medium-gray);
+  font-size: 0.85rem;
+  margin: 0 0 12px 0;
+}
+
+.top100-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.rating-stars {
+  font-weight: 700;
+  color: var(--black);
+  font-size: 0.95rem;
+}
+
+.rating-count {
+  color: var(--medium-gray);
+  font-size: 0.8rem;
+}
+
+.top100-price {
+  color: var(--black);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.pagination-container {
+  text-align: center;
+}
+
+.pagination-custom {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+  justify-content: center;
+}
+
+.pagination-custom .page-link {
+  border: 2px solid var(--light-gray);
+  color: var(--black);
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-width: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pagination-custom .page-link:hover {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+  transform: translateY(-2px);
+}
+
+.pagination-custom .page-item.active .page-link {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+.pagination-custom .page-item.disabled .page-link {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-info {
+  color: var(--medium-gray);
+  font-size: 0.95rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1400px) { 
+  .top100-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } 
+}
+
+@media (max-width: 1200px) { 
+  .top100-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .top100-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .top100-header { padding: 24px; }
+  .top100-title { font-size: 1.8rem; }
+}
+
+@media (max-width: 480px) { 
+  .top100-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
