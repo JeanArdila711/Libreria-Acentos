@@ -51,4 +51,11 @@ urlpatterns = [
     
     # 🆕 CONFIGURACIÓN
     path('configuracion/', user_settings, name='user_settings'),
+    # Reseñas
+    path('book/<int:book_id>/review/add/', views.add_review, name='add_review'),
+    path('review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
+    path('review/<int:review_id>/helpful/', views.mark_review_helpful, name='mark_review_helpful'),
+    path('recomendaciones/', views.personalized_recommendations_view, name='personalized_recommendations'),
+
+
 ]

@@ -4,7 +4,7 @@
 {% block title %}Inicio - {{ app_name }}{% endblock %}
 
 {% block content %}
-<!-- 1. HERO BANNER MEJORADO -->
+<!-- 1. HERO BANNER -->
 <section class="hero-banner fade-in-up">
     <div class="hero-content">
         <h1 class="hero-title">Bienvenido a INKALAB LIBROS 📚</h1>
@@ -93,7 +93,60 @@
     </div>
 </section>
 
-<!-- 4. NOVEDADES (Últimos agregados) -->
+<!-- 4. RECOMENDACIONES PERSONALIZADAS (Solo usuarios autenticados) -->
+{% if user.is_authenticated and personalized_books %}
+<section class="personalized-section">
+    <div class="section-header">
+        <div class="section-title-wrapper">
+            <h2 class="section-title">
+                <i class="bi bi-stars me-2"></i>Recomendado para ti
+            </h2>
+            <p class="section-subtitle">Basado en tus gustos y preferencias</p>
+        </div>
+        <a href="{% url 'personalized_recommendations' %}" class="btn-see-more">
+            Ver todas <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+    </div>
+    <div class="books-carousel">
+        {% for book in personalized_books %}
+        <div class="book-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:0|divisibleby:2|yesno:'0,100' }}">
+            <div class="book-badge personalized">PARA TI</div>
+            <a href="{% url 'book_detail' book.id %}" class="book-image">
+                <img src="{{ book.image_url|default:'https://placehold.co/200x280?text=Sin+Imagen' }}"
+                     alt="{{ book.title }}"
+                     loading="lazy"
+                     onerror="this.onerror=null;this.src='https://placehold.co/200x280?text=Sin+Imagen';">
+                <div class="book-overlay">
+                    <i class="bi bi-eye-fill"></i>
+                </div>
+            </a>
+            <div class="book-info">
+                <h3 class="book-title">
+                    <a href="{% url 'book_detail' book.id %}">{{ book.title|truncatewords:5 }}</a>
+                </h3>
+                <p class="book-author">{{ book.authors|truncatewords:2 }}</p>
+                <div class="book-rating">
+                    {% if book.average_rating %}
+                        <span class="stars">⭐ {{ book.average_rating|floatformat:2 }}</span>
+                    {% else %}
+                        <span class="no-rating">Sin valorar</span>
+                    {% endif %}
+                </div>
+                <div class="book-price">
+                    {% if book.precio %}
+                        ${{ book.precio|floatformat:0 }}
+                    {% else %}
+                        Consultar
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- 5. NOVEDADES (Últimos agregados) -->
 <section class="home-section">
     <div class="section-header">
         <div class="section-title-wrapper">
@@ -144,42 +197,64 @@
     </div>
 </section>
 
-<!-- 5. LIBROS POR GÉNERO (con tabs) -->
-<section class="genres-section">
+<!-- 6. ÚLTIMAS RESEÑAS -->
+{% if latest_reviews %}
+<section class="latest-reviews-section">
     <div class="section-header">
-        <h2 class="section-title">
-            <i class="bi bi-bookmark-fill me-2"></i>Explora por Género
-        </h2>
-    </div>
-    
-    <div class="genre-tabs">
-        <button class="genre-tab active" data-genre="fiction">Ficción</button>
-        <button class="genre-tab" data-genre="non-fiction">No Ficción</button>
-        <button class="genre-tab" data-genre="mystery">Misterio</button>
-        <button class="genre-tab" data-genre="fantasy">Fantasía</button>
-        <button class="genre-tab" data-genre="romance">Romance</button>
-    </div>
-
-    <div class="genre-content">
-        <div class="books-carousel" id="genre-books">
-            {% for book in featured_books|slice:":8" %}
-            <div class="book-card-mini" data-aos="fade-up">
-                <a href="{% url 'book_detail' book.id %}" class="book-mini-image">
-                    <img src="{{ book.image_url|default:'https://placehold.co/150x200?text=Sin+Imagen' }}"
-                         alt="{{ book.title }}"
-                         loading="lazy">
-                </a>
-                <h4 class="book-mini-title">
-                    <a href="{% url 'book_detail' book.id %}">{{ book.title|truncatewords:4 }}</a>
-                </h4>
-                <p class="book-mini-rating">⭐ {{ book.average_rating|floatformat:1|default:"N/A" }}</p>
-            </div>
-            {% endfor %}
+        <div class="section-title-wrapper">
+            <h2 class="section-title">
+                <i class="bi bi-chat-quote-fill me-2"></i>Lo que dicen nuestros lectores
+            </h2>
+            <p class="section-subtitle">Opiniones reales de la comunidad</p>
         </div>
     </div>
+    
+    <div class="reviews-carousel">
+        {% for review in latest_reviews %}
+        <div class="review-card-home" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:0|divisibleby:3|yesno:'0,100,200' }}">
+            <div class="review-card-header">
+                <div class="review-user">
+                    <div class="review-avatar-home">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div>
+                        <h5 class="review-username-home">{{ review.user.first_name|default:review.user.username }}</h5>
+                        <p class="review-date-home">{{ review.created_at|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+                <div class="review-rating-home">
+                    {% for i in "12345" %}
+                        {% if i|add:0 <= review.rating %}
+                            <i class="bi bi-star-fill"></i>
+                        {% else %}
+                            <i class="bi bi-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="review-book-info">
+                <img src="{{ review.book.image_url|default:'https://placehold.co/60x80?text=Sin+Imagen' }}" 
+                     alt="{{ review.book.title }}"
+                     class="review-book-thumb">
+                <div>
+                    <h6 class="review-book-title">{{ review.book.title|truncatewords:6 }}</h6>
+                    <p class="review-book-author">{{ review.book.authors|truncatewords:2 }}</p>
+                </div>
+            </div>
+            
+            <p class="review-comment-home">{{ review.comment|truncatewords:20 }}</p>
+            
+            <a href="{% url 'book_detail' review.book.id %}" class="btn-view-book">
+                Ver libro <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
 </section>
+{% endif %}
 
-<!-- 6. ESTADÍSTICAS RÁPIDAS -->
+<!-- 7. ESTADÍSTICAS RÁPIDAS -->
 <section class="stats-section">
     <div class="stats-grid">
         <div class="stat-card" data-aos="fade-up">
@@ -193,11 +268,11 @@
         </div>
         <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
             <div class="stat-icon">
-                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-chat-quote-fill"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-number">{{ total_ratings|default:"50,000+" }}</h3>
-                <p class="stat-label">Valoraciones</p>
+                <h3 class="stat-number">{{ total_reviews|default:"5,000+" }}</h3>
+                <p class="stat-label">Reseñas de lectores</p>
             </div>
         </div>
         <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
@@ -205,7 +280,7 @@
                 <i class="bi bi-people-fill"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-number">{{ total_users|default:"1,500+" }}</h3>
+                <h3 class="stat-number">1,500+</h3>
                 <p class="stat-label">Lectores activos</p>
             </div>
         </div>
@@ -214,14 +289,14 @@
                 <i class="bi bi-bookmark-heart-fill"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-number">{{ total_genres|default:"50+" }}</h3>
+                <h3 class="stat-number">50+</h3>
                 <p class="stat-label">Géneros literarios</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 7. CTA FINAL -->
+<!-- 8. CTA FINAL -->
 <section class="cta-section">
     <div class="cta-card">
         <h2 class="cta-title">¿Listo para encontrar tu próximo libro favorito?</h2>
@@ -401,6 +476,10 @@
     box-shadow: 0 4px 12px rgba(255,68,68,0.4);
 }
 
+.book-badge.personalized {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
 .book-image {
     display: block;
     position: relative;
@@ -574,81 +653,135 @@
     box-shadow: 0 8px 20px rgba(255,255,255,0.3);
 }
 
-/* GENRES SECTION */
-.genres-section {
+/* SECCIÓN PERSONALIZADA */
+.personalized-section {
+    max-width: 1400px;
+    margin: 60px auto;
+    padding: 32px 20px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-radius: 20px;
+}
+
+/* ÚLTIMAS RESEÑAS */
+.latest-reviews-section {
     max-width: 1400px;
     margin: 60px auto;
     padding: 0 20px;
 }
 
-.genre-tabs {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
+.reviews-carousel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
 }
 
-.genre-tab {
+.review-card-home {
     background: var(--white);
     border: 2px solid var(--light-gray);
-    color: var(--black);
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
+    border-radius: 16px;
+    padding: 24px;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
-.genre-tab:hover {
+.review-card-home:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
     border-color: var(--black);
 }
 
-.genre-tab.active {
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.review-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.review-avatar-home {
+    font-size: 2.5rem;
+    color: var(--medium-gray);
+}
+
+.review-username-home {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--black);
+}
+
+.review-date-home {
+    font-size: 0.8rem;
+    color: var(--medium-gray);
+    margin: 0;
+}
+
+.review-rating-home {
+    color: #ffc107;
+    font-size: 1rem;
+}
+
+.review-book-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--extra-light-gray);
+    border-radius: 10px;
+}
+
+.review-book-thumb {
+    width: 50px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.review-book-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: var(--black);
+}
+
+.review-book-author {
+    font-size: 0.8rem;
+    color: var(--medium-gray);
+    margin: 0;
+}
+
+.review-comment-home {
+    color: var(--black);
+    line-height: 1.6;
+    flex: 1;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+}
+
+.btn-view-book {
     background: var(--black);
     color: var(--white);
-    border-color: var(--black);
-}
-
-.book-card-mini {
-    background: var(--white);
-    border: 1px solid var(--light-gray);
+    padding: 10px 20px;
     border-radius: 10px;
-    overflow: hidden;
-    transition: all 0.2s ease;
-}
-
-.book-card-mini:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-}
-
-.book-mini-image {
-    display: block;
-}
-
-.book-mini-image img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-.book-mini-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 10px;
-    margin: 0;
-}
-
-.book-mini-title a {
-    color: var(--black);
     text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.book-mini-rating {
-    padding: 0 10px 10px;
-    margin: 0;
-    font-size: 0.8rem;
-  color: var(--medium-gray);
+.btn-view-book:hover {
+    background: var(--dark-gray);
+    transform: translateY(-2px);
 }
 
 /* STATS SECTION */
@@ -756,6 +889,9 @@
     .books-carousel {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+    .reviews-carousel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -767,6 +903,9 @@
     }
     .books-carousel {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .reviews-carousel {
+        grid-template-columns: 1fr;
     }
     .stats-grid {
         grid-template-columns: 1fr;

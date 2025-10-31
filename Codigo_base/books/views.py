@@ -84,13 +84,98 @@ class HomePageView(TemplateView):
         # Últimos 8 agregados (novedades)
         ctx['new_books'] = Book.objects.all().order_by('-id')[:8]
         
-        # Featured books (para explorar por género)
-        ctx['featured_books'] = Book.objects.all()[:16]
+        # 🆕 RECOMENDACIONES PERSONALIZADAS (si el usuario está autenticado)
+        if self.request.user.is_authenticated:
+            recommended_books = self.get_personalized_recommendations(self.request.user)
+            ctx['personalized_books'] = recommended_books
+        else:
+            # Si no está autenticado, mostrar libros random
+            from random import sample
+            all_books = list(Book.objects.all())
+            ctx['personalized_books'] = sample(all_books, min(len(all_books), 8))
+        
+        # 🆕 ÚLTIMAS RESEÑAS (5 más recientes)
+        ctx['latest_reviews'] = Review.objects.select_related('user', 'book').order_by('-created_at')[:5]
         
         # Estadísticas
         ctx['total_books'] = Book.objects.count()
+        ctx['total_reviews'] = Review.objects.count()
         
         return ctx
+    
+    def get_personalized_recommendations(self, user):
+        """
+        Genera recomendaciones personalizadas basadas en:
+        1. Historial de compras
+        2. Favoritos
+        3. Reseñas que ha hecho
+        """
+        recommended_books = []
+        
+        try:
+            # Obtener libros favoritos del usuario
+            favorite_books = Book.objects.filter(
+                id__in=Favorite.objects.filter(user=user).values_list('book_id', flat=True)
+            ).exclude(embeddings__isnull=True)
+            
+            # Obtener libros comprados
+            purchased_books = Book.objects.filter(
+                id__in=OrderItem.objects.filter(
+                    order__user=user
+                ).values_list('book_id', flat=True)
+            ).exclude(embeddings__isnull=True)
+            
+            # Obtener libros que ha reseñado
+            reviewed_books = Book.objects.filter(
+                id__in=Review.objects.filter(user=user).values_list('book_id', flat=True)
+            ).exclude(embeddings__isnull=True)
+            
+            # Combinar todos los libros base
+            base_books = list(favorite_books) + list(purchased_books) + list(reviewed_books)
+            
+            if base_books:
+                # Calcular promedio de embeddings de libros base
+                embeddings_list = []
+                for book in base_books:
+                    if book.embeddings:
+                        embeddings_list.append(np.array(book.embeddings, dtype=np.float32))
+                
+                if embeddings_list:
+                    # Promedio de embeddings
+                    avg_embedding = np.mean(embeddings_list, axis=0)
+                    
+                    # Buscar libros similares
+                    books_with_similarity = []
+                    
+                    # Excluir libros que ya tiene
+                    exclude_ids = [b.id for b in base_books]
+                    
+                    for candidate in Book.objects.exclude(id__in=exclude_ids).exclude(embeddings__isnull=True)[:200]:
+                        try:
+                            candidate_emb = np.array(candidate.embeddings, dtype=np.float32)
+                            similarity = cosine_similarity(avg_embedding, candidate_emb)
+                            books_with_similarity.append((candidate, similarity))
+                        except Exception:
+                            continue
+                    
+                    # Ordenar por similitud
+                    books_with_similarity.sort(key=lambda x: x[1], reverse=True)
+                    recommended_books = [b[0] for b in books_with_similarity[:8]]
+        
+        except Exception as e:
+            print(f"Error en recomendaciones personalizadas: {e}")
+        
+        # Si no hay suficientes recomendaciones, completar con mejor valorados
+        if len(recommended_books) < 8:
+            additional = Book.objects.filter(
+                average_rating__isnull=False
+            ).exclude(
+                id__in=[b.id for b in recommended_books]
+            ).order_by('-average_rating')[:8 - len(recommended_books)]
+            
+            recommended_books.extend(list(additional))
+        
+        return recommended_books[:8]
 
 
 
@@ -309,7 +394,53 @@ def promociones_view(request):
 
 def book_detail(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-    return render(request, "books/book_detail.html", {"book": book})
+    
+    # Obtener reseñas del libro
+    reviews = Review.objects.filter(book=book).select_related('user')
+    
+    # Verificar si el usuario ya dejó reseña
+    user_review = None
+    if request.user.is_authenticated:
+        try:
+            user_review = Review.objects.get(book=book, user=request.user)
+        except Review.DoesNotExist:
+            pass
+    
+    # 🆕 LIBROS SIMILARES (usando embeddings)
+    similar_books = []
+    if book.embeddings:
+        try:
+            book_emb = np.array(book.embeddings, dtype=np.float32)
+            books_with_similarity = []
+            
+            for other_book in Book.objects.exclude(id=book.id).exclude(embeddings__isnull=True)[:100]:
+                try:
+                    other_emb = np.array(other_book.embeddings, dtype=np.float32)
+                    similarity = cosine_similarity(book_emb, other_emb)
+                    books_with_similarity.append((other_book, similarity))
+                except Exception:
+                    continue
+            
+            books_with_similarity.sort(key=lambda x: x[1], reverse=True)
+            similar_books = [b[0] for b in books_with_similarity[:6]]
+        except Exception:
+            pass
+    
+    # Si no hay similares por embeddings, usar mismo género
+    if not similar_books and book.genre:
+        similar_books = Book.objects.filter(
+            genre=book.genre
+        ).exclude(id=book.id).order_by('-average_rating')[:6]
+    
+    context = {
+        "book": book,
+        "reviews": reviews,
+        "user_review": user_review,
+        "similar_books": similar_books,
+    }
+    
+    return render(request, "books/book_detail.html", context)
+
 
 
 # -------------------------------------------------------
@@ -756,3 +887,159 @@ def create_order_from_cart(request):
         return redirect('order_detail', order_id=order.id)
     
     return redirect('cart_view')
+
+from django.db.models import Avg
+from .models import Review
+
+# ==========================================
+# 📝 AGREGAR/EDITAR RESEÑA
+# ==========================================
+@login_required
+def add_review(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        
+        if not rating or not comment:
+            messages.error(request, "Debes agregar una calificación y comentario")
+            return redirect('book_detail', book_id=book_id)
+        
+        try:
+            rating = int(rating)
+            if rating < 1 or rating > 5:
+                raise ValueError
+        except ValueError:
+            messages.error(request, "La calificación debe ser entre 1 y 5")
+            return redirect('book_detail', book_id=book_id)
+        
+        # Crear o actualizar reseña
+        review, created = Review.objects.update_or_create(
+            book=book,
+            user=request.user,
+            defaults={
+                'rating': rating,
+                'comment': comment
+            }
+        )
+        
+        # Actualizar promedio del libro
+        avg_rating = Review.objects.filter(book=book).aggregate(Avg('rating'))['rating__avg']
+        book.average_rating = avg_rating
+        book.ratings_count = Review.objects.filter(book=book).count()
+        book.save(update_fields=['average_rating', 'ratings_count'])
+        
+        if created:
+            messages.success(request, "✓ Reseña agregada exitosamente")
+        else:
+            messages.success(request, "✓ Reseña actualizada exitosamente")
+        
+        return redirect('book_detail', book_id=book_id)
+    
+    return redirect('book_detail', book_id=book_id)
+
+
+# ==========================================
+# 🗑️ ELIMINAR RESEÑA
+# ==========================================
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, pk=review_id, user=request.user)
+    book = review.book
+    review.delete()
+    
+    # Recalcular promedio
+    avg_rating = Review.objects.filter(book=book).aggregate(Avg('rating'))['rating__avg']
+    book.average_rating = avg_rating if avg_rating else None
+    book.ratings_count = Review.objects.filter(book=book).count()
+    book.save(update_fields=['average_rating', 'ratings_count'])
+    
+    messages.success(request, "✓ Reseña eliminada")
+    return redirect('book_detail', book_id=book.id)
+
+
+# ==========================================
+# 👍 MARCAR RESEÑA COMO ÚTIL
+# ==========================================
+@login_required
+def mark_review_helpful(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+    review.helpful_count += 1
+    review.save(update_fields=['helpful_count'])
+    messages.success(request, "✓ Gracias por tu valoración")
+    return redirect('book_detail', book_id=review.book.id)
+
+# ==========================================
+# Recomendaciones con IA
+# ==========================================
+
+@login_required
+def personalized_recommendations_view(request):
+    """
+    Página dedicada a recomendaciones personalizadas
+    """
+    user = request.user
+    
+    # Obtener libros favoritos
+    favorite_books = Book.objects.filter(
+        id__in=Favorite.objects.filter(user=user).values_list('book_id', flat=True)
+    )
+    
+    # Obtener historial de compras
+    purchased_books = Book.objects.filter(
+        id__in=OrderItem.objects.filter(
+            order__user=user
+        ).values_list('book_id', flat=True)
+    ).distinct()
+    
+    # Generar recomendaciones
+    recommended_books = []
+    
+    try:
+        base_books = list(favorite_books) + list(purchased_books)
+        
+        if base_books:
+            embeddings_list = []
+            for book in base_books:
+                if book.embeddings:
+                    embeddings_list.append(np.array(book.embeddings, dtype=np.float32))
+            
+            if embeddings_list:
+                avg_embedding = np.mean(embeddings_list, axis=0)
+                books_with_similarity = []
+                
+                exclude_ids = [b.id for b in base_books]
+                
+                for candidate in Book.objects.exclude(id__in=exclude_ids).exclude(embeddings__isnull=True)[:300]:
+                    try:
+                        candidate_emb = np.array(candidate.embeddings, dtype=np.float32)
+                        similarity = cosine_similarity(avg_embedding, candidate_emb)
+                        books_with_similarity.append((candidate, similarity))
+                    except Exception:
+                        continue
+                
+                books_with_similarity.sort(key=lambda x: x[1], reverse=True)
+                recommended_books = [b[0] for b in books_with_similarity[:20]]
+    
+    except Exception as e:
+        print(f"Error: {e}")
+    
+    # Completar con mejor valorados si faltan
+    if len(recommended_books) < 20:
+        additional = Book.objects.filter(
+            average_rating__isnull=False
+        ).exclude(
+            id__in=[b.id for b in recommended_books]
+        ).order_by('-average_rating')[:20 - len(recommended_books)]
+        
+        recommended_books.extend(list(additional))
+    
+    context = {
+        'recommended_books': recommended_books,
+        'base_books_count': len(base_books) if 'base_books' in locals() else 0,
+    }
+    
+    return render(request, 'books/personalized_recommendations.html', context)
+
+

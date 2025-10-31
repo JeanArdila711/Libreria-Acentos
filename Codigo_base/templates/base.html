@@ -4,16 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="INKALAB Libros - La mejor plataforma de libros en línea. Explora, descubre y compra tus libros favoritos.">
+    <meta name="keywords" content="libros, lectura, comprar libros, tienda de libros, INKALAB">
     <title>{% block title %}{{ app_name }}{% endblock %}</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
     <!-- Bootstrap y animaciones -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/monochrome.css' %}">
-
 
     <style>
     :root {
@@ -28,11 +37,9 @@
         --hero-end: #4da5a5;
     }
 
-
     * {
         box-sizing: border-box;
     }
-
 
     body {
         font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -45,18 +52,15 @@
         letter-spacing: -0.011em;
     }
 
-
     /* 🎨 SCROLLBAR personalizado estilo Google */
     ::-webkit-scrollbar {
         width: 12px;
         height: 12px;
     }
 
-
     ::-webkit-scrollbar-track {
         background: var(--extra-light-gray);
     }
-
 
     ::-webkit-scrollbar-thumb {
         background: var(--medium-gray);
@@ -65,17 +69,14 @@
         transition: background 0.3s ease;
     }
 
-
     ::-webkit-scrollbar-thumb:hover {
         background: var(--dark-gray);
     }
-
 
     * {
         scrollbar-width: thin;
         scrollbar-color: var(--medium-gray) var(--extra-light-gray);
     }
-
 
     header {
         background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
@@ -89,7 +90,6 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-
     h1.app-title {
         margin: 0;
         font-size: 1.8rem;
@@ -97,14 +97,12 @@
         font-weight: 600;
     }
 
-
     .user-avatar-container {
         position: relative;
         display: flex;
         align-items: center;
         gap: 10px;
     }
-
 
     .user-avatar {
         width: 42px;
@@ -122,14 +120,12 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
-
     .user-avatar:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
         border-color: rgba(255, 255, 255, 0.3);
         background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%);
     }
-
 
     .user-dropdown {
         position: absolute;
@@ -148,7 +144,6 @@
         border: 1px solid var(--light-gray);
     }
 
-
     .user-dropdown::before {
         content: '';
         position: absolute;
@@ -162,14 +157,12 @@
         border-top: 1px solid var(--light-gray);
     }
 
-
     .user-avatar-container:hover .user-dropdown,
     .user-dropdown:hover {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
     }
-
 
     .dropdown-header {
         padding: 20px;
@@ -178,13 +171,11 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-
     .dropdown-user-info {
         display: flex;
         align-items: center;
         gap: 12px;
     }
-
 
     .dropdown-avatar {
         width: 48px;
@@ -198,7 +189,6 @@
         border: 2px solid rgba(255, 255, 255, 0.2);
     }
 
-
     .dropdown-user-details h6 {
         margin: 0;
         font-size: 1rem;
@@ -206,19 +196,16 @@
         letter-spacing: -0.01em;
     }
 
-
     .dropdown-user-details p {
         margin: 2px 0 0 0;
         font-size: 0.85rem;
         opacity: 0.8;
     }
 
-
     .dropdown-body {
         padding: 8px 0;
         background: var(--white);
     }
-
 
     .dropdown-item {
         display: flex;
@@ -237,7 +224,6 @@
         font-weight: 500;
     }
 
-
     .dropdown-item i {
         width: 20px;
         font-size: 1.1rem;
@@ -245,18 +231,15 @@
         transition: all 0.2s ease;
     }
 
-
     .dropdown-item:hover {
         background: var(--extra-light-gray);
         color: var(--black);
     }
 
-
     .dropdown-item:hover i {
         color: var(--black);
         transform: translateX(2px);
     }
-
 
     .dropdown-divider {
         height: 1px;
@@ -264,27 +247,22 @@
         margin: 8px 0;
     }
 
-
     .dropdown-item.logout {
         color: var(--medium-gray);
     }
 
-
     .dropdown-item.logout i {
         color: var(--medium-gray);
     }
-
 
     .dropdown-item.logout:hover {
         background: var(--black);
         color: var(--white);
     }
 
-
     .dropdown-item.logout:hover i {
         color: var(--white);
     }
-
 
     .dropdown-item.login,
     .dropdown-item.signup {
@@ -292,12 +270,10 @@
         color: var(--black);
     }
 
-
     .dropdown-item.login i,
     .dropdown-item.signup i {
         color: var(--black);
     }
-
 
     .btn-cart {
         font-weight: 600;
@@ -314,14 +290,12 @@
         text-decoration: none;
     }
 
-
     .btn-cart:hover {
         background-color: var(--black);
         color: var(--white);
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
-
 
     .cart-badge {
         position: absolute;
@@ -341,7 +315,6 @@
         border: 2px solid var(--white);
     }
 
-
     nav {
         background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
         color: var(--white);
@@ -357,20 +330,17 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-
     .navbar-left {
         display: flex;
         align-items: center;
         gap: 15px;
     }
 
-
     .navbar-right {
         display: flex;
         align-items: center;
         gap: 12px;
     }
-
 
     /* 🔍 BUSCADOR EXPANDIBLE ELEGANTE */
     .search-wrapper {
@@ -453,7 +423,6 @@
         pointer-events: none;
     }
 
-
     .btn-hamburguesa {
         background: rgba(255, 255, 255, 0.05);
         border: 2px solid rgba(255, 255, 255, 0.2);
@@ -470,7 +439,6 @@
         border-color: rgba(255, 255, 255, 0.4);
         transform: scale(1.05);
     }
-
 
     .offcanvas {
         width: 320px !important;
@@ -513,20 +481,17 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
-
     .menu-link i {
         font-size: 1.2rem;
         width: 24px;
         text-align: center;
     }
 
-
     .main-content-wrapper {
         width: 96%;
         max-width: 1400px;
         margin: 30px auto;
     }
-
 
     .content {
         background-color: var(--white);
@@ -536,119 +501,176 @@
         border: 1px solid var(--light-gray);
     }
 
-
     footer {
         text-align: center;
-        padding: 30px 20px;
+        padding: 0;
         background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
         color: var(--white);
         border-top: 1px solid rgba(255, 255, 255, 0.05);
         margin-top: 50px;
     }
 
-
-    footer p {
-        opacity: 0.9;
-    }
-
-
-    /* 💫 Mini header para navegación */
-    .navigation-header {
-        background: linear-gradient(135deg, var(--extra-light-gray) 0%, var(--white) 100%);
-        border-bottom: 2px solid var(--light-gray);
+    /* 🆕 BREADCRUMBS MEJORADOS */
+    .breadcrumb-container {
+        background: var(--white);
+        border: 1px solid var(--light-gray);
+        border-radius: 12px;
         padding: 12px 20px;
         margin-bottom: 20px;
-        border-radius: 12px 12px 0 0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        display: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
-
-    .navigation-header.show {
+    .breadcrumb {
+        margin: 0;
+        padding: 0;
         display: flex;
-        gap: 10px;
-        align-items: center;
-        animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-15px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-
-    .btn-nav {
-        background: var(--white);
-        color: var(--black);
-        border: 2px solid var(--black);
-        font-weight: 600;
-        border-radius: 8px;
-        padding: 8px 16px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
+        flex-wrap: wrap;
         align-items: center;
         gap: 8px;
-        cursor: pointer;
-        text-decoration: none;
+        list-style: none;
         font-size: 0.9rem;
     }
 
-
-    .btn-nav:hover {
-        background: var(--black);
-        color: var(--white);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
     }
 
-
-    .btn-nav i {
-        font-size: 1.1rem;
-        transition: transform 0.2s ease;
-    }
-
-
-    .btn-nav:hover i {
-        transform: scale(1.15);
-    }
-
-
-    .btn-nav-home {
-        border-color: var(--medium-gray);
+    .breadcrumb-item a {
         color: var(--medium-gray);
+        text-decoration: none;
+        transition: color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
+    .breadcrumb-item a:hover {
+        color: var(--black);
+    }
 
-    .btn-nav-home:hover {
-        background: var(--medium-gray);
+    .breadcrumb-item.active {
+        color: var(--black);
+        font-weight: 600;
+    }
+
+    .breadcrumb-separator {
+        color: var(--light-gray);
+        user-select: none;
+    }
+
+    /* 🆕 SCROLL TO TOP BUTTON */
+    .scroll-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--black), var(--dark-gray));
         color: var(--white);
-        border-color: var(--medium-gray);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(0);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
     }
 
-
-    @keyframes slideInFromTop {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .scroll-to-top.show {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
     }
 
-
-    header, nav {
-        animation: slideInFromTop 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    .scroll-to-top:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 24px rgba(0,0,0,0.3);
     }
 
+    /* 🆕 FOOTER MEJORADO */
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+        padding: 40px 20px 20px;
+    }
+
+    .footer-section h5 {
+        color: var(--white);
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 10px;
+    }
+
+    .footer-links a {
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+
+    .footer-links a:hover {
+        color: var(--white);
+        transform: translateX(4px);
+    }
+
+    .social-links {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1.2rem;
+    }
+
+    .social-link:hover {
+        background: var(--white);
+        color: var(--black);
+        transform: translateY(-3px);
+    }
+
+    .footer-bottom {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding: 20px;
+        text-align: center;
+        margin-top: 20px;
+    }
 
     .page-loader {
         position: fixed;
@@ -664,18 +686,15 @@
         transition: opacity 0.5s ease, visibility 0.5s ease;
     }
 
-
     .page-loader.hidden {
         opacity: 0;
         visibility: hidden;
     }
 
-
     .loader-content {
         text-align: center;
         color: var(--black);
     }
-
 
     .spinner {
         width: 70px;
@@ -683,7 +702,6 @@
         margin: 0 auto 20px;
         position: relative;
     }
-
 
     .spinner-ring {
         position: absolute;
@@ -695,24 +713,20 @@
         animation: spin 1s linear infinite;
     }
 
-
     .spinner-ring:nth-child(2) {
         border-top-color: var(--medium-gray);
         animation-duration: 1.5s;
     }
-
 
     .spinner-ring:nth-child(3) {
         border-top-color: var(--light-gray);
         animation-duration: 2s;
     }
 
-
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
-
 
     .loader-text {
         font-size: 1.2rem;
@@ -721,12 +735,10 @@
         animation: fadeInOut 1.5s ease-in-out infinite;
     }
 
-
     @keyframes fadeInOut {
         0%, 100% { opacity: 0.4; }
         50% { opacity: 1; }
     }
-
 
     .toast-container-custom {
         position: fixed;
@@ -738,7 +750,6 @@
         gap: 12px;
         max-width: 400px;
     }
-
 
     .toast-custom {
         background: var(--white);
@@ -756,11 +767,9 @@
         border-left: 4px solid;
     }
 
-
     .toast-custom.removing {
         animation: slideOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
-
 
     @keyframes slideInRight {
         from {
@@ -773,7 +782,6 @@
         }
     }
 
-
     @keyframes slideOutRight {
         from {
             transform: translateX(0);
@@ -785,26 +793,21 @@
         }
     }
 
-
     .toast-custom.success {
         border-left-color: var(--dark-gray);
     }
-
 
     .toast-custom.error {
         border-left-color: var(--black);
     }
 
-
     .toast-custom.warning {
         border-left-color: var(--medium-gray);
     }
 
-
     .toast-custom.info {
         border-left-color: var(--light-gray);
     }
-
 
     .toast-icon {
         width: 40px;
@@ -817,35 +820,29 @@
         flex-shrink: 0;
     }
 
-
     .toast-custom.success .toast-icon {
         background: var(--dark-gray);
         color: var(--white);
     }
-
 
     .toast-custom.error .toast-icon {
         background: var(--black);
         color: var(--white);
     }
 
-
     .toast-custom.warning .toast-icon {
         background: var(--medium-gray);
         color: var(--white);
     }
-
 
     .toast-custom.info .toast-icon {
         background: var(--light-gray);
         color: var(--black);
     }
 
-
     .toast-content {
         flex: 1;
     }
-
 
     .toast-title {
         font-weight: 600;
@@ -854,13 +851,11 @@
         color: var(--black);
     }
 
-
     .toast-message {
         font-size: 0.85rem;
         color: var(--medium-gray);
         line-height: 1.4;
     }
-
 
     .toast-close {
         background: none;
@@ -879,12 +874,10 @@
         flex-shrink: 0;
     }
 
-
     .toast-close:hover {
         background: var(--extra-light-gray);
         color: var(--black);
     }
-
 
     .toast-progress {
         position: absolute;
@@ -895,34 +888,44 @@
         animation: progressBar 4s linear forwards;
     }
 
-
     @keyframes progressBar {
         from { width: 100%; }
         to { width: 0%; }
     }
 
+    @keyframes slideInFromTop {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
+    header, nav {
+        animation: slideInFromTop 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* RESPONSIVE */
     @media (max-width: 768px) {
         h1.app-title {
             font-size: 1.4rem;
         }
-
 
         nav {
             padding: 0.6rem 1rem;
             gap: 10px;
         }
 
-
         .navbar-left a span {
             display: none;
         }
 
-
         .btn-cart span {
             display: none;
         }
-
 
         .toast-container-custom {
             right: 10px;
@@ -930,23 +933,19 @@
             max-width: none;
         }
 
-
         .toast-custom {
             min-width: auto;
             width: 100%;
         }
-
 
         .user-dropdown {
             min-width: 260px;
             right: -10px;
         }
 
-
         .dropdown-header {
             padding: 16px;
         }
-
 
         .dropdown-avatar {
             width: 40px;
@@ -954,25 +953,6 @@
             font-size: 1.3rem;
         }
 
-
-        /* Mini header responsive */
-        .navigation-header {
-            padding: 10px 15px;
-            margin-bottom: 15px;
-        }
-
-
-        .btn-nav {
-            padding: 7px 12px;
-            font-size: 0.85rem;
-        }
-
-
-        .btn-nav i {
-            font-size: 1rem;
-        }
-
-        /* Buscador responsive */
         .search-input-expandable.active {
             width: 200px;
             font-size: 0.85rem;
@@ -983,20 +963,29 @@
             height: 38px;
             font-size: 1rem;
         }
-    }
 
+        .footer-content {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .scroll-to-top {
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+        }
+    }
 
     @media (max-width: 480px) {
         .navbar-left a {
             font-size: 1rem;
         }
 
-
         .btn-hamburguesa {
             padding: 4px 10px;
             font-size: 1.5rem;
         }
-
 
         .user-dropdown {
             min-width: calc(100vw - 40px);
@@ -1016,8 +1005,8 @@
     </style>
 </head>
 
-
 <body>
+    <!-- Page Loader -->
     <div class="page-loader" id="pageLoader">
         <div class="loader-content">
             <div class="spinner">
@@ -1029,9 +1018,8 @@
         </div>
     </div>
 
-
+    <!-- Toast Container -->
     <div class="toast-container-custom" id="toastContainer"></div>
-
 
     {% if messages %}
     <script>
@@ -1043,14 +1031,14 @@
     </script>
     {% endif %}
 
-
+    <!-- Header -->
     <header>
         <div class="logo-container" style="display:flex; align-items:center; gap:15px; justify-content:center;">
             <h1 class="app-title">{{ app_name }}</h1>
         </div>
     </header>
 
-
+    <!-- Navigation -->
     <nav>
         <div class="navbar-left">
             <button class="btn-hamburguesa" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral">
@@ -1061,9 +1049,8 @@
             </a>
         </div>
 
-
         <div class="navbar-right">
-            <!-- 🔍 BUSCADOR EXPANDIBLE ELEGANTE -->
+            <!-- Buscador -->
             <div class="search-wrapper">
                 <form method="get" action="{% url 'book_search' %}" class="search-form-expandable">
                     <input type="text" 
@@ -1078,7 +1065,7 @@
                 </form>
             </div>
 
-            <!-- 🛒 CARRITO -->
+            <!-- Carrito -->
             <a href="{% url 'cart_view' %}" class="btn-cart">
                 <i class="bi bi-cart3 fs-5"></i>
                 <span>Carrito</span>
@@ -1087,8 +1074,7 @@
                 {% endif %}
             </a>
 
-
-            <!-- 👤 USUARIO -->
+            <!-- Usuario -->
             {% if user.is_authenticated %}
                 <div class="user-avatar-container">
                     <div class="user-avatar">
@@ -1109,31 +1095,34 @@
                         </div>
                         
                         <div class="dropdown-body">
-    <a href="{% url 'user_profile' %}" class="dropdown-item">
-        <i class="bi bi-person"></i>
-        <span>Mi Perfil</span>
-    </a>
-    <a href="{% url 'my_orders' %}" class="dropdown-item">
-        <i class="bi bi-box-seam"></i>
-        <span>Mis Pedidos</span>
-    </a>
-    <a href="{% url 'my_favorites' %}" class="dropdown-item">
-        <i class="bi bi-heart"></i>
-        <span>Favoritos</span>
-    </a>
-    
-    <div class="dropdown-divider"></div>
-    
-    <a href="{% url 'user_settings' %}" class="dropdown-item">
-        <i class="bi bi-gear"></i>
-        <span>Configuración</span>
-    </a>
-    <a href="{% url 'logout' %}" class="dropdown-item logout">
-        <i class="bi bi-box-arrow-right"></i>
-        <span>Cerrar Sesión</span>
-    </a>
-</div>
-
+                            <a href="{% url 'user_profile' %}" class="dropdown-item">
+                                <i class="bi bi-person"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                            <a href="{% url 'my_orders' %}" class="dropdown-item">
+                                <i class="bi bi-box-seam"></i>
+                                <span>Mis Pedidos</span>
+                            </a>
+                            <a href="{% url 'my_favorites' %}" class="dropdown-item">
+                                <i class="bi bi-heart"></i>
+                                <span>Favoritos</span>
+                            </a>
+                            <a href="{% url 'personalized_recommendations' %}" class="dropdown-item">
+                                <i class="bi bi-stars"></i>
+                                <span>Recomendaciones</span>
+                            </a>
+                            
+                            <div class="dropdown-divider"></div>
+                            
+                            <a href="{% url 'user_settings' %}" class="dropdown-item">
+                                <i class="bi bi-gear"></i>
+                                <span>Configuración</span>
+                            </a>
+                            <a href="{% url 'logout' %}" class="dropdown-item logout">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Cerrar Sesión</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% else %}
@@ -1159,7 +1148,7 @@
         </div>
     </nav>
 
-
+    <!-- Offcanvas Menu -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="menuLateral">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title"><i class="bi bi-compass me-2"></i>Navegación</h5>
@@ -1175,8 +1164,18 @@
                     <i class="bi bi-book-half"></i>
                     <span>Catálogo de Libros</span>
                 </a>
-                <a href="{% url 'promociones' %}" class="menu-link">
+                <a href="{% url 'top_100' %}" class="menu-link">
+                    <i class="bi bi-trophy-fill"></i>
+                    <span>Top 100</span>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'personalized_recommendations' %}" class="menu-link">
                     <i class="bi bi-stars"></i>
+                    <span>Recomendaciones</span>
+                </a>
+                {% endif %}
+                <a href="{% url 'promociones' %}" class="menu-link">
+                    <i class="bi bi-tags-fill"></i>
                     <span>Promociones</span>
                 </a>
                 <a href="#" class="menu-link">
@@ -1207,41 +1206,78 @@
         </div>
     </div>
 
-
+    <!-- Main Content -->
     <div class="main-content-wrapper">
-        <!-- Mini header de navegación -->
-        <div id="navigationHeader" class="navigation-header">
-            <button id="btnBack" class="btn-nav">
-                <i class="bi bi-arrow-left"></i>
-                <span>Volver</span>
-            </button>
-            <a href="{% url 'home' %}" class="btn-nav btn-nav-home">
-                <i class="bi bi-house-door-fill"></i>
-                <span>Inicio</span>
-            </a>
-        </div>
-
+        <!-- Breadcrumbs -->
+        {% block breadcrumbs %}{% endblock %}
 
         <div class="content" data-aos="fade-up">
             {% block content %}{% endblock %}
         </div>
     </div>
 
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="bi bi-arrow-up"></i>
+    </button>
 
+    <!-- Footer Mejorado -->
     <footer>
-        <p style="margin: 0; font-size: 0.95rem;">
-            <i class="bi bi-book-fill me-2"></i>
-            Plataforma INKALAB Libros. (Universidad EAFIT)
-        </p>
-        <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.8;">
-            © 2025 INKALAB Libros. Todos los derechos reservados.
-        </p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h5><i class="bi bi-book-fill"></i> INKALAB Libros</h5>
+                <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; line-height: 1.6;">
+                    Tu plataforma de confianza para descubrir, explorar y comprar los mejores libros.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link" title="Facebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="#" class="social-link" title="Twitter">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                    <a href="#" class="social-link" title="Instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="#" class="social-link" title="LinkedIn">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h5><i class="bi bi-link-45deg"></i> Enlaces Rápidos</h5>
+                <ul class="footer-links">
+                    <li><a href="{% url 'home' %}"><i class="bi bi-house-door"></i> Inicio</a></li>
+                    <li><a href="{% url 'book_list' %}"><i class="bi bi-book"></i> Catálogo</a></li>
+                    <li><a href="{% url 'top_100' %}"><i class="bi bi-trophy"></i> Top 100</a></li>
+                    <li><a href="{% url 'promociones' %}"><i class="bi bi-tags"></i> Promociones</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h5><i class="bi bi-info-circle"></i> Información</h5>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="bi bi-file-text"></i> Términos y Condiciones</a></li>
+                    <li><a href="#"><i class="bi bi-shield-check"></i> Política de Privacidad</a></li>
+                    <li><a href="#"><i class="bi bi-question-circle"></i> Preguntas Frecuentes</a></li>
+                    <li><a href="#"><i class="bi bi-envelope"></i> Contacto</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p style="margin: 0; font-size: 0.9rem;">
+                © 2025 INKALAB Libros - Universidad EAFIT. Todos los derechos reservados.
+            </p>
+        </div>
     </footer>
 
-
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
+        // Page Loader
         window.addEventListener('load', function() {
             const loader = document.getElementById('pageLoader');
             setTimeout(() => {
@@ -1249,40 +1285,7 @@
             }, 500);
         });
 
-
-        (function() {
-            const navigationHeader = document.getElementById('navigationHeader');
-            const btnBack = document.getElementById('btnBack');
-            
-            if (!navigationHeader || !btnBack) return;
-            
-            const homeUrl = "{% url 'home' %}";
-            const currentPath = window.location.pathname;
-            const hiddenPages = [homeUrl, '/login/', '/signup/', '/logout/'];
-            
-            function isHiddenPage() {
-                const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/$/, '');
-                return hiddenPages.some(page => {
-                    const normalizedHidden = page === '/' ? '/' : page.replace(/\/$/, '');
-                    return normalizedPath === normalizedHidden;
-                });
-            }
-            
-            if (!isHiddenPage()) {
-                navigationHeader.classList.add('show');
-            }
-            
-            btnBack.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (document.referrer && document.referrer.includes(window.location.host)) {
-                    window.history.back();
-                } else {
-                    window.location.href = homeUrl;
-                }
-            });
-        })();
-
-
+        // Toast Function
         function showToast(type, message, duration = 4000) {
             const container = document.getElementById('toastContainer');
             
@@ -1338,7 +1341,7 @@
             }, 400);
         }
 
-
+        // AOS Init
         if (window.AOS) {
             AOS.init({ 
                 once: true, 
@@ -1348,8 +1351,7 @@
             });
         }
 
-
-        // 🔍 JavaScript para búsqueda expandible
+        // Search Toggle
         (function() {
             const searchToggle = document.getElementById('searchToggle');
             const searchInput = document.getElementById('searchInput');
@@ -1359,17 +1361,14 @@
             
             let isExpanded = false;
             
-            // Toggle al hacer clic en el botón
             searchToggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 
-                // Si está expandido y hay texto, hacer submit
                 if (isExpanded && searchInput.value.trim()) {
                     searchForm.submit();
                     return;
                 }
                 
-                // Toggle expansión
                 isExpanded = !isExpanded;
                 
                 if (isExpanded) {
@@ -1383,14 +1382,12 @@
                 }
             });
             
-            // Submit al presionar Enter
             searchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && searchInput.value.trim()) {
                     searchForm.submit();
                 }
             });
             
-            // Cerrar al hacer clic fuera
             document.addEventListener('click', function(e) {
                 if (!searchToggle.contains(e.target) && !searchInput.contains(e.target)) {
                     if (isExpanded && !searchInput.value.trim()) {
@@ -1399,6 +1396,26 @@
                         isExpanded = false;
                     }
                 }
+            });
+        })();
+
+        // Scroll to Top Button
+        (function() {
+            const scrollBtn = document.getElementById('scrollToTop');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    scrollBtn.classList.add('show');
+                } else {
+                    scrollBtn.classList.remove('show');
+                }
+            });
+            
+            scrollBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             });
         })();
     </script>

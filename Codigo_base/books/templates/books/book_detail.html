@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-
 {% block title %}{{ book.title }} - Detalle{% endblock %}
-
 
 {% block breadcrumbs %}
 <div class="breadcrumb-container fade-in-up mb-4">
@@ -29,7 +27,6 @@
 </div>
 {% endblock %}
 
-
 {% block content %}
 <div class="container py-5 fade-in-up">
     <div class="row align-items-start g-4">
@@ -41,7 +38,6 @@
                      class="img-fluid rounded-3 shadow-sm book-cover"
                      onerror="this.onerror=null;this.src='https://placehold.co/300x450?text=Sin+Imagen';">
 
-
                 <!-- Badge -->
                 <div class="book-badge">
                     <span class="badge bg-dark text-white">
@@ -51,11 +47,9 @@
             </div>
         </div>
 
-
         <!-- 📄 Detalles del libro -->
         <div class="col-md-8" data-aos="fade-left">
             <h1 class="fw-bold mb-3 book-title">{{ book.title }}</h1>
-
 
             <div class="book-meta mb-4">
                 <div class="meta-item"><i class="bi bi-person"></i><span>Autor(es):</span> {{ book.authors }}</div>
@@ -63,7 +57,6 @@
                 <div class="meta-item"><i class="bi bi-calendar"></i><span>Año:</span> {{ book.publication_date }}</div>
                 <div class="meta-item"><i class="bi bi-people"></i><span>Grupo edad:</span> {{ book.dominant_age_group|default:"No especificado" }}</div>
             </div>
-
 
             <!-- 💰 Precio -->
             <div class="price-section mb-3">
@@ -75,7 +68,6 @@
                     {% endif %}
                 </h3>
             </div>
-
 
             <!-- ⭐ Calificación -->
             <div class="rating-section mb-4">
@@ -93,13 +85,11 @@
                 </div>
             </div>
 
-
             <!-- 📜 Descripción -->
             <div class="book-description mb-4">
                 <h5><i class="bi bi-card-text"></i> Descripción</h5>
                 <p>{{ book.description|default:"No hay descripción disponible para este libro." }}</p>
             </div>
-
 
             <!-- 🛒 Botones principales -->
             <div class="action-buttons d-flex flex-wrap gap-3 mt-4">
@@ -110,7 +100,6 @@
                     </button>
                 </form>
 
-
                 <form action="{% url 'buy_now' book.id %}" method="post" class="flex-fill">
                     {% csrf_token %}
                     <button class="btn btn-main btn-lg w-100">
@@ -119,39 +108,169 @@
                 </form>
             </div>
 
-
             <!-- ❤️ Botones secundarios -->
-            <!-- ❤️ Botones secundarios -->
-<div class="secondary-actions d-flex gap-2 mt-3">
-    <a href="{% url 'toggle_favorite' book.id %}" class="btn btn-outline btn-small">
-        <i class="bi bi-heart-fill"></i> Agregar a Favoritos
-    </a>
-    <button class="btn btn-outline btn-small">
-        <i class="bi bi-share"></i> Compartir
-    </button>
-</div>
-
-
+            <div class="secondary-actions d-flex gap-2 mt-3">
+                <a href="{% url 'toggle_favorite' book.id %}" class="btn btn-outline btn-small">
+                    <i class="bi bi-heart-fill"></i> Agregar a Favoritos
+                </a>
+                <button class="btn btn-outline btn-small">
+                    <i class="bi bi-share"></i> Compartir
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- 🔸 Separador -->
     <hr class="divider-custom my-5">
 
+    <!-- 📝 SECCIÓN DE RESEÑAS -->
+    <section class="reviews-section mt-5">
+        <h3 class="reviews-title">
+            <i class="bi bi-chat-quote-fill me-2"></i>Reseñas de Lectores
+            <span class="reviews-count">({{ reviews.count }})</span>
+        </h3>
 
-    <!-- 📚 Libros relacionados -->
-    <div class="related-books-section" data-aos="fade-up">
-        <h3 class="fw-bold text-center mb-2">
-            <i class="bi bi-stars"></i> Libros relacionados
+        <!-- Formulario para agregar/editar reseña -->
+        {% if user.is_authenticated %}
+        <div class="review-form-card">
+            <h4 class="review-form-title">
+                {% if user_review %}
+                    <i class="bi bi-pencil-fill me-2"></i>Editar tu reseña
+                {% else %}
+                    <i class="bi bi-star-fill me-2"></i>Escribe tu reseña
+                {% endif %}
+            </h4>
+            <form method="post" action="{% url 'add_review' book.id %}">
+                {% csrf_token %}
+                
+                <!-- Rating con estrellas -->
+                <div class="rating-input-group">
+                    <label class="form-label fw-bold">Calificación:</label>
+                    <div class="star-rating-input">
+                        {% for i in "54321" %}
+                        <input type="radio" 
+                               name="rating" 
+                               id="star{{ i }}" 
+                               value="{{ i }}"
+                               {% if user_review and user_review.rating == i|add:0 %}checked{% endif %}
+                               required>
+                        <label for="star{{ i }}" class="star-label">
+                            <i class="bi bi-star-fill"></i>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Comentario -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tu opinión:</label>
+                    <textarea name="comment" 
+                              class="form-control review-textarea" 
+                              rows="4" 
+                              placeholder="Comparte tu experiencia con este libro..."
+                              required>{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+                </div>
+
+                <div class="review-form-actions">
+                    <button type="submit" class="btn-submit-review">
+                        <i class="bi bi-send-fill me-2"></i>
+                        {% if user_review %}Actualizar{% else %}Publicar{% endif %} Reseña
+                    </button>
+                    {% if user_review %}
+                    <a href="{% url 'delete_review' user_review.id %}" 
+                       class="btn-delete-review"
+                       onclick="return confirm('¿Eliminar tu reseña?')">
+                        <i class="bi bi-trash-fill me-2"></i>Eliminar
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="review-login-prompt">
+            <i class="bi bi-lock-fill"></i>
+            <p><a href="{% url 'login' %}">Inicia sesión</a> para dejar tu reseña</p>
+        </div>
+        {% endif %}
+
+        <!-- Lista de reseñas -->
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-user-info">
+                        <div class="review-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div>
+                            <h5 class="review-username">{{ review.user.first_name|default:review.user.username }}</h5>
+                            <p class="review-date">{{ review.created_at|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="review-rating">
+                        {% for i in "12345" %}
+                            {% if i|add:0 <= review.rating %}
+                                <i class="bi bi-star-fill"></i>
+                            {% else %}
+                                <i class="bi bi-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="review-body">
+                    <p class="review-comment">{{ review.comment }}</p>
+                </div>
+                <div class="review-footer">
+                    <button class="btn-helpful" onclick="location.href='{% url 'mark_review_helpful' review.id %}'">
+                        <i class="bi bi-hand-thumbs-up me-1"></i>
+                        Útil ({{ review.helpful_count }})
+                    </button>
+                    {% if review.user == user %}
+                    <span class="review-badge">Tu reseña</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-reviews">
+                <i class="bi bi-chat-quote"></i>
+                <p>Aún no hay reseñas. ¡Sé el primero en opinar!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- 📚 LIBROS SIMILARES -->
+    {% if similar_books %}
+    <section class="similar-books-section mt-5">
+        <h3 class="similar-title">
+            <i class="bi bi-bookmark-star-fill me-2"></i>Libros Similares
         </h3>
         <p class="text-center text-muted mb-4">
-            Descubre más libros que te podrían interesar
+            Basados en tus preferencias y características del libro
         </p>
-        <div class="alert alert-info text-center">
-            <i class="bi bi-clock-history me-2"></i>
-            Próximamente recomendaciones personalizadas basadas en tus intereses
+        <div class="similar-books-grid">
+            {% for similar in similar_books %}
+            <div class="similar-book-card">
+                <a href="{% url 'book_detail' similar.id %}">
+                    <img src="{{ similar.image_url|default:'https://placehold.co/150x200?text=Sin+Imagen' }}"
+                         alt="{{ similar.title }}">
+                </a>
+                <h4 class="similar-book-title">
+                    <a href="{% url 'book_detail' similar.id %}">{{ similar.title|truncatewords:4 }}</a>
+                </h4>
+                <p class="similar-book-rating">
+                    {% if similar.average_rating %}
+                        ⭐ {{ similar.average_rating|floatformat:1 }}
+                    {% else %}
+                        Sin valorar
+                    {% endif %}
+                </p>
+            </div>
+            {% endfor %}
         </div>
-    </div>
+    </section>
+    {% endif %}
 </div>
-
 
 <style>
 /* 🧱 ESTRUCTURA DEL DETALLE (Monocromático) */
@@ -188,7 +307,6 @@
     padding: 5px 0;
 }
 
-
 /* 💰 PRECIO - DESTACADO */
 .price-section {
     background: var(--white);
@@ -204,7 +322,6 @@
     letter-spacing: -0.02em;
 }
 
-
 /* ⭐ RATING - DISCRETO */
 .rating-section {
     padding: 12px 0;
@@ -214,7 +331,6 @@
     font-weight: 600;
     color: var(--black);
 }
-
 
 .book-description {
     background: var(--extra-light-gray);
@@ -234,22 +350,330 @@
     height: 2px;
     background: linear-gradient(90deg, transparent, var(--medium-gray), transparent);
 }
-.related-books-section h3 {
-    color: var(--black);
-}
-.related-books-section .alert {
-    border: 2px dashed var(--medium-gray);
-    background: var(--extra-light-gray);
-    color: var(--black);
-    border-radius: 12px;
-}
 .secondary-actions .btn:hover {
     transform: translateY(-2px);
 }
+
+/* RESEÑAS */
+.reviews-section {
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.reviews-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--black);
+    margin-bottom: 24px;
+}
+
+.reviews-count {
+    color: var(--medium-gray);
+    font-size: 1.2rem;
+}
+
+/* Formulario de reseña */
+.review-form-card {
+    background: var(--extra-light-gray);
+    border: 2px solid var(--light-gray);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.review-form-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 20px;
+}
+
+.star-rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.star-rating-input input[type="radio"] {
+    display: none;
+}
+
+.star-label {
+    font-size: 2rem;
+    color: var(--light-gray);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.star-rating-input input[type="radio"]:checked ~ .star-label,
+.star-rating-input .star-label:hover,
+.star-rating-input .star-label:hover ~ .star-label {
+    color: #ffc107;
+    transform: scale(1.1);
+}
+
+.review-textarea {
+    border: 2px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 12px;
+    transition: border-color 0.2s ease;
+}
+
+.review-textarea:focus {
+    border-color: var(--black);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    outline: none;
+}
+
+.review-form-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-submit-review {
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-submit-review:hover {
+    background: var(--dark-gray);
+    transform: translateY(-2px);
+}
+
+.btn-delete-review {
+    background: #dc3545;
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.btn-delete-review:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+}
+
+/* Lista de reseñas */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.review-card {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.review-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border-color: var(--black);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.review-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.review-avatar {
+    font-size: 2.5rem;
+    color: var(--medium-gray);
+}
+
+.review-username {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--black);
+}
+
+.review-date {
+    font-size: 0.85rem;
+    color: var(--medium-gray);
+    margin: 0;
+}
+
+.review-rating {
+    color: #ffc107;
+    font-size: 1.2rem;
+}
+
+.review-comment {
+    color: var(--black);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--light-gray);
+}
+
+.btn-helpful {
+    background: var(--extra-light-gray);
+    border: 1px solid var(--light-gray);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-helpful:hover {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.review-badge {
+    background: var(--black);
+    color: var(--white);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--medium-gray);
+}
+
+.no-reviews i {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 16px;
+    opacity: 0.3;
+}
+
+.review-login-prompt {
+    background: var(--extra-light-gray);
+    border: 2px dashed var(--light-gray);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.review-login-prompt i {
+    font-size: 3rem;
+    color: var(--medium-gray);
+    display: block;
+    margin-bottom: 12px;
+}
+
+/* LIBROS SIMILARES */
+.similar-books-section {
+    background: var(--extra-light-gray);
+    border: 2px solid var(--light-gray);
+    border-radius: 16px;
+    padding: 32px;
+}
+
+.similar-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--black);
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.similar-books-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.similar-book-card {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.similar-book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    border-color: var(--black);
+}
+
+.similar-book-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.similar-book-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 10px;
+    margin: 0;
+}
+
+.similar-book-title a {
+    color: var(--black);
+    text-decoration: none;
+}
+
+.similar-book-rating {
+    padding: 0 10px 10px;
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--medium-gray);
+}
+
+@media (max-width: 1200px) {
+    .similar-books-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
     .book-title { font-size: 1.6rem; }
     .price-amount { font-size: 2rem; }
     .action-buttons { flex-direction: column; }
+    .similar-books-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .similar-books-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 </style>
 {% endblock %}

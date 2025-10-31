@@ -1,9 +1,14 @@
 from django.db import models
 import numpy as np
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 def get_default_array():
     default_arr = np.random.rand(1536)
     return default_arr.astype(np.float32).tobytes()
+
 
 class Book(models.Model):
     id = models.AutoField(primary_key=True)
@@ -21,12 +26,9 @@ class Book(models.Model):
     embeddings = models.JSONField(null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
-
     def __str__(self):
         return self.title
-    
-from django.contrib.auth.models import User
-from django.utils import timezone
+
 
 # Modelo de Favoritos
 class Favorite(models.Model):
@@ -35,7 +37,7 @@ class Favorite(models.Model):
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'book')  # Un usuario no puede marcar el mismo libro 2 veces
+        unique_together = ('user', 'book')
         ordering = ['-added_at']
 
     def __str__(self):
@@ -68,7 +70,6 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.order_number:
-            # Generar número de orden único
             import uuid
             self.order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
         super().save(*args, **kwargs)
@@ -79,7 +80,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    price = models.DecimalField(max_digits=10, decimal_places=2)  # Precio al momento de la compra
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.quantity}x {self.book.title}"
@@ -107,3 +108,24 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Perfil de {self.user.username}"
+
+
+# 🆕 Modelo de Reseñas
+class Review(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Calificación de 1 a 5 estrellas"
+    )
+    comment = models.TextField(max_length=1000, help_text="Tu opinión sobre el libro")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    helpful_count = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('book', 'user')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.book.title} ({self.rating}⭐)"
