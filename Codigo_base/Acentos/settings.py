@@ -12,7 +12,7 @@ load_dotenv(os.path.join(BASE_DIR, "openAI.env"))
 
 SECRET_KEY = 'django-insecure-reemplaza-esto-por-una-clave-real'
 DEBUG = True
-ALLOWED_HOSTS = ['44.202.88.146', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['3.81.229.122', 'localhost', '127.0.0.1']
 
 # ===============================================
 # 📦 APLICACIONES
