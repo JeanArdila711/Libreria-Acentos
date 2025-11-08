@@ -6,6 +6,7 @@ from django.views.generic import TemplateView, ListView
 from django.db.models import Q, Count
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from openai import OpenAI
 import numpy as np
 import os
@@ -21,7 +22,7 @@ from .models import Book
 # -------------------------------------------------------
 # 🔧 CONFIGURACIÓN OPENAI
 # -------------------------------------------------------
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'openAI.env'))
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 def get_openai_client():
     """Inicializa el cliente de OpenAI usando la API Key del entorno."""
@@ -1041,5 +1042,235 @@ def personalized_recommendations_view(request):
     }
     
     return render(request, 'books/personalized_recommendations.html', context)
+
+
+# ==========================================
+# 🛒 CHECKOUT - PROCESO DE PAGO
+# ==========================================
+@login_required
+def checkout_view(request):
+    """Vista de checkout donde el usuario ingresa dirección de envío"""
+    cart = request.session.get('cart', {})
+
+    if not cart:
+        messages.error(request, "Tu carrito está vacío")
+        return redirect('cart_view')
+
+    # Calcular items del carrito
+    cart_items = []
+    total = 0
+
+    for book_id_str, qty in cart.items():
+        try:
+            qty = int(qty)
+            book = Book.objects.get(pk=int(book_id_str))
+            price = float(book.precio or 0)
+            subtotal = price * qty
+            total += subtotal
+
+            cart_items.append({
+                'book': book,
+                'quantity': qty,
+                'price': price,
+                'subtotal': subtotal
+            })
+        except (Book.DoesNotExist, ValueError):
+            continue
+
+    if request.method == 'POST':
+        # Obtener todos los campos del formulario
+        nombre = request.POST.get('nombre', '').strip()
+        apellidos = request.POST.get('apellidos', '').strip()
+        cedula = request.POST.get('cedula', '').strip()
+        direccion = request.POST.get('direccion', '').strip()
+        apartamento = request.POST.get('apartamento', '').strip()
+        ciudad = request.POST.get('ciudad', '').strip()
+        provincia = request.POST.get('provincia', '').strip()
+        codigo_postal = request.POST.get('codigo_postal', '').strip()
+        telefono = request.POST.get('telefono', '').strip()
+        pais = request.POST.get('pais', 'Colombia')
+
+        # Validar campos requeridos
+        if not all([nombre, apellidos, cedula, direccion, ciudad, provincia, telefono]):
+            messages.error(request, "Por favor completa todos los campos requeridos")
+            return render(request, 'books/checkout.html', {
+                'cart_items': cart_items,
+                'total': total
+            })
+
+        # Construir dirección completa
+        shipping_address = f"{nombre} {apellidos}\nCC: {cedula}\n{direccion}"
+        if apartamento:
+            shipping_address += f", {apartamento}"
+        shipping_address += f"\n{ciudad}, {provincia}"
+        if codigo_postal:
+            shipping_address += f" - {codigo_postal}"
+        shipping_address += f"\n{pais}\nTel: {telefono}"
+
+        # Guardar dirección en la sesión
+        request.session['shipping_address'] = shipping_address
+        request.session.modified = True
+
+        # Redirigir a la página de selección de método de pago
+        return redirect('payment_method')
+
+    context = {
+        'cart_items': cart_items,
+        'total': total
+    }
+
+    return render(request, 'books/checkout.html', context)
+
+
+@login_required
+def payment_method_view(request):
+    """Vista de selección de método de pago"""
+    cart = request.session.get('cart', {})
+    shipping_address = request.session.get('shipping_address', '')
+
+    if not cart:
+        messages.error(request, "Tu carrito está vacío")
+        return redirect('cart_view')
+
+    if not shipping_address:
+        messages.error(request, "Por favor completa primero la información de envío")
+        return redirect('checkout')
+
+    # Calcular total del carrito
+    cart_items = []
+    total = 0
+
+    for book_id_str, qty in cart.items():
+        try:
+            qty = int(qty)
+            book = Book.objects.get(pk=int(book_id_str))
+            price = float(book.precio or 0)
+            subtotal = price * qty
+            total += subtotal
+
+            cart_items.append({
+                'book': book,
+                'quantity': qty,
+                'price': price,
+                'subtotal': subtotal
+            })
+        except (Book.DoesNotExist, ValueError):
+            continue
+
+    if request.method == 'POST':
+        payment_method = request.POST.get('payment_method')
+
+        if not payment_method:
+            messages.error(request, "Por favor selecciona un método de pago")
+            return render(request, 'books/payment_method.html', {
+                'cart_items': cart_items,
+                'total': total,
+                'payment_methods': Order.PAYMENT_METHOD_CHOICES
+            })
+
+        # Redirigir a la página de procesamiento de pago
+        return redirect('process_payment', payment_method=payment_method)
+
+    context = {
+        'cart_items': cart_items,
+        'total': total,
+        'payment_methods': Order.PAYMENT_METHOD_CHOICES,
+        'shipping_address': shipping_address
+    }
+
+    return render(request, 'books/payment_method.html', context)
+
+
+@login_required
+def process_payment_view(request, payment_method):
+    """Vista de procesamiento de pago"""
+    cart = request.session.get('cart', {})
+    shipping_address = request.session.get('shipping_address', '')
+
+    if not cart:
+        messages.error(request, "Tu carrito está vacío")
+        return redirect('cart_view')
+
+    if not shipping_address:
+        messages.error(request, "Por favor completa primero la información de envío")
+        return redirect('checkout')
+
+    # Calcular items y total
+    order_items_data = []
+    total = 0
+
+    for book_id_str, qty in cart.items():
+        try:
+            qty = int(qty)
+            book = Book.objects.get(pk=int(book_id_str))
+            price = float(book.precio or 0)
+            subtotal = price * qty
+            total += subtotal
+
+            order_items_data.append({
+                'book': book,
+                'quantity': qty,
+                'price': price
+            })
+        except (Book.DoesNotExist, ValueError):
+            continue
+
+    if request.method == 'POST':
+        # Aquí se procesaría el pago con la pasarela real
+        # Por ahora simularemos el procesamiento
+
+        import uuid
+        transaction_id = f"TXN-{uuid.uuid4().hex[:12].upper()}"
+
+        # Crear pedido
+        order = Order.objects.create(
+            user=request.user,
+            total_price=total,
+            shipping_address=shipping_address,
+            payment_method=payment_method,
+            payment_status='completed',
+            transaction_id=transaction_id,
+            paid_at=timezone.now()
+        )
+
+        # Crear items del pedido
+        for item_data in order_items_data:
+            OrderItem.objects.create(
+                order=order,
+                book=item_data['book'],
+                quantity=item_data['quantity'],
+                price=item_data['price']
+            )
+
+        # Limpiar carrito y sesión
+        request.session['cart'] = {}
+        if 'shipping_address' in request.session:
+            del request.session['shipping_address']
+        request.session.modified = True
+
+        messages.success(request, f"✓ ¡Pago procesado exitosamente! Pedido #{order.order_number}")
+        return redirect('payment_success', order_id=order.id)
+
+    # Mostrar formulario de pago según el método seleccionado
+    context = {
+        'payment_method': payment_method,
+        'payment_method_display': dict(Order.PAYMENT_METHOD_CHOICES).get(payment_method, payment_method),
+        'total': total,
+        'shipping_address': shipping_address
+    }
+
+    return render(request, 'books/process_payment.html', context)
+
+
+@login_required
+def payment_success_view(request, order_id):
+    """Vista de confirmación de pago exitoso"""
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    context = {
+        'order': order
+    }
+
+    return render(request, 'books/payment_success.html', context)
 
 

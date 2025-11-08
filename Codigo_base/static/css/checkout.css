@@ -1,0 +1,303 @@
+/* ==========================================
+   ESTILOS PARA PROCESO DE CHECKOUT Y PAGO
+   ========================================== */
+
+/* Indicador de Progreso del Checkout */
+.checkout-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.step-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border: 3px solid #e9ecef;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.progress-step.active .step-circle {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-step.completed .step-circle {
+    background: #28a745;
+    color: #fff;
+    border-color: #28a745;
+}
+
+.step-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6c757d;
+    text-align: center;
+}
+
+.progress-step.active .step-label {
+    color: #000;
+    font-weight: 600;
+}
+
+.progress-step.completed .step-label {
+    color: #28a745;
+}
+
+.progress-line {
+    width: 100px;
+    height: 3px;
+    background: #e9ecef;
+    position: relative;
+    top: -20px;
+}
+
+.progress-line.completed {
+    background: #28a745;
+}
+
+/* Resumen del Pedido */
+.order-summary {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.order-item {
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-item h6 {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.4;
+}
+
+/* Métodos de Pago */
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.payment-option {
+    cursor: pointer;
+    margin: 0;
+}
+
+.payment-option input[type="radio"] {
+    display: none;
+}
+
+.payment-card {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    background: #fff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.payment-card:hover {
+    border-color: #000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.payment-option input[type="radio"]:checked + .payment-card {
+    border-color: #000;
+    background: #f8f9fa;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.payment-icon {
+    font-size: 2.5rem;
+    color: #495057;
+    transition: color 0.3s ease;
+}
+
+.payment-option input[type="radio"]:checked + .payment-card .payment-icon {
+    color: #000;
+}
+
+.payment-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.payment-checkmark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    color: #28a745;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.payment-option input[type="radio"]:checked + .payment-card .payment-checkmark {
+    opacity: 1;
+}
+
+/* Icono de pago grande */
+.payment-icon-large i {
+    font-size: 4rem;
+    color: #000;
+}
+
+/* Página de éxito */
+.success-icon i {
+    font-size: 5rem;
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.order-details-box {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 16px;
+    border: 2px solid #e9ecef;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.detail-item {
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+}
+
+/* Inputs del formulario de pago */
+.form-control:focus {
+    border-color: #000;
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+}
+
+/* Tarjetas con altura uniforme */
+.card {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Botones personalizados */
+.btn-dark {
+    background-color: #000;
+    border-color: #000;
+}
+
+.btn-dark:hover {
+    background-color: #333;
+    border-color: #333;
+}
+
+/* Alertas */
+.alert {
+    border-radius: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .checkout-progress {
+        gap: 5px;
+    }
+
+    .progress-line {
+        width: 50px;
+    }
+
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+
+    .step-label {
+        font-size: 0.75rem;
+    }
+
+    .payment-methods {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-card {
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: left;
+    }
+
+    .payment-icon {
+        font-size: 2rem;
+    }
+}
+
+/* Animaciones */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

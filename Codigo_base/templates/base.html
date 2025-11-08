@@ -128,9 +128,9 @@
     }
 
     .user-dropdown {
-        position: absolute;
-        top: calc(100% + 12px);
-        right: 0;
+        position: fixed;
+        top: 130px;
+        right: 20px;
         min-width: 260px;
         background: var(--white);
         border-radius: 12px;
@@ -139,7 +139,7 @@
         visibility: hidden;
         transform: translateY(-10px);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 2000;
+        z-index: 10500;
         overflow: hidden;
         border: 1px solid var(--light-gray);
     }

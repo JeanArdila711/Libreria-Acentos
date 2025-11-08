@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Método de Pago - {{ app_name }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Indicador de progreso -->
+            <div class="checkout-progress mb-5">
+                <div class="progress-step completed">
+                    <div class="step-circle"><i class="bi bi-check"></i></div>
+                    <div class="step-label">Dirección</div>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step active">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Pago</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Confirmación</div>
+                </div>
+            </div>
+
+            <h2 class="text-center mb-4 fw-bold">Selecciona tu Método de Pago</h2>
+
+            <div class="row">
+                <!-- Métodos de pago -->
+                <div class="col-lg-7 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-4">Método de Pago</h5>
+
+                            <form method="POST">
+                                {% csrf_token %}
+
+                                <div class="payment-methods">
+                                    {% for value, label in payment_methods %}
+                                    <label class="payment-option">
+                                        <input type="radio" name="payment_method" value="{{ value }}" required>
+                                        <div class="payment-card">
+                                            <div class="payment-icon">
+                                                {% if value == 'tarjeta_credito' %}
+                                                    <i class="bi bi-credit-card-2-front"></i>
+                                                {% elif value == 'tarjeta_debito' %}
+                                                    <i class="bi bi-credit-card"></i>
+                                                {% elif value == 'pse' %}
+                                                    <i class="bi bi-bank"></i>
+                                                {% elif value == 'efectivo' %}
+                                                    <i class="bi bi-cash-stack"></i>
+                                                {% elif value == 'nequi' %}
+                                                    <i class="bi bi-phone"></i>
+                                                {% elif value == 'daviplata' %}
+                                                    <i class="bi bi-wallet2"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="payment-label">{{ label }}</div>
+                                            <div class="payment-checkmark">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                            </div>
+                                        </div>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mt-4">
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Todos los pagos son procesados de forma segura
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-dark btn-lg">
+                                        Continuar al Pago
+                                        <i class="bi bi-arrow-right ms-2"></i>
+                                    </button>
+                                    <a href="{% url 'checkout' %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left me-2"></i>
+                                        Volver
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen del pedido -->
+                <div class="col-lg-5">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-4">Resumen del Pedido</h5>
+
+                            <div class="order-summary">
+                                {% for item in cart_items %}
+                                <div class="order-item mb-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ item.book.title }}</h6>
+                                            <small class="text-muted">Cantidad: {{ item.quantity }}</small>
+                                        </div>
+                                        <div class="text-end ms-2">
+                                            <span class="fw-semibold">${{ item.subtotal|floatformat:0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+
+                                <hr>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Subtotal:</span>
+                                    <span class="fw-semibold">${{ total|floatformat:0 }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Envío:</span>
+                                    <span class="text-success fw-semibold">GRATIS</span>
+                                </div>
+
+                                <hr class="my-3">
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="h5 mb-0">Total:</span>
+                                    <span class="h5 mb-0 fw-bold text-dark">${{ total|floatformat:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <h6 class="card-title mb-3">Dirección de Envío</h6>
+                            <p class="mb-0 text-muted small">{{ shipping_address }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

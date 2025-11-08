@@ -1,11 +1,12 @@
 from django.urls import path
 from .views import (
-    HomePageView, AboutPageView, BookListView, BookSearchView, 
+    HomePageView, AboutPageView, BookListView, BookSearchView,
     statistics_view, promociones_view, recommend_book, filter_options_ajax,
     book_detail, add_to_cart, buy_now, cart_view,
-    UserProfileView, edit_profile, my_orders, order_detail, 
+    UserProfileView, edit_profile, my_orders, order_detail,
     my_favorites, toggle_favorite, user_statistics, user_settings,
-    create_order_from_cart, Top100BooksView
+    create_order_from_cart, Top100BooksView,
+    checkout_view, payment_method_view, process_payment_view, payment_success_view
 )
 from .ia_api import ia_book_synopsis
 from . import views
@@ -33,6 +34,12 @@ urlpatterns = [
     path('cart/remove/<int:book_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/clear/', views.clear_cart, name='clear_cart'),
     path('cart/checkout/', create_order_from_cart, name='create_order'),
+
+    # Proceso de pago
+    path('checkout/', checkout_view, name='checkout'),
+    path('checkout/payment-method/', payment_method_view, name='payment_method'),
+    path('checkout/process/<str:payment_method>/', process_payment_view, name='process_payment'),
+    path('checkout/success/<int:order_id>/', payment_success_view, name='payment_success'),
     
     # 🆕 PERFIL DE USUARIO
     path('perfil/', UserProfileView.as_view(), name='user_profile'),

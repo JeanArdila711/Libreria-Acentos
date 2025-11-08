@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Procesamiento de Pago - {{ app_name }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="payment-icon-large mb-3">
+                            {% if payment_method == 'tarjeta_credito' or payment_method == 'tarjeta_debito' %}
+                                <i class="bi bi-credit-card-2-front text-dark"></i>
+                            {% elif payment_method == 'pse' %}
+                                <i class="bi bi-bank text-dark"></i>
+                            {% elif payment_method == 'efectivo' %}
+                                <i class="bi bi-cash-stack text-dark"></i>
+                            {% elif payment_method == 'nequi' %}
+                                <i class="bi bi-phone text-dark"></i>
+                            {% elif payment_method == 'daviplata' %}
+                                <i class="bi bi-wallet2 text-dark"></i>
+                            {% endif %}
+                        </div>
+                        <h3 class="mb-2 text-dark">Pago con {{ payment_method_display }}</h3>
+                        <p class="text-dark">Total a pagar: <strong class="text-dark">${{ total|floatformat:0 }}</strong></p>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {% if payment_method == 'tarjeta_credito' or payment_method == 'tarjeta_debito' %}
+                        <!-- Formulario de tarjeta -->
+                        <div class="mb-3">
+                            <label for="card_number" class="form-label fw-semibold text-dark">Número de Tarjeta</label>
+                            <input type="text" class="form-control" id="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="card_name" class="form-label fw-semibold text-dark">Nombre en la Tarjeta</label>
+                                <input type="text" class="form-control" id="card_name" placeholder="NOMBRE APELLIDO" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="expiry" class="form-label fw-semibold text-dark">Expiración</label>
+                                <input type="text" class="form-control" id="expiry" placeholder="MM/AA" maxlength="5" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="cvv" class="form-label fw-semibold text-dark">CVV</label>
+                                <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+
+                        {% elif payment_method == 'pse' %}
+                        <!-- Formulario PSE -->
+                        <div class="mb-3">
+                            <label for="bank" class="form-label fw-semibold text-dark">Selecciona tu Banco</label>
+                            <select class="form-select" id="bank" required>
+                                <option value="">Selecciona un banco</option>
+                                <option value="bancolombia">Bancolombia</option>
+                                <option value="davivienda">Davivienda</option>
+                                <option value="banco_bogota">Banco de Bogotá</option>
+                                <option value="bbva">BBVA</option>
+                                <option value="colpatria">Scotiabank Colpatria</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="person_type" class="form-label fw-semibold text-dark">Tipo de Persona</label>
+                            <select class="form-select" id="person_type" required>
+                                <option value="">Selecciona</option>
+                                <option value="natural">Persona Natural</option>
+                                <option value="juridica">Persona Jurídica</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="document" class="form-label fw-semibold text-dark">Número de Documento</label>
+                            <input type="text" class="form-control" id="document" placeholder="123456789" required>
+                        </div>
+
+                        {% elif payment_method == 'nequi' or payment_method == 'daviplata' %}
+                        <!-- Formulario billetera digital -->
+                        <div class="mb-3">
+                            <label for="phone" class="form-label fw-semibold text-dark">Número de Celular</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="3001234567" maxlength="10" required>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Recibirás una notificación push en tu celular para aprobar el pago
+                        </div>
+
+                        {% elif payment_method == 'efectivo' %}
+                        <!-- Pago en efectivo -->
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Pago Contra Entrega</strong>
+                            <p class="mb-0 mt-2">El pago se realizará en efectivo al momento de recibir tu pedido.</p>
+                        </div>
+
+                        {% endif %}
+
+                        <div class="mt-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <input type="checkbox" class="form-check-input me-2" id="terms" required>
+                                <label class="form-check-label small" for="terms">
+                                    Acepto los <a href="#">términos y condiciones</a> y la <a href="#">política de privacidad</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-lock-fill me-2"></i>
+                                Confirmar Pago - ${{ total|floatformat:0 }}
+                            </button>
+                            <a href="{% url 'payment_method' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Cambiar Método de Pago
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Tus datos están protegidos con encriptación SSL
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Formato automático para número de tarjeta
+document.getElementById('card_number')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+    e.target.value = formattedValue;
+});
+
+// Formato automático para fecha de expiración
+document.getElementById('expiry')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+    e.target.value = value;
+});
+
+// Solo números para CVV
+document.getElementById('cvv')?.addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '');
+});
+</script>
+{% endblock %}

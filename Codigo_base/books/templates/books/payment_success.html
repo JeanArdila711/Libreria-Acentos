@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pago Exitoso - {{ app_name }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Indicador de progreso -->
+            <div class="checkout-progress mb-5">
+                <div class="progress-step completed">
+                    <div class="step-circle"><i class="bi bi-check"></i></div>
+                    <div class="step-label">Dirección</div>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step completed">
+                    <div class="step-circle"><i class="bi bi-check"></i></div>
+                    <div class="step-label">Pago</div>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step completed">
+                    <div class="step-circle"><i class="bi bi-check"></i></div>
+                    <div class="step-label">Confirmación</div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-5 text-center">
+                    <!-- Icono de éxito -->
+                    <div class="success-icon mb-4">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                    </div>
+
+                    <h1 class="mb-3 fw-bold text-dark">¡Gracias por tu Compra{{ request.user.first_name|default:"" }}{% if request.user.first_name %}, {{ request.user.first_name }}{% endif %}!</h1>
+                    <p class="text-dark fs-5 mb-4">
+                        Tu pedido ha sido confirmado exitosamente
+                    </p>
+                    <div class="alert alert-success border-0 shadow-sm mb-4">
+                        <h5 class="alert-heading text-dark mb-2">
+                            <i class="bi bi-envelope-check me-2"></i>Revisa tu Correo Electrónico
+                        </h5>
+                        <p class="mb-0 text-dark">
+                            Te hemos enviado un correo de confirmación a <strong>{{ request.user.email }}</strong> con todos los detalles de tu pedido y el seguimiento del envío.
+                        </p>
+                    </div>
+
+                    <div class="order-details-box p-4 mb-4">
+                        <h5 class="text-dark fw-bold mb-4 text-start">
+                            <i class="bi bi-receipt me-2"></i>Detalles de tu Pedido
+                        </h5>
+                        <div class="row text-start">
+                            <div class="col-md-6 mb-4">
+                                <div class="detail-item">
+                                    <small class="text-muted d-block mb-1">
+                                        <i class="bi bi-hash me-1"></i>Número de Pedido
+                                    </small>
+                                    <strong class="fs-5 text-dark">{{ order.order_number }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="detail-item">
+                                    <small class="text-muted d-block mb-1">
+                                        <i class="bi bi-calendar me-1"></i>Fecha
+                                    </small>
+                                    <strong class="text-dark">{{ order.created_at|date:"d/m/Y H:i" }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="detail-item">
+                                    <small class="text-muted d-block mb-1">
+                                        <i class="bi bi-cash me-1"></i>Total Pagado
+                                    </small>
+                                    <strong class="text-success fs-4">${{ order.total_price|floatformat:0 }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="detail-item">
+                                    <small class="text-muted d-block mb-1">
+                                        <i class="bi bi-credit-card me-1"></i>Método de Pago
+                                    </small>
+                                    <strong class="text-dark">{{ order.get_payment_method_display }}</strong>
+                                </div>
+                            </div>
+                            {% if order.transaction_id %}
+                            <div class="col-12 mb-4">
+                                <div class="detail-item">
+                                    <small class="text-muted d-block mb-1">
+                                        <i class="bi bi-key me-1"></i>ID de Transacción
+                                    </small>
+                                    <code class="bg-light p-2 rounded text-dark d-inline-block">{{ order.transaction_id }}</code>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="col-12">
+                                <div class="detail-item">
+                                    <small class="text-muted d-block mb-2">
+                                        <i class="bi bi-geo-alt me-1"></i>Dirección de Envío
+                                    </small>
+                                    <div class="bg-white p-3 rounded border">
+                                        <p class="mb-0 text-dark" style="white-space: pre-line;">{{ order.shipping_address }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{% url 'order_detail' order.id %}" class="btn btn-dark btn-lg">
+                            <i class="bi bi-receipt me-2"></i>
+                            Ver Detalles del Pedido
+                        </a>
+                        <a href="{% url 'my_orders' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-box-seam me-2"></i>
+                            Mis Pedidos
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-house me-2"></i>
+                            Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="row mt-4">
+                <div class="col-md-4 text-center mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="bi bi-truck fs-2 text-primary mb-2"></i>
+                            <h6 class="fw-semibold">Envío Gratis</h6>
+                            <small class="text-muted">Entrega en 3-5 días hábiles</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="bi bi-shield-check fs-2 text-success mb-2"></i>
+                            <h6 class="fw-semibold">Compra Segura</h6>
+                            <small class="text-muted">Tus datos están protegidos</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="bi bi-headset fs-2 text-info mb-2"></i>
+                            <h6 class="fw-semibold">Soporte 24/7</h6>
+                            <small class="text-muted">Estamos aquí para ayudarte</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.success-icon i {
+    font-size: 5rem;
+}
+
+.order-details-box {
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+}
+</style>
+{% endblock %}

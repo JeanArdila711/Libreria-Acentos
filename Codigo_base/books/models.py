@@ -54,6 +54,22 @@ class Order(models.Model):
         ('cancelled', 'Cancelado'),
     ]
 
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pendiente'),
+        ('completed', 'Completado'),
+        ('failed', 'Fallido'),
+        ('refunded', 'Reembolsado'),
+    ]
+
+    PAYMENT_METHOD_CHOICES = [
+        ('tarjeta_credito', 'Tarjeta de Crédito'),
+        ('tarjeta_debito', 'Tarjeta de Débito'),
+        ('pse', 'PSE'),
+        ('efectivo', 'Efectivo'),
+        ('nequi', 'Nequi'),
+        ('daviplata', 'Daviplata'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     order_number = models.CharField(max_length=100, unique=True, editable=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -61,6 +77,12 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     shipping_address = models.TextField(blank=True, null=True)
+
+    # Campos de pago
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, blank=True, null=True)
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+    transaction_id = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-created_at']

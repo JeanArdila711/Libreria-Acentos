@@ -28,6 +28,15 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Labels de los formularios */
+.auth-card .form-label {
+    color: #333333;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 0.95rem;
+}
+
 /* Inputs más elegantes */
 .auth-card input {
     border-radius: 10px;
@@ -81,5 +90,21 @@
     color: #007bff;
     text-decoration: none;
     font-weight: 500;
+}
+
+/* Texto de ayuda (como las instrucciones de contraseña) */
+.auth-card .form-text {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+.auth-card .form-text ul {
+    padding-left: 20px;
+    margin-top: 5px;
+}
+
+.auth-card .form-text li {
+    margin-bottom: 3px;
 }
 
