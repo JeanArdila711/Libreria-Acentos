@@ -12,7 +12,7 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = 'django-insecure-reemplaza-esto-por-una-clave-real'
 DEBUG = True
-ALLOWED_HOSTS = ['3.81.229.122', 'localhost', '127.0.0.1', '98.81.152.68']
+ALLOWED_HOSTS = ['3.81.229.122', 'localhost', '127.0.0.1', '98.81.152.68', '54.91.75.140']
 
 # ===============================================
 # 📦 APLICACIONES
