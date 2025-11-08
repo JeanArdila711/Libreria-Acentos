@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Recomendaciones personalizadas</h2>
+
+    {% if recommendations %}
+        <div class="row">
+            {% for book in recommendations %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            <p class="card-text">{{ book.description|truncatewords:20 }}</p>
+                            <a href="{% url 'book_detail' book.id %}" class="btn btn-dark">Ver detalle</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No hay recomendaciones disponibles en este momento.</p>
+    {% endif %}
+</div>
+{% endblock %}
